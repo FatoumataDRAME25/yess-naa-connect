@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion — Espace Transformatrice | Riz Local</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'yn-green-dark': '#1A3A0A',
+                        'yn-green': '#2D5A16',
+                        'yn-gray': '#6B7280',
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-heading { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex items-center justify-center">
+
+    <div class="w-full max-w-md bg-white rounded-[20px] shadow-xl shadow-black/5 p-10">
+
+        <!-- Logo + titre -->
+        <div class="text-center mb-8">
+            <p class="font-heading font-extrabold text-lg mb-4">
+                <span class="text-yn-green-dark">Riz</span>
+                <span class="text-yn-green">Local</span>
+            </p>
+            <h1 class="font-heading font-bold text-2xl text-yn-green-dark mb-1">Espace Administrateur</h1>
+            <p class="text-yn-gray text-sm">Accès réservé à l'administration</p>
+        </div>
+
+        {% if form.errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-6">
+            Identifiant ou mot de passe incorrect.
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'admin_transformatrice:admin_login' %}" class="space-y-5">
+            {% csrf_token %}
+
+            <!-- Identifiant -->
+            <div>
+                <label class="block text-xs font-semibold text-yn-gray tracking-wide mb-2">
+                    UTILISATEUR / TÉLÉPHONE
+                </label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a4 4 0 100 8 4 4 0 000-8zM3 18a7 7 0 0114 0H3z"/></svg>
+                    </span>
+                    <input type="text" name="username" placeholder="Identifiant" required
+                           class="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm
+                                  focus:outline-none focus:ring-2 focus:ring-yn-green focus:border-transparent">
+                </div>
+            </div>
+
+            <!-- Mot de passe -->
+            <div>
+                <label class="block text-xs font-semibold text-yn-gray tracking-wide mb-2">
+                    MOT DE PASSE
+                </label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+                    </span>
+                    <input type="password" name="password" id="password" placeholder="••••••••" required
+                           class="w-full pl-11 pr-11 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm
+                                  focus:outline-none focus:ring-2 focus:ring-yn-green focus:border-transparent">
+                    <button type="button" onclick="togglePassword()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Se souvenir de moi -->
+            <div class="flex items-center gap-2">
+                <input type="checkbox" name="remember_me" id="remember_me"
+                       class="w-4 h-4 rounded border-gray-300 text-yn-green focus:ring-yn-green">
+                <label for="remember_me" class="text-sm text-gray-700">Se souvenir de moi</label>
+            </div>
+
+            <!-- Bouton -->
+            <button type="submit"
+                    class="w-full bg-yn-green-dark hover:bg-yn-green-dark/90 text-white font-semibold
+                           py-3.5 rounded-xl transition shadow-sm">
+                Se connecter
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="#" class="text-sm font-semibold text-yn-green hover:text-yn-green-dark transition">
+                Mot de passe oublié ?
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('password');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+
+</body>
+</html>

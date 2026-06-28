@@ -1,0 +1,292 @@
+{% extends "admin/base.html" %}
+{% block title %}Stocks Producteurs — Riz Local{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="flex items-start justify-between mb-8">
+    <div>
+        <h1 class="font-heading font-bold text-2xl text-yn-green-dark">Stocks des Producteurs</h1>
+        <p class="text-yn-gray text-sm mt-1">Consultez les récoltes disponibles et commandez du riz paddy</p>
+    </div>
+
+    <div class="flex items-center gap-2 bg-yn-green-pale text-yn-green-dark text-sm font-semibold px-5 py-3 rounded-full">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10A8 8 0 11-2 10a8 8 0 0120 0zM9 8a1 1 0 112 0v4a1 1 0 11-2 0V8zm1-3a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/></svg>
+        Stock total disponible : <span class="font-bold">{{ stock_total_kg|default:"2 500" }} kg</span> chez {{ nb_producteurs|default:18 }} producteurs
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="flex items-center gap-4 mb-8">
+    <div class="relative flex-1 max-w-md">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </span>
+        <input type="text" name="q" placeholder="Rechercher un producteur..."
+               class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm
+                      focus:outline-none focus:ring-2 focus:ring-yn-green focus:border-transparent">
+    </div>
+
+    <select name="region" class="bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yn-green">
+        <option>Région (Toutes)</option>
+        {% for region in regions %}<option value="{{ region }}">{{ region }}</option>{% endfor %}
+    </select>
+
+    <select name="variete" class="bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yn-green">
+        <option>Variété (Toutes)</option>
+        {% for variete in varietes %}<option value="{{ variete }}">{{ variete }}</option>{% endfor %}
+    </select>
+
+    <button class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 text-gray-700 hover:bg-gray-50">
+        Plus récent
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h5m6-8l4 16m0 0l-4-4m4 4l4-4"/></svg>
+    </button>
+</div>
+
+<!-- Grille des stocks -->
+<div class="grid grid-cols-3 gap-6">
+    {% for stock in stocks_producteurs %}
+    <div class="bg-white rounded-[20px] shadow-sm shadow-black/5 overflow-hidden flex flex-col">
+
+        <!-- Photo + badge variété -->
+        <div class="relative h-48">
+            <img src="{{ stock.photo_url }}" alt="{{ stock.variete }}" class="w-full h-full object-cover">
+            <span class="absolute top-3 left-3 bg-white/95 text-yn-green-dark text-xs font-bold px-3 py-1.5 rounded-lg">
+                VARIÉTÉ : {{ stock.variete|upper }}
+            </span>
+        </div>
+
+        <div class="p-5 flex flex-col flex-1">
+            <!-- Producteur -->
+            <div class="flex items-center gap-3 mb-4">
+                <img src="{{ stock.producteur.photo_url }}" class="w-10 h-10 rounded-full object-cover" alt="{{ stock.producteur.nom }}">
+                <div>
+                    <p class="font-bold text-gray-800">{{ stock.producteur.nom }}</p>
+                    <p class="text-xs text-yn-gray flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18s6-5.686 6-10A6 6 0 008 8 6 6 0 004 8c0 4.314 6 10 6 10z" clip-rule="evenodd"/></svg>
+                        {{ stock.producteur.region }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quantité / prix -->
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-xs text-yn-gray uppercase font-semibold mb-1">Quantité</p>
+                    <p class="font-bold text-yn-green-dark text-lg">{{ stock.quantite_kg }} kg</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-yn-gray uppercase font-semibold mb-1">Prix/kg</p>
+                    <p class="font-bold text-yn-gold text-lg">{{ stock.prix_kg }} FCFA</p>
+                </div>
+            </div>
+
+            <p class="text-xs text-yn-gray flex items-center gap-1.5 mb-4">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                Récolté le : {{ stock.date_recolte|date:"d M Y" }}
+            </p>
+
+            <button type="button"
+                    onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.nom }}', {{ stock.quantite_kg }}, {{ stock.prix_kg }})"
+                    class="mt-auto w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark
+                           text-white font-semibold py-3 rounded-xl transition">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/></svg>
+                Commander ce paddy
+            </button>
+        </div>
+    </div>
+    {% empty %}
+    <p class="col-span-3 text-center text-yn-gray py-12">Aucun stock producteur disponible pour le moment.</p>
+    {% endfor %}
+</div>
+
+<!-- ============ MODAL : Commander ce paddy ============ -->
+<div id="orderModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-[20px] w-full max-w-md p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-1">
+            <h3 class="font-heading font-bold text-lg text-yn-green-dark">Commander du paddy</h3>
+            <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <p class="text-sm text-yn-gray mb-5">Producteur : <span id="modal-producteur" class="font-semibold text-gray-800"></span></p>
+
+        <form method="post" action="{% url 'admin_transformatrice:admin_commander_paddy' %}">
+            {% csrf_token %}
+            <input type="hidden" name="stock_id" id="modal-stock-id">
+            <input type="hidden" name="prix_kg" id="modal-prix-kg">
+            <input type="hidden" name="producteur_nom" id="modal-producteur-nom">
+
+            <div class="bg-yn-green-pale rounded-xl px-4 py-3 flex items-center justify-between mb-5">
+                <span class="flex items-center gap-2 text-sm text-yn-green-dark font-semibold">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2L3 6v8l7 4 7-4V6l-7-4z"/></svg>
+                    Stock disponible
+                </span>
+                <span id="modal-stock-dispo" class="font-bold text-yn-green-dark"></span>
+            </div>
+
+            <label class="block text-xs font-semibold text-yn-gray uppercase mb-2">Quantité à commander (kg)</label>
+            <div class="flex items-center gap-3 mb-1">
+                <button type="button" onclick="adjustQty(-50)" class="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-lg">−</button>
+                <input type="number" name="quantite_kg" id="modal-qty" value="100" min="50" step="50"
+                       class="flex-1 text-center font-bold text-lg py-3 border border-gray-200 rounded-xl">
+                <button type="button" onclick="adjustQty(50)" class="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-lg">+</button>
+            </div>
+            <p id="modal-max" class="text-xs text-yn-gray mb-5"></p>
+
+            <label class="block text-xs font-semibold text-yn-gray uppercase mb-2">Date de livraison prévue</label>
+            <input type="date" name="date_livraison" required
+                   class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm mb-5 focus:outline-none focus:ring-2 focus:ring-yn-green">
+
+            <label class="block text-xs font-semibold text-yn-gray uppercase mb-2">Note (facultatif)</label>
+            <textarea name="note" rows="2" placeholder="Instructions spéciales pour la livraison..."
+                      class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm mb-5 focus:outline-none focus:ring-2 focus:ring-yn-green"></textarea>
+
+            <div class="flex items-center justify-between mb-5 pt-3 border-t border-gray-100">
+                <span class="text-gray-700">Total estimé</span>
+                <span id="modal-total" class="font-bold text-yn-gold text-xl">0 FCFA</span>
+            </div>
+
+            <button type="submit"
+                    class="w-full flex items-center justify-center gap-2 border-2 border-yn-green text-yn-green
+                           font-bold py-3.5 rounded-xl hover:bg-yn-green hover:text-white transition">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Confirmer la commande
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if commande_envoyee %}
+<!-- ============ MODAL : Commande envoyée ============ -->
+<div id="successOrderModal" class="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-[28px] sm:rounded-[20px] w-full sm:max-w-sm shadow-2xl">
+
+        <!-- Drag handle -->
+        <div class="flex justify-center pt-3 pb-1 sm:hidden">
+            <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+        </div>
+
+        <div class="px-6 pt-4 pb-6">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-5">
+                <div>
+                    <h3 class="font-heading font-bold text-lg text-gray-900">Commande envoyée</h3>
+                    <p class="text-sm text-yn-gray">Envoyée à {{ commande_envoyee.producteur_nom }}</p>
+                </div>
+                <button onclick="document.getElementById('successOrderModal').remove()" class="text-gray-400 hover:text-gray-600 mt-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Check icon -->
+            <div class="flex justify-center mb-5">
+                <div class="w-16 h-16 rounded-full bg-yn-green-light flex items-center justify-center">
+                    <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="text-center mb-5">
+                <p class="font-heading font-bold text-lg text-gray-900 mb-2">Votre commande a été transmise<br>avec succès</p>
+                <p class="text-sm text-yn-gray">{{ commande_envoyee.producteur_nom }} recevra une notification et confirmera la disponibilité</p>
+            </div>
+
+            <!-- Info table -->
+            <div class="border border-gray-200 rounded-xl overflow-hidden mb-4">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                    <span class="text-sm text-yn-gray">Producteur</span>
+                    <span class="text-sm font-bold text-gray-800">{{ commande_envoyee.producteur_nom }}</span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                    <span class="text-sm text-yn-gray">Quantité commandée</span>
+                    <span class="text-sm font-bold text-gray-800">{{ commande_envoyee.quantite_kg }} kg</span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                    <span class="text-sm text-yn-gray">Date de livraison prévue</span>
+                    <span class="text-sm font-bold text-gray-800">{{ commande_envoyee.date_livraison }}</span>
+                </div>
+            </div>
+
+            <!-- Total -->
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-sm font-semibold text-gray-700">Total estimé</span>
+                <span class="font-bold text-yn-green-light text-xl">{{ commande_envoyee.total }} FCFA</span>
+            </div>
+
+            <!-- Référence -->
+            <div class="flex justify-center mb-5">
+                <div class="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5">
+                    <span class="text-sm text-yn-gray">Référence commande :</span>
+                    <span class="text-sm font-bold text-gray-800">{{ commande_envoyee.reference }}</span>
+                    <button onclick="navigator.clipboard.writeText('{{ commande_envoyee.reference }}')"
+                            class="text-gray-400 hover:text-gray-600 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bouton CTA -->
+            <a href="{% url 'admin_transformatrice:admin_commandes' %}"
+               class="flex items-center justify-center gap-2 w-full bg-yn-green-dark hover:bg-yn-green text-white font-bold py-3.5 rounded-xl transition mb-3">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Voir mes commandes
+            </a>
+
+            <button onclick="document.getElementById('successOrderModal').remove()"
+                    class="w-full text-center text-sm font-semibold text-gray-600 hover:text-gray-900 py-2 mb-2 transition">
+                Fermer
+            </button>
+
+            <p class="text-center text-xs text-yn-gray italic">Le producteur sera notifié immédiatement de votre demande.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPrixKg = 0;
+
+function openOrderModal(stockId, producteurNom, stockDispo, prixKg) {
+    document.getElementById('modal-stock-id').value = stockId;
+    document.getElementById('modal-prix-kg').value = prixKg;
+    document.getElementById('modal-producteur-nom').value = producteurNom;
+    document.getElementById('modal-producteur').textContent = producteurNom;
+    document.getElementById('modal-stock-dispo').textContent = stockDispo + ' kg';
+    document.getElementById('modal-max').textContent = 'Maximum autorisé : ' + stockDispo + ' kg';
+    document.getElementById('modal-qty').max = stockDispo;
+    currentPrixKg = prixKg;
+    updateTotal();
+    document.getElementById('orderModal').classList.remove('hidden');
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').classList.add('hidden');
+}
+
+function adjustQty(delta) {
+    const input = document.getElementById('modal-qty');
+    let val = parseInt(input.value || 0) + delta;
+    val = Math.max(parseInt(input.min), Math.min(parseInt(input.max || 999999), val));
+    input.value = val;
+    updateTotal();
+}
+
+document.getElementById('modal-qty').addEventListener('input', updateTotal);
+
+function updateTotal() {
+    const qty = parseInt(document.getElementById('modal-qty').value || 0);
+    const total = qty * currentPrixKg;
+    document.getElementById('modal-total').textContent = total.toLocaleString('fr-FR') + ' FCFA';
+}
+</script>
+{% endblock %}
