@@ -1,9 +1,13 @@
 from django.urls import path
+from django.views.generic import RedirectView
 from . import views
 
 app_name = 'admin_transformatrice'
 
 urlpatterns = [
+    # Racine → redirige vers connexion
+    path('', RedirectView.as_view(pattern_name='admin_transformatrice:admin_login'), name='index'),
+
     # Authentification
     path('connexion/', views.admin_login, name='admin_login'),
     path('deconnexion/', views.admin_logout, name='admin_logout'),
@@ -24,4 +28,10 @@ urlpatterns = [
     # Commandes clients
     path('commandes/', views.admin_commandes, name='admin_commandes'),
     path('commandes/<int:pk>/', views.admin_commande_detail, name='admin_commande_detail'),
+
+    # Démo & À propos
+    path('a-propos/', views.admin_about, name='admin_about'),
+
+    # Traçabilité QR (public)
+    path('tracabilite/<str:lot_code>/', views.tracabilite_produit, name='tracabilite_produit'),
 ]

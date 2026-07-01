@@ -1,3 +1,25 @@
 venv/
 __pycache__/
+*.pyc
+*.pyo
+
+# Base de données locale
 db.sqlite3
+
+# Fichiers médias uploadés (ne pas versionner)
+media/
+
+# Node
+node_modules/
+package-lock.json
+
+# Fichiers statiques compilés
+staticfiles/
+static/css/tailwind.css
+
+# VS Code
+.vscode/
+
+# Environnement
+.env
+*.env
