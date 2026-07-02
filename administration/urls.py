@@ -18,6 +18,8 @@ urlpatterns = [
     # Stocks producteurs
     path('stocks/', views.admin_stocks, name='admin_stocks'),
     path('stocks/commander/', views.admin_commander_paddy, name='admin_commander_paddy'),
+    path('stocks/commandes-paddy/', views.admin_commandes_paddy, name='admin_commandes_paddy'),
+    path('stocks/commandes-paddy/<int:pk>/recu/', views.admin_marquer_paddy_recu, name='admin_marquer_paddy_recu'),
 
     # Commandes paddy (suivi + changement statut)
     path('stocks/commandes-paddy/', views.admin_commandes_paddy, name='admin_commandes_paddy'),

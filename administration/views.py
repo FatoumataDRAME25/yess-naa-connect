@@ -3,10 +3,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count, F
+from django.urls import reverse
 from datetime import date, datetime
 
 from producteur.models import StockPaddy
-from .models import CommandePaddy, Produit
+from administration.models import Produit, CommandePaddy
 from client.models import CommandeClient
 
 
@@ -100,14 +101,26 @@ def admin_dashboard(request):
 def admin_stocks(request):
     commande_envoyee = request.session.pop('commande_envoyee', None)
 
+    # Stocks disponibles + déjà commandés (pour afficher les états dans les cartes)
     stocks = StockPaddy.objects.filter(
-        statut=StockPaddy.Statut.DISPONIBLE
+        statut__in=[StockPaddy.Statut.DISPONIBLE, StockPaddy.Statut.COMMANDE]
     ).select_related('producteur__user').order_by('-id')
 
-    stock_total_kg = stocks.aggregate(total=Sum('quantite_kg'))['total'] or 0
+    stock_total_kg = stocks.filter(
+        statut=StockPaddy.Statut.DISPONIBLE
+    ).aggregate(total=Sum('quantite_kg'))['total'] or 0
     nb_producteurs = stocks.values('producteur').distinct().count()
     regions = list(stocks.values_list('region', flat=True).distinct())
     varietes = [v[1] for v in StockPaddy.Variete.choices]
+
+    # Annoter chaque stock avec sa commande active (en_attente ou confirmee)
+    commandes_actives = CommandePaddy.objects.filter(
+        stock__in=stocks,
+        statut__in=[CommandePaddy.Statut.EN_ATTENTE, CommandePaddy.Statut.CONFIRMEE],
+    ).select_related('stock')
+    commandes_par_stock = {c.stock_id: c for c in commandes_actives}
+    for stock in stocks:
+        stock.commande_active = commandes_par_stock.get(stock.id)
 
     context = {
         'active_nav': 'stocks',
@@ -117,6 +130,7 @@ def admin_stocks(request):
         'varietes': varietes,
         'stocks_producteurs': stocks,
         'commande_envoyee': commande_envoyee,
+        'commandes_par_stock': commandes_par_stock,
     }
     return render(request, 'espace_admin/stocks_producteurs.html', context)
 
@@ -171,6 +185,51 @@ def admin_commander_paddy(request):
             'reference': f"#PAD-{commande.pk:04d}",
         }
 
+    return redirect('admin_transformatrice:admin_stocks')
+
+
+@admin_required
+def admin_commandes_paddy(request):
+    """Liste toutes les commandes paddy passées par l'admin."""
+    statut_filtre = request.GET.get('statut', '')
+    commandes_qs = CommandePaddy.objects.select_related(
+        'stock__producteur__user'
+    ).order_by('-cree_le')
+
+    if statut_filtre and statut_filtre in CommandePaddy.Statut.values:
+        commandes_qs = commandes_qs.filter(statut=statut_filtre)
+
+    counts = {s: CommandePaddy.objects.filter(statut=s).count() for s, _ in CommandePaddy.Statut.choices}
+
+    context = {
+        'active_nav': 'stocks',
+        'commandes': commandes_qs,
+        'statuts': CommandePaddy.Statut.choices,
+        'filtre_actif': statut_filtre,
+        'counts': counts,
+    }
+    return render(request, 'espace_admin/commandes_paddy.html', context)
+
+
+@admin_required
+def admin_marquer_paddy_recu(request, pk):
+    """L'admin marque une commande paddy comme reçue après livraison physique."""
+    commande = get_object_or_404(
+        CommandePaddy,
+        pk=pk,
+        statut=CommandePaddy.Statut.CONFIRMEE
+    )
+    if request.method == 'POST':
+        commande.statut = CommandePaddy.Statut.RECUE
+        commande.save(update_fields=['statut'])
+        messages.success(
+            request,
+            f"Commande #{pk} marquée comme reçue. "
+            f"Vous pouvez maintenant créer un produit lié à ce lot."
+        )
+        # Redirige vers le catalogue avec pré-sélection de la commande
+        url = reverse('admin_transformatrice:admin_catalogue') + f'?commande_paddy_id={pk}'
+        return redirect(url)
     return redirect('admin_transformatrice:admin_stocks')
 
 

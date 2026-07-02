@@ -100,13 +100,46 @@
                 Récolté le : {{ stock.date_recolte|date:"d M Y" }}
             </p>
 
-            <button type="button"
-                    onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.nom }}', {{ stock.quantite_kg }}, {{ stock.prix_kg }})"
-                    class="mt-auto w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark
-                           text-white font-semibold py-3 rounded-xl transition">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/></svg>
-                Commander ce paddy
-            </button>
+            {% if stock.commande_active %}
+              {% if stock.commande_active.statut == 'confirmee' %}
+                <!-- Commande confirmée : badge + bouton Marquer reçue -->
+                <div class="mt-auto">
+                  <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs font-semibold px-3 py-2 rounded-xl mb-3">
+                    <svg class="w-4 h-4 text-yellow-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                    </svg>
+                    Commande confirmée — réf. #PAD-{{ stock.commande_active.pk|stringformat:"04d" }}
+                  </div>
+                  <form method="post" action="{% url 'admin_transformatrice:admin_marquer_paddy_recu' stock.commande_active.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark
+                                   text-white font-semibold py-3 rounded-xl transition">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                      Marquer reçue
+                    </button>
+                  </form>
+                </div>
+              {% else %}
+                <!-- Commande en attente -->
+                <div class="mt-auto flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold px-3 py-2.5 rounded-xl">
+                  <svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                  </svg>
+                  Commande en attente — réf. #PAD-{{ stock.commande_active.pk|stringformat:"04d" }}
+                </div>
+              {% endif %}
+            {% else %}
+              <button type="button"
+                      onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.nom }}', {{ stock.quantite_kg }}, {{ stock.prix_kg }})"
+                      class="mt-auto w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark
+                             text-white font-semibold py-3 rounded-xl transition">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/></svg>
+                  Commander ce paddy
+              </button>
+            {% endif %}
         </div>
     </div>
     {% empty %}
@@ -378,16 +411,47 @@
           <span class="text-xs font-bold text-yn-green bg-yn-green-pale px-2 py-0.5 rounded-full">Qualité A1</span>
         </div>
 
-        <!-- Bouton commander -->
-        <button type="button"
-                onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.nom }}', {{ stock.quantite_kg }}, {{ stock.prix_kg }})"
-                class="w-full flex items-center justify-center gap-2 border-2 border-yn-green text-yn-green
-                       font-bold py-3 rounded-xl hover:bg-yn-green hover:text-white transition">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/>
-          </svg>
-          Commander ce paddy
-        </button>
+        <!-- Bouton commander / état commande -->
+        {% if stock.commande_active %}
+          {% if stock.commande_active.statut == 'confirmee' %}
+            <!-- Confirmée : badge + bouton Marquer reçue -->
+            <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs font-semibold px-3 py-2 rounded-xl mb-3">
+              <svg class="w-4 h-4 text-yellow-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+              </svg>
+              Confirmée — réf. #PAD-{{ stock.commande_active.pk|stringformat:"04d" }}
+            </div>
+            <form method="post" action="{% url 'admin_transformatrice:admin_marquer_paddy_recu' stock.commande_active.pk %}">
+              {% csrf_token %}
+              <button type="submit"
+                      class="w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark
+                             text-white font-bold py-3 rounded-xl transition">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Marquer reçue
+              </button>
+            </form>
+          {% else %}
+            <!-- En attente -->
+            <div class="w-full flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold px-3 py-2.5 rounded-xl">
+              <svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+              </svg>
+              En attente — réf. #PAD-{{ stock.commande_active.pk|stringformat:"04d" }}
+            </div>
+          {% endif %}
+        {% else %}
+          <button type="button"
+                  onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.nom }}', {{ stock.quantite_kg }}, {{ stock.prix_kg }})"
+                  class="w-full flex items-center justify-center gap-2 border-2 border-yn-green text-yn-green
+                         font-bold py-3 rounded-xl hover:bg-yn-green hover:text-white transition">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/>
+            </svg>
+            Commander ce paddy
+          </button>
+        {% endif %}
       </div>
     </div>
     {% empty %}

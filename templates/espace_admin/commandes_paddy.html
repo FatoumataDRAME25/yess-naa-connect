@@ -1,362 +1,144 @@
 {% extends "espace_admin/base.html" %}
-{% block title %}Commandes Paddy — Yess Naa Connect{% endblock %}
+{% block title %}Commandes Paddy — Riz Local{% endblock %}
 
 {% block content %}
-
-{% if messages %}
-<div class="mb-4 space-y-2">
-  {% for message in messages %}
-  <div class="rounded-xl px-4 py-3 text-sm font-semibold
-              {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
-              {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border border-amber-200
-              {% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
-    {{ message }}
-  </div>
-  {% endfor %}
-</div>
-{% endif %}
-
-<!-- ================================================================ -->
-<!-- DESKTOP                                                           -->
-<!-- ================================================================ -->
 <div class="hidden md:block">
 
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
+<!-- Header -->
+<div class="flex items-start justify-between mb-8">
     <div>
-      <div class="flex items-center gap-2 mb-1">
-        <a href="{% url 'admin_transformatrice:admin_stocks' %}"
-           class="text-yn-gray hover:text-yn-green-dark text-sm font-semibold flex items-center gap-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-          </svg>
-          Stocks
-        </a>
-        <span class="text-gray-300">/</span>
-        <span class="text-sm font-semibold text-gray-700">Commandes paddy</span>
-      </div>
-      <h1 class="font-heading font-bold text-2xl text-yn-green-dark">Mes commandes paddy</h1>
-      <p class="text-sm text-yn-gray mt-0.5">Suivez vos achats de paddy et créez des produits depuis les livraisons reçues</p>
+        <h1 class="font-heading font-bold text-2xl text-yn-green-dark">Mes commandes paddy</h1>
+        <p class="text-yn-gray text-sm mt-1">Suivez l'état de vos commandes auprès des producteurs</p>
     </div>
     <a href="{% url 'admin_transformatrice:admin_stocks' %}"
-       class="flex items-center gap-2 bg-yn-green hover:bg-yn-green-dark text-white font-semibold px-5 py-3 rounded-xl transition text-sm">
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-      </svg>
-      Nouvelle commande paddy
+       class="flex items-center gap-2 bg-yn-green hover:bg-yn-green-dark text-white text-sm font-semibold px-5 py-3 rounded-full transition">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2L3 6v8l7 4 7-4V6l-7-4z"/></svg>
+        Voir les stocks
     </a>
-  </div>
+</div>
 
-  <!-- Onglets statut -->
-  <div class="flex gap-1 mb-6 border-b border-gray-200">
-    {% for tab in status_tabs %}
-    <a href="?statut={{ tab.value }}"
-       class="px-4 py-2.5 text-sm font-semibold transition border-b-2
-              {% if tab.active %}border-yn-green text-yn-green{% else %}border-transparent text-yn-gray hover:text-yn-green-dark{% endif %}">
-      {{ tab.label }} ({{ tab.count }})
+<!-- Filtres statut -->
+<div class="flex items-center gap-2 mb-6">
+    <a href="{% url 'admin_transformatrice:admin_commandes_paddy' %}"
+       class="px-4 py-2 rounded-full text-sm font-semibold transition
+              {% if not filtre_actif %}bg-yn-green-dark text-white{% else %}bg-white border border-gray-200 text-gray-600 hover:border-yn-green{% endif %}">
+        Toutes
+    </a>
+    {% for val, label in statuts %}
+    <a href="?statut={{ val }}"
+       class="px-4 py-2 rounded-full text-sm font-semibold transition
+              {% if filtre_actif == val %}bg-yn-green-dark text-white{% else %}bg-white border border-gray-200 text-gray-600 hover:border-yn-green{% endif %}">
+        {{ label }}
+        {% if counts|default_if_none:0 %}
+            <span class="ml-1 text-xs opacity-60">({{ counts|default:"0" }})</span>
+        {% endif %}
     </a>
     {% endfor %}
-  </div>
+</div>
 
-  <!-- Tableau -->
-  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
-      <thead>
-        <tr class="text-left text-xs font-semibold text-yn-gray uppercase border-b border-gray-100 bg-gray-50/50">
-          <th class="px-6 py-4">Référence</th>
-          <th class="px-6 py-4">Producteur & Paddy</th>
-          <th class="px-6 py-4">Quantité</th>
-          <th class="px-6 py-4">Date livraison</th>
-          <th class="px-6 py-4">Statut</th>
-          <th class="px-6 py-4">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for cmd in commandes %}
-        <tr class="border-b border-gray-50 hover:bg-gray-50/60 transition">
-
-          <!-- Référence -->
-          <td class="px-6 py-4">
-            <span class="font-bold text-gray-800">#PAD-{{ cmd.pk|stringformat:"04d" }}</span>
-            <p class="text-xs text-yn-gray mt-0.5">{{ cmd.cree_le|date:"d/m/Y" }}</p>
-          </td>
-
-          <!-- Producteur -->
-          <td class="px-6 py-4">
-            <p class="font-semibold text-gray-800">
-              {{ cmd.stock.producteur.user.prenom }} {{ cmd.stock.producteur.user.nom }}
-            </p>
-            <p class="text-xs text-yn-gray">
-              {{ cmd.stock.get_variete_display }} — {{ cmd.stock.region }}
-            </p>
-          </td>
-
-          <!-- Quantité -->
-          <td class="px-6 py-4">
-            <span class="font-bold text-yn-green-dark">{{ cmd.quantite_commande }} kg</span>
-          </td>
-
-          <!-- Date livraison -->
-          <td class="px-6 py-4 text-gray-600">
-            {% if cmd.date_livraison %}{{ cmd.date_livraison|date:"d/m/Y" }}{% else %}—{% endif %}
-          </td>
-
-          <!-- Statut + badge -->
-          <td class="px-6 py-4">
-            {% if cmd.statut == 'en_attente' %}
-              <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-3 py-1.5 rounded-full">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> En attente
-              </span>
-            {% elif cmd.statut == 'confirmee' %}
-              <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-3 py-1.5 rounded-full">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Confirmée
-              </span>
-            {% elif cmd.statut == 'recue' %}
-              <span class="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 text-xs font-bold px-3 py-1.5 rounded-full">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Reçue ✓
-              </span>
-            {% elif cmd.statut == 'annulee' %}
-              <span class="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 text-xs font-bold px-3 py-1.5 rounded-full">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Annulée
-              </span>
-            {% endif %}
-          </td>
-
-          <!-- Actions -->
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-2 flex-wrap">
-
-              <!-- Bouton principal : Créer des produits (si RECUE) -->
-              {% if cmd.statut == 'recue' %}
-              <a href="{% url 'admin_transformatrice:admin_catalogue' %}?commande_paddy_id={{ cmd.pk }}"
-                 class="flex items-center gap-1.5 bg-yn-green hover:bg-yn-green-dark text-white text-xs font-bold px-3 py-2 rounded-lg transition">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                </svg>
-                Créer des produits
-              </a>
-              {% endif %}
-
-              <!-- Menu changement statut -->
-              {% if cmd.statut != 'annulee' and cmd.statut != 'recue' %}
-              <div class="relative group">
-                <button class="flex items-center gap-1 text-xs font-semibold text-gray-500 border border-gray-200
-                               hover:border-yn-green hover:text-yn-green px-3 py-2 rounded-lg transition">
-                  Changer statut
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                  </svg>
-                </button>
-                <div class="absolute right-0 mt-1 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-10 hidden group-hover:block">
-                  {% if cmd.statut == 'en_attente' %}
-                  <form method="post" action="{% url 'admin_transformatrice:admin_commande_paddy_statut' cmd.pk %}">
-                    {% csrf_token %}<input type="hidden" name="statut" value="confirmee">
-                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 text-blue-700 font-semibold rounded-t-xl">
-                      ✓ Marquer confirmée
-                    </button>
-                  </form>
-                  {% endif %}
-                  {% if cmd.statut in 'en_attente,confirmee' %}
-                  <form method="post" action="{% url 'admin_transformatrice:admin_commande_paddy_statut' cmd.pk %}">
-                    {% csrf_token %}<input type="hidden" name="statut" value="recue">
-                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm hover:bg-green-50 text-green-700 font-semibold">
-                      ✓ Marquer reçue
-                    </button>
-                  </form>
-                  {% endif %}
-                  <form method="post" action="{% url 'admin_transformatrice:admin_commande_paddy_statut' cmd.pk %}">
-                    {% csrf_token %}<input type="hidden" name="statut" value="annulee">
-                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm hover:bg-red-50 text-red-600 font-semibold rounded-b-xl"
-                            onclick="return confirm('Annuler cette commande ?')">
-                      ✕ Annuler
-                    </button>
-                  </form>
-                </div>
-              </div>
-              {% endif %}
-
-            </div>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="6" class="px-6 py-16 text-center text-yn-gray">
-            <svg class="w-12 h-12 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-            <p class="font-semibold text-gray-400">Aucune commande paddy pour ce filtre.</p>
-            <a href="{% url 'admin_transformatrice:admin_stocks' %}" class="text-yn-green text-sm font-semibold underline mt-1 inline-block">
-              Commander du paddy →
-            </a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
+<!-- Table -->
+<div class="bg-white rounded-[20px] shadow-sm shadow-black/5 overflow-hidden">
+    <table class="w-full text-left">
+        <thead class="bg-gray-50/50 border-b border-gray-100">
+            <tr>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Réf.</th>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Producteur</th>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Stock / Variété</th>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Qté (kg)</th>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Total estimé</th>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date livraison</th>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Statut</th>
+                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for cmd in commandes %}
+            <tr class="hover:bg-gray-50 transition-colors">
+                <!-- Ref -->
+                <td class="px-6 py-5 text-sm font-bold text-gray-700 whitespace-nowrap">
+                    #PAD-{{ cmd.pk|stringformat:"04d" }}
+                </td>
+                <!-- Producteur -->
+                <td class="px-6 py-5">
+                    <p class="text-sm font-semibold text-gray-800">{{ cmd.stock.producteur.user.prenom }} {{ cmd.stock.producteur.user.nom }}</p>
+                    <p class="text-xs text-gray-400">{{ cmd.stock.region }}</p>
+                </td>
+                <!-- Stock -->
+                <td class="px-6 py-5">
+                    <p class="text-sm text-gray-700">{{ cmd.stock.get_variete_display }}</p>
+                    {% if cmd.note %}<p class="text-xs text-gray-400 italic">{{ cmd.note }}</p>{% endif %}
+                </td>
+                <!-- Quantité -->
+                <td class="px-6 py-5 text-sm font-bold text-gray-900 text-right">{{ cmd.quantite_commande }}</td>
+                <!-- Total -->
+                <td class="px-6 py-5 text-sm font-bold text-yn-gold text-right">
+                    {{ cmd.quantite_commande|floatformat:0 }} × {{ cmd.stock.prix_par_kg }} FCFA
+                </td>
+                <!-- Date livraison -->
+                <td class="px-6 py-5 text-sm text-gray-500 whitespace-nowrap">
+                    {% if cmd.date_livraison %}{{ cmd.date_livraison|date:"d M Y" }}{% else %}—{% endif %}
+                </td>
+                <!-- Statut -->
+                <td class="px-6 py-5">
+                    {% if cmd.statut == 'en_attente' %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                            <span class="text-xs font-medium text-blue-700">En attente</span>
+                        </span>
+                    {% elif cmd.statut == 'confirmee' %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span class="text-xs font-medium text-amber-700">Confirmée</span>
+                        </span>
+                    {% elif cmd.statut == 'recue' %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yn-green-pale border border-green-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-yn-green"></span>
+                            <span class="text-xs font-medium text-yn-green-dark">Reçue ✓</span>
+                        </span>
+                    {% elif cmd.statut == 'annulee' %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 border border-red-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                            <span class="text-xs font-medium text-red-700">Annulée</span>
+                        </span>
+                    {% endif %}
+                </td>
+                <!-- Action -->
+                <td class="px-6 py-5 text-center">
+                    {% if cmd.statut == 'confirmee' %}
+                    <form method="post" action="{% url 'admin_transformatrice:admin_marquer_paddy_recu' cmd.pk %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="inline-flex items-center gap-1.5 px-3 py-2 bg-yn-green hover:bg-yn-green-dark text-white text-xs font-bold rounded-xl transition"
+                                onclick="return confirm('Confirmer la réception de ce paddy ?')">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Marquer reçue
+                        </button>
+                    </form>
+                    {% elif cmd.statut == 'recue' %}
+                    <a href="{% url 'admin_transformatrice:admin_catalogue' %}?commande_paddy_id={{ cmd.pk }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-2 bg-yn-gold/10 hover:bg-yn-gold/20 text-yn-gold border border-yn-gold/30 text-xs font-bold rounded-xl transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Créer produit
+                    </a>
+                    {% else %}
+                    <span class="text-gray-300 text-sm">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-6 py-16 text-center text-yn-gray">
+                    Aucune commande paddy pour le moment.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-  </div>
+</div>
 
-</div><!-- fin desktop -->
-
-
-<!-- ================================================================ -->
-<!-- MOBILE                                                            -->
-<!-- ================================================================ -->
-<div class="md:hidden min-h-screen bg-gray-50 pb-24">
-
-  <!-- Header mobile -->
-  <div class="bg-white border-b border-gray-100 px-4 pt-5 pb-3 sticky top-0 z-20">
-    <div class="flex items-center gap-3 mb-1">
-      <a href="{% url 'admin_transformatrice:admin_stocks' %}" class="text-gray-500">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-      </a>
-      <h1 class="font-heading font-bold text-lg text-gray-900">Commandes paddy</h1>
-    </div>
-    <p class="text-xs text-yn-gray ml-8">{{ total }} commande{{ total|pluralize }}</p>
-  </div>
-
-  <!-- Onglets statut mobile -->
-  <div class="flex overflow-x-auto gap-1 px-4 py-3 bg-white border-b border-gray-100">
-    {% for tab in status_tabs %}
-    <a href="?statut={{ tab.value }}"
-       class="flex-shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full transition
-              {% if tab.active %}bg-yn-green text-white{% else %}bg-gray-100 text-gray-500{% endif %}">
-      {{ tab.label }} ({{ tab.count }})
-    </a>
-    {% endfor %}
-  </div>
-
-  <!-- Liste commandes mobile -->
-  <div class="px-4 pt-4 space-y-3">
-    {% for cmd in commandes %}
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-
-      <!-- En-tête carte -->
-      <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-50">
-        <div>
-          <p class="font-bold text-gray-900 text-sm">#PAD-{{ cmd.pk|stringformat:"04d" }}</p>
-          <p class="text-xs text-yn-gray">{{ cmd.cree_le|date:"d/m/Y" }}</p>
-        </div>
-        {% if cmd.statut == 'en_attente' %}
-          <span class="text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full">En attente</span>
-        {% elif cmd.statut == 'confirmee' %}
-          <span class="text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full">Confirmée</span>
-        {% elif cmd.statut == 'recue' %}
-          <span class="text-xs font-bold bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-full">Reçue ✓</span>
-        {% elif cmd.statut == 'annulee' %}
-          <span class="text-xs font-bold bg-red-50 text-red-700 border border-red-200 px-2.5 py-1 rounded-full">Annulée</span>
-        {% endif %}
-      </div>
-
-      <!-- Détails -->
-      <div class="px-4 py-3 space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-yn-gray">Producteur</span>
-          <span class="text-xs font-semibold text-gray-800">
-            {{ cmd.stock.producteur.user.prenom }} {{ cmd.stock.producteur.user.nom }}
-          </span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-yn-gray">Variété / Région</span>
-          <span class="text-xs font-semibold text-gray-800">
-            {{ cmd.stock.get_variete_display }} — {{ cmd.stock.region }}
-          </span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-yn-gray">Quantité commandée</span>
-          <span class="text-xs font-bold text-yn-green-dark">{{ cmd.quantite_commande }} kg</span>
-        </div>
-        {% if cmd.date_livraison %}
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-yn-gray">Livraison prévue</span>
-          <span class="text-xs font-semibold text-gray-700">{{ cmd.date_livraison|date:"d/m/Y" }}</span>
-        </div>
-        {% endif %}
-        {% if cmd.note %}
-        <p class="text-xs text-yn-gray italic border-t border-gray-50 pt-2">{{ cmd.note }}</p>
-        {% endif %}
-      </div>
-
-      <!-- Actions mobile -->
-      <div class="px-4 pb-4 flex flex-col gap-2">
-
-        {% if cmd.statut == 'recue' %}
-        <!-- Bouton créer produits (RECUE) -->
-        <a href="{% url 'admin_transformatrice:admin_catalogue' %}?commande_paddy_id={{ cmd.pk }}"
-           class="w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark
-                  text-white text-sm font-bold py-3 rounded-xl transition">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-          </svg>
-          Créer des produits depuis cette commande
-        </a>
-        {% endif %}
-
-        {% if cmd.statut != 'annulee' and cmd.statut != 'recue' %}
-        <div class="flex gap-2">
-          {% if cmd.statut == 'en_attente' %}
-          <form method="post" action="{% url 'admin_transformatrice:admin_commande_paddy_statut' cmd.pk %}" class="flex-1">
-            {% csrf_token %}<input type="hidden" name="statut" value="confirmee">
-            <button type="submit" class="w-full text-sm font-semibold text-blue-700 border border-blue-200 bg-blue-50 py-2.5 rounded-xl">
-              ✓ Confirmer
-            </button>
-          </form>
-          {% endif %}
-          <form method="post" action="{% url 'admin_transformatrice:admin_commande_paddy_statut' cmd.pk %}" class="flex-1">
-            {% csrf_token %}<input type="hidden" name="statut" value="recue">
-            <button type="submit" class="w-full text-sm font-semibold text-green-700 border border-green-200 bg-green-50 py-2.5 rounded-xl">
-              ✓ Marquer reçue
-            </button>
-          </form>
-          <form method="post" action="{% url 'admin_transformatrice:admin_commande_paddy_statut' cmd.pk %}">
-            {% csrf_token %}<input type="hidden" name="statut" value="annulee">
-            <button type="submit" class="text-sm font-semibold text-red-600 border border-red-200 bg-red-50 px-4 py-2.5 rounded-xl"
-                    onclick="return confirm('Annuler cette commande ?')">✕</button>
-          </form>
-        </div>
-        {% endif %}
-
-      </div>
-    </div>
-    {% empty %}
-    <div class="text-center py-16 text-yn-gray">
-      <p class="font-semibold mb-2">Aucune commande paddy.</p>
-      <a href="{% url 'admin_transformatrice:admin_stocks' %}" class="text-yn-green font-semibold underline text-sm">
-        Commander du paddy →
-      </a>
-    </div>
-    {% endfor %}
-  </div>
-
-  <!-- Bottom nav mobile -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around px-2 py-2 z-30">
-    <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-      </svg>
-      <span class="text-[10px]">Accueil</span>
-    </a>
-    <a href="{% url 'admin_transformatrice:admin_catalogue' %}" class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-      </svg>
-      <span class="text-[10px]">Catalogue</span>
-    </a>
-    <a href="{% url 'admin_transformatrice:admin_commandes' %}" class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-      </svg>
-      <span class="text-[10px]">Commandes</span>
-    </a>
-    <a href="{% url 'admin_transformatrice:admin_stocks' %}" class="flex flex-col items-center gap-1 text-yn-green">
-      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M10 2L3 6v8l7 4 7-4V6l-7-4z"/>
-      </svg>
-      <span class="text-[10px] font-bold">Stocks</span>
-    </a>
-  </nav>
-
-</div><!-- fin mobile -->
-
+</div>
 {% endblock %}

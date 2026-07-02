@@ -158,7 +158,34 @@
 
           <!-- Actions -->
           <td class="px-6 py-5 text-center">
-            {% if cmd.note %}
+            {% if cmd.statut == 'en_attente' %}
+              <div class="flex items-center justify-center gap-2">
+                <!-- Accepter -->
+                <form method="post" action="{% url 'accepter_commande' cmd.pk %}">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2d5a27] hover:bg-green-800 text-white text-xs font-semibold rounded-lg transition"
+                          onclick="return confirm('Confirmer l\'acceptation de cette commande ?')">
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Accepter
+                  </button>
+                </form>
+                <!-- Refuser -->
+                <form method="post" action="{% url 'refuser_commande' cmd.pk %}">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold rounded-lg transition"
+                          onclick="return confirm('Refuser cette commande ? Le stock redeviendra disponible.')">
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    Refuser
+                  </button>
+                </form>
+              </div>
+            {% elif cmd.note %}
               <button class="text-gray-400 hover:text-gray-600 transition-colors" title="{{ cmd.note }}">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>

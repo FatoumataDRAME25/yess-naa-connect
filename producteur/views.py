@@ -192,6 +192,43 @@ def commandes(request):
 
 
 @login_required(login_url='/producteur/connexion/')
+def accepter_commande(request, pk):
+    """Le producteur accepte une commande de paddy → statut CONFIRMEE."""
+    producteur = get_object_or_404(Producteur, user=request.user)
+    commande = get_object_or_404(
+        CommandePaddy,
+        pk=pk,
+        stock__producteur=producteur,
+        statut=CommandePaddy.Statut.EN_ATTENTE
+    )
+    if request.method == 'POST':
+        commande.statut = CommandePaddy.Statut.CONFIRMEE
+        commande.save(update_fields=['statut'])
+        messages.success(request, f"Commande #{pk} acceptée. L'administrateur peut maintenant créer le produit.")
+    return redirect('commandes')
+
+
+@login_required(login_url='/producteur/connexion/')
+def refuser_commande(request, pk):
+    """Le producteur refuse une commande → statut ANNULEE, stock redevient DISPONIBLE."""
+    producteur = get_object_or_404(Producteur, user=request.user)
+    commande = get_object_or_404(
+        CommandePaddy,
+        pk=pk,
+        stock__producteur=producteur,
+        statut=CommandePaddy.Statut.EN_ATTENTE
+    )
+    if request.method == 'POST':
+        commande.statut = CommandePaddy.Statut.ANNULEE
+        commande.save(update_fields=['statut'])
+        # Remettre le stock en disponible
+        commande.stock.statut = StockPaddy.Statut.DISPONIBLE
+        commande.stock.save(update_fields=['statut'])
+        messages.success(request, f"Commande #{pk} refusée. Le stock est de nouveau disponible.")
+    return redirect('commandes')
+
+
+@login_required(login_url='/producteur/connexion/')
 def profil(request):
     edit_mode = False
     if request.method == 'POST':

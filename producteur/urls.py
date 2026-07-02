@@ -9,6 +9,8 @@ urlpatterns = [
     path('deconnexion/', auth_views.LogoutView.as_view(next_page='connexion'), name='deconnexion'),
     path('dashbord/', views.dashbord, name='dashbord'),
     path('commandes/', views.commandes, name='commandes'),
+    path('commandes/<int:pk>/accepter/', views.accepter_commande, name='accepter_commande'),
+    path('commandes/<int:pk>/refuser/', views.refuser_commande, name='refuser_commande'),
     path('profil/', views.profil, name='profil'),
     path('declaration/', views.declaration, name='declaration'),
     path('profil/mot-de-passe/', auth_views.PasswordChangeView.as_view(
