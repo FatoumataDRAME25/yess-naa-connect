@@ -341,6 +341,30 @@
     <form method="post" action="{% url 'admin_transformatrice:admin_produit_create' %}" enctype="multipart/form-data" class="px-6 py-6 space-y-5">
       {% csrf_token %}
 
+      <!-- Bannière traçabilité pré-sélectionnée -->
+      {% if commande_paddy_preselect %}
+      <div class="flex items-start gap-3 bg-yn-green-pale border border-yn-green rounded-xl px-4 py-3">
+        <svg class="w-5 h-5 text-yn-green flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <div class="flex-1">
+          <p class="text-sm font-bold text-yn-green-dark">Traçabilité automatique</p>
+          <p class="text-xs text-yn-green-dark/80 mt-0.5">
+            Origine :
+            <span class="font-semibold">
+              {{ commande_paddy_preselect.stock.producteur.user.prenom }}
+              {{ commande_paddy_preselect.stock.producteur.user.nom }}
+            </span>
+            — {{ commande_paddy_preselect.stock.get_variete_display }},
+            {{ commande_paddy_preselect.quantite_commande }} kg
+            ({{ commande_paddy_preselect.stock.region }})
+          </p>
+          <p class="text-xs text-yn-green-dark/60 mt-0.5">Commande #PAD-{{ commande_paddy_preselect.pk|stringformat:"04d" }}</p>
+        </div>
+      </div>
+      <input type="hidden" name="commande_paddy_id" value="{{ commande_paddy_preselect.pk }}">
+      {% endif %}
+
       <!-- Photo -->
       <div>
         <label class="block text-sm font-semibold text-yn-green-dark mb-2">Photo du produit</label>
@@ -520,4 +544,14 @@
 </div>
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+{% if commande_paddy_preselect %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('addProductModal').classList.remove('hidden');
+  });
+</script>
+{% endif %}
 {% endblock %}

@@ -1,17 +1,21 @@
 from django.db import models
-from producteur.models import Produit
+
+from administration.models import Produit
 
 
 class Client(models.Model):
     """
-    Pas de compte utilisateur : le client ne se connecte pas.
-    Il faut l'enregistrer AVANT de créer une commande, pour récupérer sa clé (pk)
-    à utiliser comme FK dans CommandeClient.
+    Le client ne se connecte pas — il est enregistré avant toute commande
+    pour servir de clé étrangère dans CommandeClient.
     """
     prenom = models.CharField(max_length=100)
     nom = models.CharField(max_length=100)
     telephone = models.CharField(max_length=20)
     adresse = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        verbose_name = 'Client'
+        verbose_name_plural = 'Clients'
 
     def __str__(self):
         return f"{self.prenom} {self.nom} ({self.telephone})"
@@ -30,19 +34,25 @@ class CommandeClient(models.Model):
     mode_paiement = models.CharField(max_length=50)
     date = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Commande client'
+        verbose_name_plural = 'Commandes clients'
+        ordering = ['-date']
+
     def __str__(self):
-        return f"Commande #{self.pk} - {self.client}"
+        return f"Commande #{self.pk} — {self.client}"
 
 
 class LigneCommande(models.Model):
-    """
-    Ajout non explicite dans le diagramme : relie une commande à ses produits.
-    Sans ça, CommandeClient ne sait pas ce que le client a commandé.
-    """
+    """Relie une commande client à ses produits avec quantité et prix."""
     commande = models.ForeignKey(CommandeClient, on_delete=models.CASCADE, related_name='lignes')
     produit = models.ForeignKey(Produit, on_delete=models.PROTECT, related_name='lignes_commande')
     quantite = models.PositiveIntegerField(default=1)
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2)
 
+    class Meta:
+        verbose_name = 'Ligne de commande'
+        verbose_name_plural = 'Lignes de commande'
+
     def __str__(self):
-        return f"{self.quantite} x {self.produit.nom}"
+        return f"{self.quantite} × {self.produit.nom} ({self.produit.poids_kg} kg)"
