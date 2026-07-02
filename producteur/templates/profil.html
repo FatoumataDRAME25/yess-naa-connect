@@ -1,0 +1,116 @@
+{% extends 'sidebar.html' %}
+{% load static %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+
+<!-- Carte profil -->
+<div class="w-full p-7 flex flex-col gap-7">
+
+      <!-- Profile Header Card -->
+      <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm p-8 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <!-- Avatar -->
+          <div class="w-15 h-15 rounded-full outline outline-4 outline-[#D4EDB8] flex-shrink-0 bg-sidebar flex items-center justify-center">
+            <span class="text-white text-base font-bold">AD</span>
+          </div>
+          <!-- Info -->
+          <div class="flex flex-col gap-1">
+            <h1 class="text-2xl font-bold text-sidebar">Amadou Diallo</h1>
+            <p class="text-base font-medium text-gray-500">Producteur indépendant</p>
+            <div class="flex items-center gap-2 mt-1">
+              <svg class="w-3.5 h-3.5 flex-shrink-0" style="color:#7DBD48" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span class="text-sm text-gray-600">Saint-Louis, Sénégal</span>
+            </div>
+          </div>
+        </div>
+        <!-- Edit button -->
+        <button class="flex items-center gap-2 bg-sidebar text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-900 transition-colors shadow-sm">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Modifier les informations
+        </button>
+      </div>
+
+      <!-- Informations Personnelles -->
+      <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm overflow-hidden">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <h2 class="text-base font-bold text-sidebar">Informations Personnelles</h2>
+        </div>
+        <div class="p-6 grid grid-cols-2 gap-5">
+          <!-- Prénom -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-500">Prénom</label>
+            <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">Amadou</div>
+          </div>
+          <!-- Nom -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-500">Nom</label>
+            <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">Diallo</div>
+          </div>
+          <!-- Email -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-500">Email</label>
+            <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">amadou.diallo@example.com</div>
+          </div>
+          <!-- Téléphone -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-500">Numéro de téléphone</label>
+            <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">+221 77 123 45 67</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations Professionnelles -->
+      <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm overflow-hidden">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h2 class="text-base font-bold text-sidebar">Informations Professionnelles</h2>
+        </div>
+        <div class="p-6 grid grid-cols-2 gap-5">
+          <!-- Type de producteur -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-500">Type de producteur</label>
+            <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">Céréales (Riz Paddy)</div>
+          </div>
+          <!-- Localisation -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-500">Localisation de l'exploitation</label>
+            <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">Vallée du Fleuve Sénégal</div>
+          </div>
+          <!-- Surface -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-500">Surface totale (Hectares)</label>
+            <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">12.5 ha</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sécurité -->
+      <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm overflow-hidden">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
+          <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h2 class="text-base font-bold text-sidebar">Sécurité</h2>
+        </div>
+        <div class="px-6 py-5 flex items-center justify-between">
+          <div>
+            <p class="text-base font-medium text-gray-900">Mot de passe</p>
+            <p class="text-sm text-gray-500 mt-0.5">Dernière modification il y a 3 mois</p>
+          </div>
+          <button class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Modifier le mot de passe
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+{% endblock %}

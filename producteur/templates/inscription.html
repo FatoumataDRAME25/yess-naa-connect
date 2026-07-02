@@ -1,158 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription Producteur</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription – Yees Naa Connect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sidebar: '#2D5A16',
+            'green-brand': '#1A3A0A',
+            'green-accent': '#4A8A28',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-8">
-    <div class="bg-white rounded-3xl overflow-hidden shadow-xl max-w-6xl w-full grid md:grid-cols-2">
+<body class="bg-[#F8FAFC] font-sans min-h-screen flex items-center justify-center px-8 py-28">
 
-        <!-- Partie gauche -->
-        <div class="relative bg-cover bg-center min-h-[700px]"
-        style="background-image:url('/static/images/riz.jpg')">
-            <div class="absolute inset-0 bg-black/30"></div>
+  <div class="w-full max-w-[1100px] bg-white rounded-3xl shadow-2xl overflow-hidden flex">
 
-            <div class="relative z-10 p-10 text-white h-full flex flex-col">
+    <!-- ════════ PANNEAU GAUCHE ════════ -->
+    <div class="flex-1 relative bg-[#14532D] overflow-hidden flex flex-col justify-between p-12">
 
-                <h2 class="font-bold text-2xl">
-                    YEES NAA CONNECT
-                </h2>
+      <!-- Image de fond -->
+      <img class="absolute inset-0 w-full h-full object-cover opacity-40" src="https://placehold.co/550x788" alt="Champ de riz" />
 
-                <div class="mt-16">
+      <!-- Gradient overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#14532D] via-[#14532D]/40 to-transparent"></div>
 
-                    <h1 class="text-5xl font-bold leading-tight">
-                        Rejoignez la révolution agricole au Sénégal.
-                    </h1>
-
-                    <p class="mt-6 text-lg">
-                        Connectez-vous directement aux marchés,
-                        gérez votre production et boostez vos revenus.
-                    </p>
-
-                </div>
-
-                <div class="mt-auto space-y-6">
-
-                    <div>
-                        <h3 class="font-semibold">
-                            Accès direct au marché
-                        </h3>
-
-                        <p class="text-sm">
-                            Éliminez les intermédiaires.
-                        </p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold">
-                            Suivi de production
-                        </h3>
-
-                        <p class="text-sm">
-                            Gérez vos récoltes en temps réel.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
+      <!-- Contenu haut -->
+      <div class="relative z-10 flex flex-col gap-4">
+        <!-- Logo -->
+        <div class="flex items-center pl-2">
+          <span class="text-white text-2xl font-bold">YEES NAA </span>
+          <span class="text-white text-2xl font-light ml-1">CONNECT</span>
         </div>
 
-        <!-- Partie droite -->
-        <div class="p-10 flex flex-col justify-center">
-            <div class="text-center mb-8">
+        <!-- Titre & sous-titre -->
+        <div class="mt-4 flex flex-col gap-3">
+          <h1 class="text-white text-4xl font-bold leading-tight">
+            Rejoignez la révolution<br/>agricole au Sénégal.
+          </h1>
+          <p class="text-green-100 text-lg font-normal leading-relaxed max-w-md">
+            Connectez-vous directement aux marchés, gérez votre production et boostez vos revenus avec nos outils numériques.
+          </p>
+        </div>
+      </div>
 
-                <h2 class="text-4xl font-bold text-slate-800">
-                    Devenir Producteur
-                </h2>
+      <!-- Features bas -->
+      <div class="relative z-10 flex flex-col gap-6">
 
-                <p class="text-slate-500">
-                    Créez votre compte
-                </p>
-
-            </div>
-
-            <form class="space-y-5">
-
-                <div>
-
-                    <label class="block text-xs uppercase font-semibold text-slate-500 mb-2">
-                        Prénom et Nom
-                    </label>
-
-                    <input
-                        type="text"
-                        placeholder="Ex : Moussa Diop"
-                        class="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-600 bg-gray-200">
-
-                </div>
-
-                <div>
-
-                    <label class="block text-xs uppercase font-semibold text-slate-500 mb-2">
-                        Numéro de téléphone
-                    </label>
-
-                    <div class="flex gap-2">
-
-                        <div class="border rounded-xl px-4 flex items-center bg-gray-200">
-                            🇸🇳 +221
-                        </div>
-
-                        <input
-                            type="text"
-                            class="flex-1 border rounded-xl px-4 py-3 bg-gray-200"
-                            placeholder="77 000 00 00">
-
-                    </div>
-
-                </div>
-                <div>
-                    <label class="block text-xs uppercase font-semibold text-slate-500 mb-2">
-                        Region
-                    </label>
-                    <select class="w-full border rounded-xl px-4 py-3 bg-gray-200">
-                        <option>Sélectionnez votre région</option>
-                        <option>Dakar</option>
-                        <option>Thiès</option>
-                        <option>Saint-Louis</option>
-                        <option>Kaolack</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-
-                    <input
-                        type="password"
-                        placeholder="Mot de passe"
-                        class="border rounded-xl px-4 py-3 bg-gray-200">
-
-                    <input
-                        type="password"
-                        placeholder="Confirmation"
-                        class="border rounded-xl px-4 py-3 bg-gray-200">
-
-                </div>
-                <label class="flex gap-2 text-sm text-slate-500">
-
-                    <input type="checkbox">
-
-                    <span>
-                        J'accepte les conditions d'utilisation
-                    </span>
-
-                </label>
-                <button
-                    type="submit"
-                    class="w-full bg-green-800 hover:bg-green-900 text-white py-4 rounded-xl font-semibold transition">
-                    S'inscrire
-                </button>
-                                            
-            </form>
+        <!-- Feature 1 -->
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-white text-base font-semibold">Accès direct au marché</p>
+            <p class="text-white/80 text-sm mt-0.5">Éliminez les intermédiaires et vendez au juste prix.</p>
+          </div>
         </div>
 
+        <!-- Feature 2 -->
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-white text-base font-semibold">Suivi de production</p>
+            <p class="text-white/80 text-sm mt-0.5">Gérez vos récoltes et vos stocks en temps réel.</p>
+          </div>
+        </div>
+
+      </div>
     </div>
+
+    <!-- ════════ PANNEAU DROIT ════════ -->
+    <div class="flex-1 bg-white/84 px-12 py-12 flex items-start">
+      <div class="w-full max-w-[448px] mx-auto flex flex-col gap-8">
+
+        <!-- Titre formulaire -->
+        <div class="flex flex-col items-center gap-2">
+          <h2 class="text-3xl font-bold text-slate-800 text-center">Devenir Producteur</h2>
+          <p class="text-slate-500 text-base text-center">Créez votre compte</p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="flex flex-col gap-5">
+
+          <!-- Prénom et Nom -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Prénom et Nom</label>
+            <div class="relative">
+              <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </div>
+              <input type="text" placeholder="Ex: Moussa Diop" class="w-full pl-10 pr-4 py-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base text-slate-700 placeholder-gray-400 outline-none focus:border-sidebar focus:ring-2 focus:ring-sidebar/10 transition" />
+            </div>
+          </div>
+
+          <!-- Numéro de téléphone -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Numéro de téléphone</label>
+            <div class="flex gap-2">
+              <!-- Indicatif -->
+              <div class="flex items-center gap-2 px-4 bg-slate-100 border border-slate-200 rounded-xl flex-shrink-0">
+                <span class="text-lg">🇸🇳</span>
+                <span class="text-base font-medium text-slate-600">+221</span>
+              </div>
+              <!-- Input -->
+              <input type="tel" placeholder="77 000 00 00" class="flex-1 px-4 py-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base text-slate-700 placeholder-gray-400 outline-none focus:border-sidebar focus:ring-2 focus:ring-sidebar/10 transition" />
+            </div>
+          </div>
+
+          <!-- Région -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Région</label>
+            <div class="relative">
+              <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                <svg class="w-3.5 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </div>
+              <select class="w-full pl-10 pr-10 py-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base text-slate-500 appearance-none outline-none focus:border-sidebar focus:ring-2 focus:ring-sidebar/10 transition cursor-pointer">
+                <option value="" disabled selected>Sélectionnez votre région</option>
+                <option>Saint-Louis</option>
+                <option>Dakar</option>
+                <option>Thiès</option>
+                <option>Ziguinchor</option>
+                <option>Kaolack</option>
+                <option>Tambacounda</option>
+                <option>Kolda</option>
+                <option>Matam</option>
+              </select>
+              <svg class="w-3.5 h-3.5 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- Mot de passe + Confirmation -->
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Mot de passe -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Mot de passe</label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <input type="password" placeholder="••••••••" class="w-full pl-10 pr-4 py-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base placeholder-gray-400 outline-none focus:border-sidebar focus:ring-2 focus:ring-sidebar/10 transition" />
+              </div>
+            </div>
+
+            <!-- Confirmation -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Confirmation</label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <input type="password" placeholder="••••••••" class="w-full pl-10 pr-4 py-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base placeholder-gray-400 outline-none focus:border-sidebar focus:ring-2 focus:ring-sidebar/10 transition" />
+              </div>
+            </div>
+          </div>
+
+          <!-- CGU -->
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="cgu" class="w-3.5 h-3.5 mt-0.5 rounded border-gray-400 accent-sidebar cursor-pointer flex-shrink-0" />
+            <label for="cgu" class="text-xs text-slate-500 leading-relaxed cursor-pointer">
+              J'accepte les conditions d'utilisation et la politique de confidentialité de YEES NAA CONNECT.
+            </label>
+          </div>
+
+          <!-- Bouton inscription -->
+          <button class="w-full flex items-center justify-center bg-sidebar text-white py-4 rounded-xl text-base font-bold hover:bg-green-900 transition-colors shadow-sm mt-1">
+            S'inscrire
+          </button>
+        </div>
+
+        <!-- Déjà inscrit -->
+        <p class="text-center text-base text-slate-500">
+          Déjà inscrit ?
+          <a href="#" class="text-sidebar font-bold hover:underline">Se connecter</a>
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+
 </body>
 </html>

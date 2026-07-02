@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion – Yees Naa Connect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sidebar: '#2D5A16',
+            'green-brand': '#1A3A0A',
+            'green-accent': '#4A8A28',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-[#F8FAFC] font-sans min-h-screen flex items-center justify-center px-8 py-36">
+
+  <div class="w-full max-w-[1100px] bg-white rounded-3xl shadow-2xl overflow-hidden flex">
+
+    <!-- ════════ PANNEAU GAUCHE ════════ -->
+    <div class="flex-1 relative bg-[#14532D] overflow-hidden flex flex-col justify-between p-12">
+
+      <!-- Image de fond -->
+      <img class="absolute inset-0 w-full h-full object-cover opacity-40" src="https://placehold.co/550x729" alt="Champ de riz" />
+
+      <!-- Gradient overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#14532D] via-[#14532D]/40 to-transparent"></div>
+
+      <!-- Contenu -->
+      <div class="relative z-10 flex flex-col gap-4">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <span class="text-white text-2xl font-bold">YEES NAA </span>
+          <span class="text-white text-2xl font-light ml-1">CONNECT</span>
+        </div>
+
+        <!-- Titre & sous-titre -->
+        <div class="mt-4 flex flex-col gap-3">
+          <h1 class="text-white text-4xl font-bold leading-tight">Bon retour parmi nous !</h1>
+          <p class="text-green-100 text-lg font-normal leading-relaxed max-w-md">
+            Accédez à votre espace producteur pour gérer vos ventes et suivre l'évolution de vos cultures.
+          </p>
+        </div>
+      </div>
+
+      <!-- Bas du panneau -->
+      <div class="relative z-10 border-t border-white/10 pt-8">
+      </div>
+    </div>
+
+    <!-- ════════ PANNEAU DROIT ════════ -->
+    <div class="flex-1 bg-white px-12 py-12 flex items-center">
+      <div class="w-full max-w-[448px] mx-auto flex flex-col gap-8">
+
+        <!-- Titre formulaire -->
+        <div class="flex flex-col items-center gap-2">
+          <h2 class="text-3xl font-bold text-slate-800 text-center">Connexion</h2>
+          <p class="text-slate-500 text-base text-center">Heureux de vous revoir sur la plateforme</p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="flex flex-col gap-6">
+
+          <!-- Numéro de téléphone -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Numéro de téléphone</label>
+            <div class="flex gap-2">
+              <!-- Indicatif -->
+              <div class="flex items-center gap-2 px-4 bg-slate-100 border border-slate-200 rounded-xl flex-shrink-0">
+                <span class="text-lg">🇸🇳</span>
+                <span class="text-base font-medium text-slate-600">+221</span>
+              </div>
+              <!-- Input -->
+              <div class="relative flex-1">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.84a16 16 0 0 0 6.29 6.29l.95-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <input type="tel" placeholder="77 000 00 00" class="w-full pl-10 pr-4 py-4 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base text-slate-700 placeholder-gray-400 outline-none focus:border-sidebar focus:ring-2 focus:ring-sidebar/10 transition" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Mot de passe -->
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Mot de passe</label>
+              <a href="#" class="text-xs font-semibold text-sidebar hover:underline">Oublié ?</a>
+            </div>
+            <div class="relative">
+              <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              <input type="password" placeholder="••••••••" class="w-full pl-10 pr-12 py-4 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base text-slate-700 placeholder-gray-400 outline-none focus:border-sidebar focus:ring-2 focus:ring-sidebar/10 transition" />
+              <button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Se souvenir de moi -->
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="remember" class="w-4 h-4 rounded border-gray-400 accent-sidebar cursor-pointer" />
+            <label for="remember" class="text-sm text-slate-600 cursor-pointer">Se souvenir de moi</label>
+          </div>
+
+          <!-- Bouton connexion -->
+          <button class="w-full flex items-center justify-center gap-2 bg-sidebar text-white py-4 rounded-xl text-base font-bold hover:bg-green-900 transition-colors shadow-sm">
+            Se connecter
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <!-- Inscription -->
+        <p class="text-center text-base text-slate-500">
+          Pas encore inscrit ?
+          <a href="#" class="text-sidebar font-bold hover:underline">Créer un compte</a>
+        </p>
+
+        <!-- Aide & Support -->
+        <div class="flex flex-col items-center gap-6">
+          <div class="flex items-center gap-4 w-full">
+            <div class="flex-1 h-px bg-slate-200"></div>
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-widest whitespace-nowrap">Aide & Support</span>
+            <div class="flex-1 h-px bg-slate-200"></div>
+          </div>
+
+          <!-- Icônes support -->
+          <div class="flex items-center gap-6">
+            <!-- Téléphone -->
+            <button class="text-slate-400 hover:text-sidebar transition-colors">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.84a16 16 0 0 0 6.29 6.29l.95-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </button>
+            <!-- Email -->
+            <button class="text-slate-400 hover:text-sidebar transition-colors">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </button>
+            <!-- Chat -->
+            <button class="text-slate-400 hover:text-sidebar transition-colors">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </button>
+          </div>
+
+          <!-- Copyright -->
+          <p class="text-xs text-slate-400 uppercase tracking-widest text-center">
+            © 2024 YEES NAA CONNECT. Sénégal.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+{% extends 'sidebar.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="w-full p-10 flex flex-col gap-10">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-green-brand">Bonjour, Mamadou</h1>
+          <p class="text-gray-500 text-base mt-1">Jeudi 12 Juin 2026</p>
+        </div>
+        <img class="w-12 h-12 rounded-full border-2 border-green-accent/20 object-cover flex-shrink-0" src="https://placehold.co/48x48" alt="Avatar" />
+      </div>
+
+      <!-- Stat cards -->
+      <div class="grid grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-full bg-green-soft/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-green-soft flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7L12 3 4 7v10l8 4 8-4z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/></svg>
+          </div>
+          <p class="text-sm font-medium text-gray-500">Stock disponible</p>
+          <p class="text-2xl font-bold text-green-brand">850 kg</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-full bg-green-accent/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-green-accent flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M16 3.5a4 4 0 0 0-8 0V7h8z"/></svg>
+          </div>
+          <p class="text-sm font-medium text-gray-500">Commandes reçues</p>
+          <p class="text-2xl font-bold text-green-brand">12</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-full bg-status-amber-text/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-status-amber-text flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <p class="text-sm font-medium text-gray-500">En attente de validation</p>
+          <p class="text-2xl font-bold text-green-brand">2</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <p class="text-sm font-medium text-gray-500">Dernière vente</p>
+          <p class="text-2xl font-bold text-green-brand">15 Juin 2026</p>
+        </div>
+      </div>
+
+      <!-- Commandes Table -->
+      <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm overflow-hidden">
+
+        <!-- Table header -->
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <h2 class="text-base font-bold text-sidebar">Mes commandes reçues</h2>
+          <button class="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-200 transition-colors">
+            Filtrer
+          </button>
+        </div>
+
+        <!-- Table -->
+        <table class="w-full text-left">
+          <thead class="bg-gray-50/50">
+            <tr>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">N° Commande</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Lot concerné</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right whitespace-nowrap">Quantité (kg)</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right whitespace-nowrap">Montant (FCFA)</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Date commande</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+
+            <!-- Row 1 — En attente -->
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-5 text-sm font-medium text-gray-900 whitespace-nowrap">#CMD-001</td>
+              <td class="px-6 py-5">
+                <p class="text-sm font-medium text-gray-900">Sahel 108</p>
+                <p class="text-xs text-gray-500">Grain long</p>
+              </td>
+              <td class="px-6 py-5 text-sm font-bold text-gray-900 text-right">1 200</td>
+              <td class="px-6 py-5 text-sm font-bold text-gray-900 text-right">210 000</td>
+              <td class="px-6 py-5 text-sm text-gray-500 whitespace-nowrap">12 Oct 2023</td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span>
+                  <span class="text-xs font-medium text-blue-700">En attente</span>
+                </span>
+              </td>
+              <td class="px-6 py-5 text-center">
+                <button class="px-3 py-1.5 bg-sidebar text-white text-xs font-medium rounded-lg shadow-sm hover:bg-green-900 transition-colors whitespace-nowrap">
+                  Valider
+                </button>
+              </td>
+            </tr>
+
+            <!-- Row 2 — Payé -->
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-5 text-sm font-medium text-gray-900 whitespace-nowrap">#CMD-002</td>
+              <td class="px-6 py-5">
+                <p class="text-sm font-medium text-gray-900">Nerica L19</p>
+                <p class="text-xs text-gray-500">Parfumé</p>
+              </td>
+              <td class="px-6 py-5 text-sm font-bold text-gray-900 text-right">850</td>
+              <td class="px-6 py-5 text-sm font-bold text-gray-900 text-right">178 500</td>
+              <td class="px-6 py-5 text-sm text-gray-500 whitespace-nowrap">10 Oct 2023</td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#D4EDB8] border border-green-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0"></span>
+                  <span class="text-xs font-medium text-sidebar">Payé</span>
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <div class="flex items-center justify-center gap-2">
+                  <button class="text-gray-300 hover:text-gray-500 transition-colors" title="Télécharger">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </button>
+                  <button class="text-gray-300 hover:text-gray-500 transition-colors" title="Voir">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 3 — Confirmé -->
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-5 text-sm font-medium text-gray-900 whitespace-nowrap">#CMD-003</td>
+              <td class="px-6 py-5">
+                <p class="text-sm font-medium text-gray-900">Tox 728-1</p>
+                <p class="text-xs text-gray-500">Standard</p>
+              </td>
+              <td class="px-6 py-5 text-sm font-bold text-gray-900 text-right">2 500</td>
+              <td class="px-6 py-5 text-sm font-bold text-gray-900 text-right">412 500</td>
+              <td class="px-6 py-5 text-sm text-gray-500 whitespace-nowrap">05 Oct 2023</td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-600 flex-shrink-0"></span>
+                  <span class="text-xs font-medium text-amber-800">Confirmé</span>
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <div class="flex items-center justify-center gap-2">
+                  <button class="text-gray-300 hover:text-gray-500 transition-colors" title="Télécharger">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </button>
+                  <button class="text-gray-300 hover:text-gray-500 transition-colors" title="Voir">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-6 py-4 bg-gray-50/30 border-t border-gray-100">
+          <p class="text-sm text-gray-500">Affichage de 1 à 10 sur 45 commandes</p>
+          <div class="flex items-center gap-1">
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 bg-white text-gray-400 opacity-50 cursor-not-allowed">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center rounded bg-sidebar text-white text-sm font-medium">1</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 bg-white text-gray-600 text-sm font-medium hover:bg-gray-50">2</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 bg-white text-gray-600 text-sm font-medium hover:bg-gray-50">3</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Floating action button -->
+    <button class="fixed bottom-10 right-10 flex items-center gap-2 bg-sidebar text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:bg-green-900 transition-colors">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Déclarer une récolte
+    </button>
+{% endblock %}

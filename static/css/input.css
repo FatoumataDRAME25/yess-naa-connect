@@ -1,9 +1,22 @@
 @import "tailwindcss";
-
+@source "../../templates";
+@source "../../producteur/templates";
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0px 1000px white inset;
     box-shadow: 0 0 0px 1000px white inset;
+}
+
+@theme {
+  --color-sidebar: #2D5A16;
+  --color-green-brand: #1A3A0A;
+  --color-green-accent: #4A8A28;
+  --color-green-soft: #16A34A;
+  --color-status-green-bg: #DCFCE7;
+  --color-status-green-text: #2D5A16;
+  --color-status-amber-bg: #FEF3C7;
+  --color-status-amber-text: #D4A017;
+  --font-family-sans: 'Inter', sans-serif;
 }
