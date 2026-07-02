@@ -58,8 +58,8 @@
             </div>
             {% for p in tous_formats %}
             <div class="flex justify-between items-center px-4 py-3 border-b border-gray-50 last:border-0">
-                <span class="text-sm text-gray-500">Format {{ p.format }}</span>
-                <span class="text-sm font-bold text-gray-800">{{ p.prix_formate }} FCFA</span>
+                <span class="text-sm text-gray-500">Format {{ p.poids_kg }} kg</span>
+                <span class="text-sm font-bold text-gray-800">{{ p.prix|floatformat:0 }} FCFA</span>
             </div>
             {% endfor %}
             <div class="flex justify-between items-center px-4 py-3 border-b border-gray-50">
@@ -83,6 +83,40 @@
             <p class="text-xs font-bold text-yn-gray uppercase tracking-wide mb-1">Description</p>
             <p class="text-sm text-gray-700">{{ produit.description }}</p>
         </div>
+        {% endif %}
+
+        <!-- Origine du riz paddy (traçabilité) -->
+        {% if produit.stock_source %}
+        {% with src=produit.stock_source %}
+        <div class="border border-yn-green/20 rounded-2xl overflow-hidden mb-5">
+            <div class="bg-yn-green-pale px-4 py-2.5 flex items-center gap-2">
+                <svg class="w-4 h-4 text-yn-green flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                </svg>
+                <p class="text-xs font-bold text-yn-green-dark uppercase tracking-wide">Origine du riz paddy</p>
+            </div>
+            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-50">
+                <span class="text-sm text-gray-500">Producteur</span>
+                <span class="text-sm font-semibold text-gray-800">{{ src.stock.producteur.user.prenom }} {{ src.stock.producteur.user.nom }}</span>
+            </div>
+            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-50">
+                <span class="text-sm text-gray-500">Région</span>
+                <span class="text-sm font-semibold text-gray-800">{{ src.stock.region|title }}</span>
+            </div>
+            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-50">
+                <span class="text-sm text-gray-500">Variété</span>
+                <span class="text-sm font-semibold text-gray-800">{{ src.stock.get_variete_display }}</span>
+            </div>
+            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-50">
+                <span class="text-sm text-gray-500">Date de récolte</span>
+                <span class="text-sm font-semibold text-gray-800">{{ src.stock.date_recolte|date:"d/m/Y" }}</span>
+            </div>
+            <div class="flex justify-between items-center px-4 py-3">
+                <span class="text-sm text-gray-500">Réf. commande</span>
+                <span class="text-sm font-mono font-bold text-yn-green">#PAD-{{ src.pk|stringformat:"04d" }}</span>
+            </div>
+        </div>
+        {% endwith %}
         {% endif %}
 
         <!-- Sceau authenticité -->
