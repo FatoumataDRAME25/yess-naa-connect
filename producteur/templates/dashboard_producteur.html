@@ -93,9 +93,9 @@
         <table class="w-full text-left">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Variété</th>
-              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quantité</th>
-              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Prix/kg</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">photo</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Variete</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quantite/kg</th>
               <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date récolte</th>
               <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Région</th>
               <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
@@ -105,14 +105,18 @@
 
             {% for stock in derniers_stocks %}
             <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4">
+                  {% if stock.photo %}
+                    <img src="{{ stock.photo.url }}"
+                      class="w-16 h-16 rounded-lg object-cover">
+                  {% endif %}
+              </td>
               <td class="px-6 py-4 text-base font-medium text-green-brand whitespace-nowrap">
                 {{ stock.get_variete_display }}
-                {% if stock.est_bio %}
-                  <span class="ml-1 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">BIO</span>
-                {% endif %}
+                
               </td>
               <td class="px-6 py-4 text-base text-gray-500">{{ stock.quantite_kg }} kg</td>
-              <td class="px-6 py-4 text-base text-gray-500">{{ stock.prix_par_kg }} FCFA</td>
+              
               <td class="px-6 py-4 text-base text-gray-500 whitespace-nowrap">{{ stock.date_recolte|date:"d M Y" }}</td>
               <td class="px-6 py-4 text-base text-gray-500">{{ stock.region }}</td>
               <td class="px-6 py-4">
