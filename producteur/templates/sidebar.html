@@ -6,6 +6,7 @@
     <title>{% block title %}Tableau de bord — YEES NAA CONNECT{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body class="flex min-h-screen bg-[#f5f6f8] font-sans antialiased">
 
@@ -25,9 +26,7 @@
                           {% else %}
                           text-white hover:bg-white/10 rounded-lg mx-2 px-3
                           {% endif %}">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-                    </svg>
+                    <i class="fa-solid fa-table-cells w-5 h-5 shrink-0"></i>
                     Tableau de bord
                 </a>
                 <a href="#"

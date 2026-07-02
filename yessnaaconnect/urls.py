@@ -13,6 +13,7 @@ urlpatterns = [
     path('admin', home, name='home'),
     path('admin/', admin.site.urls),
     path('espace-admin/', include('administration.urls')),
+    path('producteur/', include('producteur.urls'))
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
