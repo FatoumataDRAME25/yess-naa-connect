@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Détail de la livraison</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'livreur/css/detail_livraison.css' %}">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <a class="back-btn" aria-label="Retour" href="{% url 'livreur:dashboard' %}">
+      <i class="ti ti-arrow-left"></i>
+    </a>
+    <h1>Détail de la livraison</h1>
+  </header>
+
+  <div class="order-meta-bar">
+    <span class="order-id">#YNC-{{ livraison.commande.id|stringformat:"04d" }}</span>
+    {% if livraison.confirme_le %}
+      <span class="status-pill" style="background:#f2f9ed; color:#7dbd48;">Livrée</span>
+    {% else %}
+      <span class="status-pill">À livrer</span>
+    {% endif %}
+  </div>
+
+  <main class="content">
+
+    <section class="card span-2">
+      <p class="card-label">Informations client</p>
+      <p class="customer-name">{{ livraison.commande.client.prenom }} {{ livraison.commande.client.nom }}</p>
+
+      <div class="info-row">
+        <i class="ti ti-phone"></i>
+        <span>{{ livraison.commande.client.telephone }}</span>
+      </div>
+
+      <div class="address-row">
+        <i class="ti ti-map-pin"></i>
+        <div style="flex:1; min-width:0;">
+          <p class="address-text">{{ livraison.commande.client.adresse }}</p>
+          <a class="map-link" href="https://www.google.com/maps/search/?api=1&query={{ livraison.commande.client.adresse|urlencode }}" target="_blank" rel="noopener">
+            Voir sur la carte
+            <i class="ti ti-chevron-right" style="font-size:13px"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="card-title">Articles à livrer</p>
+
+      {% for ligne in livraison.commande.lignes.all %}
+      <div class="article-item">
+        <div class="article-thumb"><i class="ti ti-package"></i></div>
+        <div class="article-info">
+          <p class="article-name">{{ ligne.produit.nom }}</p>
+          <div class="article-bottom">
+            <span class="article-qty">Quantité : x{{ ligne.quantite }}</span>
+            <span class="article-price">{{ ligne.prix_unitaire|floatformat:0 }} FCFA</span>
+          </div>
+        </div>
+      </div>
+      {% if not forloop.last %}<div class="divider"></div>{% endif %}
+      {% endfor %}
+    </section>
+
+    <section class="card">
+      <p class="card-title">Paiement</p>
+
+      <div class="pay-row">
+        <span class="pay-label">Montant à encaisser</span>
+        <span class="pay-amount">{{ livraison.commande.montant_total|floatformat:0 }} FCFA</span>
+      </div>
+
+      <div class="pay-method">
+        {% if livraison.commande.mode_paiement == 'especes' %}
+          <i class="ti ti-cash"></i>
+          <span>Paiement en espèces à la livraison</span>
+        {% else %}
+          <i class="ti ti-credit-card"></i>
+          <span>{{ livraison.commande.mode_paiement }}</span>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="qr-card span-2">
+      <div class="qr-box">
+        <i class="ti ti-qrcode"></i>
+      </div>
+      <p>QR code de traçabilité du lot</p>
+    </section>
+
+  </main>
+
+  {% if not livraison.confirme_le %}
+  <div class="bottom-bar">
+    <form method="post" action="{% url 'livreur:confirmer_livraison' livraison.pk %}" class="bottom-bar-inner">
+      {% csrf_token %}
+      <p>Le client recevra une confirmation automatique.</p>
+      <button type="submit" class="btn-confirm-full">Confirmer la livraison</button>
+    </form>
+  </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

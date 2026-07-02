@@ -1,0 +1,390 @@
+ * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f3f4f6;
+    color: #111;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f3f4f6;
+    padding-bottom: 120px;
+  }
+
+  .topbar {
+    background: #fff;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .back-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f9fafb;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .back-btn i {
+    font-size: 20px;
+    color: #1a3a0a;
+  }
+
+  .topbar h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a3a0a;
+  }
+
+  .order-meta-bar {
+    background: #fff;
+    padding: 0 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .order-id {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+  }
+
+  .status-pill {
+    background: #fff9e6;
+    color: #d4a017;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .content {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    min-width: 0;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a3a0a;
+    margin-bottom: 16px;
+  }
+
+  .customer-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1c1c1c;
+    margin-bottom: 16px;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 999px;
+    background: rgba(204, 243, 173, 0.2);
+    margin-bottom: 12px;
+  }
+
+  .info-row i {
+    font-size: 16px;
+    color: #2d5a16;
+    flex-shrink: 0;
+  }
+
+  .info-row span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d5a16;
+  }
+
+  .address-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .address-row>i {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  .address-text {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #c85a1a;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .article-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+  }
+
+  .article-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .article-thumb i {
+    font-size: 26px;
+    color: #9ca3af;
+  }
+
+  .article-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .article-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c1c1c;
+    margin-bottom: 8px;
+  }
+
+  .article-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .article-qty {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+  }
+
+  .article-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1c1c1c;
+  }
+
+  .divider {
+    height: 1px;
+    background: #f3f4f6;
+    margin: 8px 0;
+  }
+
+  .pay-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .pay-label {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  .pay-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #d4a017;
+  }
+
+  .pay-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(240, 253, 244, 0.5);
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .pay-method i {
+    font-size: 16px;
+    color: #7dbd48;
+    flex-shrink: 0;
+  }
+
+  .pay-method span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #7dbd48;
+  }
+
+  .qr-card {
+    background: #2d5a16;
+    border-radius: 16px;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .qr-box {
+    width: 106px;
+    height: 106px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .qr-box i {
+    font-size: 70px;
+    color: #1c1c1c;
+  }
+
+  .qr-card p {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+  }
+
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 20px 24px;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10;
+  }
+
+  .bottom-bar-inner {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bottom-bar p {
+    font-size: 12px;
+    color: #6b7280;
+    text-align: center;
+  }
+
+  .btn-confirm-full {
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #2d5a16;
+    color: #2d5a16;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 18px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .btn-confirm-full:hover {
+    background: rgba(45, 90, 22, 0.05);
+  }
+
+  /* ≥640px : tablette portrait — la carte s'élargit un peu, tout reste empilé */
+  @media (min-width: 640px) {
+    .app {
+      max-width: 600px;
+    }
+  }
+
+  /* ≥900px : tablette paysage / petit desktop — 2 colonnes pour articles + paiement */
+  @media (min-width: 900px) {
+    .app {
+      max-width: 880px;
+      padding-bottom: 110px;
+    }
+
+    .content {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .content .span-2 {
+      grid-column: 1 / -1;
+    }
+
+    .bottom-bar-inner {
+      max-width: 880px;
+    }
+  }
+
+  /* ≥1280px : grand desktop — on plafonne la largeur pour ne pas étirer le texte */
+  @media (min-width: 1280px) {
+    .app {
+      max-width: 1040px;
+    }
+
+    .bottom-bar-inner {
+      max-width: 1040px;
+    }
+  }

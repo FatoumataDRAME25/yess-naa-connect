@@ -37,7 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'administration',
+    'producteur',
+    'client',
+    'livreur',
 ]
+
+AUTH_USER_MODEL = 'transformatrice_admin.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

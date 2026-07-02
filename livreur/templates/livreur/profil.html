@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon profil — Livreur</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'livreur/css/dashboard.css' %}">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Mon profil</h1>
+      <p>{{ livreur.telephone }}</p>
+    </div>
+  </header>
+
+  <nav class="sidenav">
+    <a class="sidenav-item" href="{% url 'livreur:dashboard' %}" style="text-decoration:none; color:inherit;">
+      <i class="ti ti-truck"></i>
+      <span>Livraisons</span>
+    </a>
+    <div class="sidenav-item active">
+      <i class="ti ti-user"></i>
+      <span>Profil</span>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div class="delivery-card">
+      <p style="font-weight:700; color:#1a3a0a; margin-bottom:8px;">{{ livreur.prenom }} {{ livreur.nom }}</p>
+      <p style="color:#6b7280; font-size:13px; margin-bottom:4px;">{{ livreur.telephone }}</p>
+      <p style="color:#6b7280; font-size:13px; margin-bottom:16px;">{{ livreur.adresse }}</p>
+      <form method="post" action="{% url 'livreur:deconnexion' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-confirm">Se déconnecter</button>
+      </form>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a class="nav-item" href="{% url 'livreur:dashboard' %}" style="text-decoration:none;">
+      <i class="ti ti-truck"></i>
+      <span>Livraisons</span>
+    </a>
+    <div class="nav-item active">
+      <i class="ti ti-user"></i>
+      <span>Profil</span>
+    </div>
+  </nav>
+
+</div>
+
+</body>
+</html>
