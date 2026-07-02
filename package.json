@@ -1,6 +1,28 @@
 {
-  "devDependencies": {
-    "@tailwindcss/cli": "^4.3.1",
-    "tailwindcss": "^4.3.1"
+  "name": "yess-naa-connect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i static/css/tailwind.src.css -o static/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i static/css/tailwind.src.css -o static/css/tailwind.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FatoumataDRAME25/yess-naa-connect.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/FatoumataDRAME25/yess-naa-connect/issues"
+  },
+  "homepage": "https://github.com/FatoumataDRAME25/yess-naa-connect#readme",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.3.2",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2"
   }
 }

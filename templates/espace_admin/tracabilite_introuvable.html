@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produit introuvable | Riz Local</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-heading { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="w-full max-w-sm bg-white rounded-3xl shadow-xl p-8 text-center">
+
+    <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 110 18A9 9 0 0112 3z"/>
+        </svg>
+    </div>
+
+    <p class="font-heading font-extrabold text-xl mb-1">
+        <span style="color:#1A3A0A">Riz</span>
+        <span style="color:#7DBD48"> Local</span>
+    </p>
+
+    <h1 class="font-heading font-bold text-lg text-gray-900 mt-3 mb-2">Produit introuvable</h1>
+    <p class="text-sm text-gray-500 mb-4">
+        Le code <strong class="font-mono text-gray-700">{{ lot_code }}</strong> ne correspond à aucun produit enregistré.
+    </p>
+    <p class="text-xs text-gray-400">
+        Ce QR code est peut-être invalide ou le produit a été retiré du catalogue.
+    </p>
+
+</div>
+
+</body>
+</html>

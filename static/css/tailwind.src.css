@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-yn-green-dark:  #1A3A0A;
+  --color-yn-green:       #2D5A16;
+  --color-yn-green-light: #7DBD48;
+  --color-yn-green-pale:  #D4EDB8;
+  --color-yn-terracotta:  #C85A1A;
+  --color-yn-gold:        #D4A017;
+  --color-yn-ivory:       #F7F3ED;
+  --color-yn-gray:        #6B7280;
+
+  --font-heading: 'Poppins', 'Sora', sans-serif;
+  --font-body:    'Inter', sans-serif;
+}
