@@ -1,0 +1,448 @@
+{% load static tailwind_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    {% tailwind_css %}
+</head>
+<body class="bg-white font-sans antialiased">
+
+  <!-- ===========================
+       NAVBAR
+  ============================ -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="{% url 'accueil' %}" class="flex items-center gap-1">
+        <span class="text-2xl font-extrabold text-lime-900">YEES NAA </span>
+        <span class="text-2xl font-bold text-lime-500">CONNECT</span>
+      </a>
+
+      <!-- Navigation -->
+      <nav class="flex items-center gap-8">
+        <a href="{% url 'accueil' %}" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+          Accueil
+        </a>
+        <a href="{% url 'catalogue' %}" class="text-sm font-medium text-lime-900 border-b-2 border-lime-900 pb-1">
+          Catalogue
+        </a>
+        <a href="#" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+          Devenir producteurs
+        </a>
+        <a href="#" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+          À Propos
+        </a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-5">
+        <button aria-label="Rechercher" class="text-gray-600 hover:text-lime-900 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+          </svg>
+        </button>
+
+        <!-- Icône panier avec badge dynamique -->
+        <a href="{% url 'panier' %}" aria-label="Panier" class="relative text-gray-700 hover:text-lime-900 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+          </svg>
+          {% if nb_panier > 0 %}
+          <span id="badge-panier" class="absolute -top-2 -right-2 w-5 h-5 bg-lime-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {{ nb_panier }}
+          </span>
+          {% else %}
+          <span id="badge-panier" class="absolute -top-2 -right-2 w-5 h-5 bg-lime-900 text-white text-[10px] font-bold rounded-full items-center justify-center hidden">0</span>
+          {% endif %}
+        </a>
+
+        <!-- Bouton Commander -->
+        <a href="{% url 'catalogue' %}"
+           class="px-5 py-2.5 bg-lime-900 text-white text-sm font-semibold rounded-xl
+                  hover:bg-lime-800 transition-colors">
+          Commander
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- ===========================
+       CONTENU PRINCIPAL
+  ============================ -->
+  <main class="pt-20">
+    <div class="w-full max-w-7xl mx-auto px-4 md:px-8 pt-12 pb-20 flex flex-col gap-16">
+        <div class="flex flex-col lg:flex-row gap-12 lg:gap-16">
+
+            <!-- LEFT: IMAGES -->
+            <div class="w-full lg:w-1/2 flex flex-col gap-6">
+
+                <!-- Image principale du produit -->
+                <div class="h-[400px] md:h-[600px] rounded-3xl shadow-xl overflow-hidden">
+                    {% if produit.image %}
+                    <img src="{{ produit.image.url }}"
+                         alt="{{ produit.nom }}"
+                         class="w-full h-full object-cover">
+                    {% else %}
+                    <img src="{% static 'images/1sac5kg.jpg' %}"
+                         alt="{{ produit.nom }}"
+                         class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+
+                <!-- Miniatures (image principale répétée pour l'instant) -->
+                <div class="grid grid-cols-4 gap-3">
+                    {% if produit.image %}
+                    <img src="{{ produit.image.url }}" class="h-20 md:h-24 w-full object-cover rounded-xl border-2 border-lime-900" />
+                    {% else %}
+                    <img src="{% static 'images/1sac5kg.jpg' %}" class="h-20 md:h-24 w-full object-cover rounded-xl border-2 border-lime-900" />
+                    {% endif %}
+                    <img src="{% static 'images/1sac5kg.jpg' %}" class="h-20 md:h-24 w-full object-cover rounded-xl border border-gray-200" />
+                    <img src="{% static 'images/1sac5kg.jpg' %}" class="h-20 md:h-24 w-full object-cover rounded-xl border border-gray-200" />
+                    <img src="{% static 'images/1sac5kg.jpg' %}" class="h-20 md:h-24 w-full object-cover rounded-xl border border-gray-200" />
+                </div>
+
+            </div>
+
+            <!-- RIGHT: INFO -->
+            <div class="w-full lg:w-1/2 flex flex-col gap-6">
+
+            <!-- TITLE -->
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black text-lime-950">
+                  {{ produit.nom }}
+                </h1>
+
+                <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
+
+                <div class="flex items-center gap-1 text-yellow-600 font-semibold">
+                    {{ produit.note }}
+                    <span class="w-3 h-3 bg-yellow-600"></span>
+                    {% if produit.nb_avis > 0 %}
+                    <span class="text-gray-500">({{ produit.nb_avis }} avis)</span>
+                    {% endif %}
+                </div>
+
+                <span class="w-px h-4 bg-gray-300"></span>
+
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-lime-900"></span>
+                    {{ produit.origine }}
+                </div>
+
+                </div>
+            </div>
+
+            <!-- PRICE -->
+            <div class="text-2xl md:text-3xl font-black text-yellow-600">
+                {{ produit.prix|floatformat:"0" }} FCFA
+            </div>
+
+            <!-- PRODUCTOR -->
+            <div class="p-4 bg-gray-50 border-l-4 border-lime-900 rounded-xl text-sm text-gray-600">
+                <span class="font-semibold text-lime-950">Producteur :</span>
+                {{ produit.producteur_info }}
+            </div>
+
+            <!-- FORMAT — boutons de sélection du poids
+                 Le poids sélectionné est mis en évidence (bg-lime-900 text-white).
+                 Par défaut le premier poids de la liste est sélectionné.
+                 Le JS lit le bouton actif pour envoyer le bon poids au panier.
+            -->
+            <div>
+                <p class="text-sm font-semibold uppercase text-lime-950 mb-2">Format du sac</p>
+
+                <div class="flex flex-wrap gap-3" id="choix-poids">
+                {% for poids in produit.get_poids_liste %}
+                <button
+                  class="btn-poids px-6 py-2 rounded-full font-semibold transition-colors
+                         {% if forloop.first %}bg-lime-900 text-white{% else %}border text-gray-500 hover:border-lime-900 hover:text-lime-900{% endif %}"
+                  data-poids="{{ poids }}">
+                  {{ poids }}
+                </button>
+                {% endfor %}
+                </div>
+            </div>
+
+            <!-- STOCK -->
+            <div class="flex items-center gap-2 text-lime-600 font-semibold">
+                <span class="w-2 h-2 bg-lime-500 rounded-full"></span>
+                {% if produit.stock > 0 %}
+                  {{ produit.stock }} sacs disponibles
+                {% else %}
+                  Rupture de stock
+                {% endif %}
+            </div>
+
+            <!-- DESCRIPTION -->
+            <p class="text-gray-700 leading-relaxed text-sm md:text-base">
+                {{ produit.description }}
+            </p>
+
+            <!-- ACTIONS -->
+            <div class="flex flex-col sm:flex-row gap-4">
+
+                <!-- Sélecteur de quantité -->
+                <div class="flex items-center border rounded-xl px-3 py-2 gap-4 w-fit">
+                  <button id="btn-moins" class="text-xl cursor-pointer hover:text-lime-900 transition-colors">-</button>
+                  <span id="quantity">1</span>
+                  <button id="btn-plus" class="text-xl cursor-pointer hover:text-lime-900 transition-colors">+</button>
+                </div>
+
+                <button
+                  id="btn-ajouter-detail"
+                  data-url="{% url 'ajouter_au_panier' produit.id %}"
+                  data-qte-panier="{{ qte_dans_panier }}"
+                  class="flex-1 bg-lime-900 rounded-xl flex justify-center items-center
+                         py-3 text-white font-bold hover:bg-lime-800 active:scale-[.98]
+                         transition-all focus:outline-none focus:ring-2 focus:ring-lime-700">
+                  Ajouter au panier
+                </button>
+
+            </div>
+
+            <button class="w-full border-2 border-lime-900 text-lime-900 py-3 rounded-xl font-bold">
+                Commander maintenant
+            </button>
+
+            <!-- FEATURES -->
+            <div class="grid grid-cols-3 gap-4 pt-6 border-t text-center text-xs text-lime-950 font-semibold">
+                <div>Livraison 48h</div>
+                <div>Paiement flexible</div>
+                <div>QR Code</div>
+            </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TABS + DESCRIPTION -->
+    <div class="w-full max-w-7xl mx-auto px-4 md:px-8 pt-8 pb-20 flex flex-col gap-10">
+
+        <!-- TABS -->
+        <div class="border-b border-gray-100 flex flex-wrap gap-8">
+            <button class="pb-3 border-b-4 border-lime-900 text-lime-950 text-lg md:text-xl font-black">
+            Description
+            </button>
+            <button class="pb-3 text-gray-500 text-lg md:text-xl font-black">
+            Traçabilité
+            </button>
+            <button class="pb-3 text-gray-500 text-lg md:text-xl font-black">
+            Avis
+            </button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="flex flex-col lg:flex-row gap-10 lg:gap-16">
+
+            <!-- LEFT : description détaillée -->
+            <div class="flex-1 flex flex-col gap-6">
+
+            <p class="text-gray-900 text-sm md:text-base leading-6">
+                {{ produit.description }}
+            </p>
+
+            <div class="flex flex-col gap-4">
+                {% for point in produit.get_points_forts_liste %}
+                <div class="flex items-start gap-3">
+                  <span class="w-2 h-2 mt-2 bg-lime-500 rounded-full"></span>
+                  <p class="text-gray-900 text-sm md:text-base">{{ point }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            </div>
+
+            <!-- RIGHT : QR traçabilité -->
+            <div class="flex-1 bg-gray-50 rounded-3xl p-8 flex flex-col items-center gap-6">
+            <div class="w-28 h-28 bg-white rounded-2xl shadow-inner flex items-center justify-center">
+                <div class="w-12 h-12 bg-lime-900"></div>
+            </div>
+            <div class="text-center flex flex-col gap-2">
+                <h3 class="text-lime-950 text-base md:text-lg font-black">Scannez pour la transparence</h3>
+                <p class="text-gray-500 text-sm leading-5 max-w-sm">
+                Découvrez le parcours exact de ce sac, de la parcelle de terre à votre table.
+                </p>
+            </div>
+            <a href="#" class="text-lime-900 font-semibold text-sm">
+                En savoir plus sur notre chaîne de valeur
+            </a>
+            </div>
+
+        </div>
+
+    </div>
+  </main>
+
+  <!-- ===========================
+       FOOTER (original)
+  ============================ -->
+  <footer class="bg-lime-950 border-t-4 border-yellow-600 pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+        <div>
+          <p class="text-white text-2xl font-extrabold uppercase mb-6">Yees Naa</p>
+          <p class="text-white/70 text-sm leading-6 mb-6">
+            Connecter les producteurs locaux de riz du Sénégal directement aux consommateurs.
+            Pour une agriculture durable et une économie circulaire forte.
+          </p>
+          <div class="flex gap-4">
+            <a href="#" aria-label="Facebook" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="#" aria-label="Twitter / X" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" aria-label="Instagram" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 stroke-white fill-none" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="2" y="2" width="20" height="20" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.5" fill="white"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-white text-lg font-bold mb-6 pb-2 border-b border-white/20">Navigation Rapide</h3>
+          <ul class="space-y-3">
+            <li><a href="{% url 'accueil' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Accueil</a></li>
+            <li><a href="{% url 'catalogue' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Notre Catalogue</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Nos Producteurs</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> La Traçabilité</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Devenir Partenaire</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white text-lg font-bold mb-6 pb-2 border-b border-white/20">Contactez-nous</h3>
+          <ul class="space-y-4 mb-6">
+            <li class="flex items-start gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 mt-0.5 shrink-0" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span class="text-white/70 text-sm leading-5">Dakar, Sénégal<br/>Point E, Rue 10</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C9.61 21 3 14.39 3 6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2z"/></svg>
+              <span class="text-white/70 text-sm">+221 77 123 45 67</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              <span class="text-white/70 text-sm">contact@yeesnaa.sn</span>
+            </li>
+          </ul>
+          <a href="#" class="inline-flex items-center gap-2 px-5 py-2 bg-white/10 border border-white/30 rounded-xl text-white text-sm hover:bg-white/20 transition-colors">
+            <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>
+            Support Client
+          </a>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-white/50 text-xs">© 2024 YEES NAA CONNECT. Tous droits réservés.</p>
+        <div class="flex gap-6">
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Mentions Légales</a>
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Politique de Confidentialité</a>
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">CGV</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  /* COMPTEUR DE QUANTITÉ */
+  let quantity = 1;
+
+  document.getElementById('btn-plus').addEventListener('click', function () {
+    quantity++;
+    document.getElementById('quantity').textContent = quantity;
+  });
+
+  document.getElementById('btn-moins').addEventListener('click', function () {
+    if (quantity > 1) {
+      quantity--;
+      document.getElementById('quantity').textContent = quantity;
+    }
+  });
+
+  /* SÉLECTION DU POIDS */
+  document.querySelectorAll('.btn-poids').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.btn-poids').forEach(b => {
+        b.classList.remove('bg-lime-900', 'text-white');
+        b.classList.add('border', 'text-gray-500');
+      });
+      btn.classList.add('bg-lime-900', 'text-white');
+      btn.classList.remove('border', 'text-gray-500');
+    });
+  });
+
+  /* AJOUT AU PANIER — met à jour le badge sans changer le design */
+  function getCookie(name) {
+    let v = null;
+    if (document.cookie) {
+      document.cookie.split(';').forEach(c => {
+        c = c.trim();
+        if (c.startsWith(name + '=')) v = decodeURIComponent(c.slice(name.length + 1));
+      });
+    }
+    return v;
+  }
+
+  function mettreAJourBadge(nb) {
+    const badge = document.getElementById('badge-panier');
+    if (!badge) return;
+    badge.textContent = nb;
+    if (nb > 0) {
+      badge.classList.remove('hidden');
+      badge.classList.add('flex');
+      badge.classList.add('scale-125');
+      setTimeout(() => badge.classList.remove('scale-125'), 200);
+    } else {
+      badge.classList.add('hidden');
+      badge.classList.remove('flex');
+    }
+  }
+
+  const btnAjouter = document.getElementById('btn-ajouter-detail');
+  let qteTotalePanier = parseInt(btnAjouter.dataset.qtePanier || '0', 10);
+
+  btnAjouter.addEventListener('click', function () {
+    const url         = btnAjouter.dataset.url;
+    const qteAAjouter = parseInt(document.getElementById('quantity').textContent, 10);
+    const poidsActif  = document.querySelector('.btn-poids.bg-lime-900');
+    const poids       = poidsActif ? poidsActif.dataset.poids : '';
+
+    btnAjouter.disabled = true;
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `quantite=${qteAAjouter}&poids=${poids}`
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        // Mettre à jour le badge du header
+        mettreAJourBadge(data.nb_panier);
+
+        // Remettre le compteur à 1 pour le prochain ajout
+        quantity = 1;
+        document.getElementById('quantity').textContent = 1;
+
+        // Réactiver le bouton
+        btnAjouter.disabled = false;
+      }
+    })
+    .catch(() => {
+      btnAjouter.disabled = false;
+    });
+  });
+</script>
+</body>
+</html>

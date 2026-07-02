@@ -1,0 +1,423 @@
+{% load static tailwind_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    {% tailwind_css %}
+</head>
+<body class="bg-white font-sans antialiased">
+
+  <!-- ===========================
+       NAVBAR
+  ============================ -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="{% url 'accueil' %}" class="flex items-center gap-1">
+        <span class="text-2xl font-extrabold text-lime-900">YEES NAA </span>
+        <span class="text-2xl font-bold text-lime-500">CONNECT</span>
+      </a>
+
+      <!-- Navigation -->
+      <nav class="flex items-center gap-8">
+        <a href="{% url 'accueil' %}" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+          Accueil
+        </a>
+        <a href="{% url 'catalogue' %}" class="text-sm font-medium text-lime-900 border-b-2 border-lime-900 pb-1">
+          Catalogue
+        </a>
+        <a href="#" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+          Devenir producteurs
+        </a>
+        <a href="#" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+          À Propos
+        </a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-5">
+        <button aria-label="Rechercher" class="text-gray-600 hover:text-lime-900 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+          </svg>
+        </button>
+
+        <!-- Icône panier avec badge dynamique -->
+        <a href="{% url 'panier' %}" aria-label="Panier" class="relative text-gray-700 hover:text-lime-900 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+          </svg>
+          {% if nb_panier > 0 %}
+          <span id="badge-panier" class="absolute -top-2 -right-2 w-5 h-5 bg-lime-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {{ nb_panier }}
+          </span>
+          {% else %}
+          <span id="badge-panier" class="absolute -top-2 -right-2 w-5 h-5 bg-lime-900 text-white text-[10px] font-bold rounded-full items-center justify-center hidden">0</span>
+          {% endif %}
+        </a>
+
+        <!-- Bouton Commander -->
+        <a href="{% url 'catalogue' %}"
+           class="px-5 py-2.5 bg-lime-900 text-white text-sm font-semibold rounded-xl
+                  hover:bg-lime-800 transition-colors">
+          Commander
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- ===========================
+       CONTENU PRINCIPAL
+  ============================ -->
+  <main class="pt-20">
+
+    <!-- ===========================
+         EN-TÊTE + FILTRES
+    ============================ -->
+    <section class="max-w-7xl mx-auto px-8 pt-12 pb-8">
+
+      <!-- Fil d'Ariane -->
+      <nav aria-label="Fil d'Ariane" class="flex items-center gap-2 mb-6 text-xs font-medium uppercase tracking-wide">
+        <a href="{% url 'accueil' %}" class="text-gray-500 hover:text-lime-900 transition-colors">Accueil</a>
+        <svg class="w-2.5 h-2.5 text-gray-300" fill="none" viewBox="0 0 6 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1 1l4 4-4 4"/>
+        </svg>
+        <span class="text-lime-900">Catalogue</span>
+      </nav>
+
+      <!-- Titre -->
+      <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">
+        Notre Catalogue de Riz Local
+      </h1>
+      <p class="text-xl text-gray-500 mb-6">
+        Riz transformé, conditionné et prêt à cuisiner
+      </p>
+
+      <!-- ===========================
+           FILTRES DYNAMIQUES
+           Chaque filtre est un <a> qui ajoute un paramètre GET dans l'URL.
+           La view Django lit ?q=, ?categorie=, ?poids= et filtre en base.
+           Le filtre actif a le style "bg-lime-900 text-white".
+      ============================ -->
+      <div class="bg-stone-100 rounded-2xl p-6 flex flex-col gap-5">
+
+        <!-- Ligne 1 : Recherche + Tri -->
+        <form method="GET" action="{% url 'catalogue' %}">
+          {% if categorie_active %}<input type="hidden" name="categorie" value="{{ categorie_active }}">{% endif %}
+          {% if poids_actif %}<input type="hidden" name="poids" value="{{ poids_actif }}">{% endif %}
+          <div class="flex items-center gap-4">
+
+            <!-- Recherche -->
+            <div class="relative flex-1">
+              <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+              </svg>
+              <input
+                type="search"
+                name="q"
+                value="{{ q }}"
+                placeholder="Rechercher un riz..."
+                class="w-full pl-12 pr-4 py-3 bg-white rounded-xl shadow-sm text-sm text-gray-700
+                       placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-700 transition"
+              />
+            </div>
+
+            <!-- Tri -->
+            <div class="relative w-52 shrink-0">
+              <select class="w-full appearance-none px-4 py-3 bg-white rounded-xl shadow-sm
+                             text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-lime-700
+                             transition cursor-pointer">
+                <option>Trier par : Popularité</option>
+                <option>Trier par : Prix croissant</option>
+                <option>Trier par : Prix décroissant</option>
+                <option>Trier par : Note</option>
+              </select>
+              <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+
+            <!-- Bouton effacer si filtre actif -->
+            {% if q or categorie_active or poids_actif %}
+            <a href="{% url 'catalogue' %}" class="text-sm text-gray-400 hover:text-red-500 transition-colors whitespace-nowrap">
+              ✕ Effacer
+            </a>
+            {% endif %}
+
+          </div>
+        </form>
+
+        <!-- Ligne 2 : Catégories + Conditionnement -->
+        <div class="flex items-center justify-between gap-3">
+
+          <!-- Catégories dynamiques -->
+          <div class="flex items-center gap-3">
+
+            <a href="{% url 'catalogue' %}{% if q %}?q={{ q }}{% endif %}{% if poids_actif %}{% if q %}&{% else %}?{% endif %}poids={{ poids_actif }}{% endif %}"
+               class="px-6 py-2 rounded-full text-sm font-semibold transition-colors
+                      {% if not categorie_active %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
+              Tous
+            </a>
+
+            {% for val, label in categories %}
+            <a href="?{% if q %}q={{ q }}&{% endif %}categorie={{ val }}{% if poids_actif %}&poids={{ poids_actif }}{% endif %}"
+               class="px-6 py-2 rounded-full text-sm font-semibold transition-colors
+                      {% if categorie_active == val %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
+              {{ label }}
+            </a>
+            {% endfor %}
+
+          </div>
+
+          <!-- Conditionnement dynamique -->
+          <div class="flex items-center bg-white rounded-xl shadow-sm outline outline-1 outline-gray-50 p-1">
+
+            <a href="?{% if q %}q={{ q }}&{% endif %}{% if categorie_active %}categorie={{ categorie_active }}&{% endif %}poids=5kg"
+               class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors
+                      {% if poids_actif == '5kg' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+              5kg
+            </a>
+            <a href="?{% if q %}q={{ q }}&{% endif %}{% if categorie_active %}categorie={{ categorie_active }}&{% endif %}poids=10kg"
+               class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors
+                      {% if poids_actif == '10kg' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+              10kg
+            </a>
+            <a href="?{% if q %}q={{ q }}&{% endif %}{% if categorie_active %}categorie={{ categorie_active }}&{% endif %}poids=25kg"
+               class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors
+                      {% if poids_actif == '25kg' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+              25kg
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ===========================
+         GRILLE PRODUITS DYNAMIQUE
+    ============================ -->
+    <section class="max-w-7xl mx-auto px-8 pb-20">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+           id="grille-produits">
+        {% include 'client/partials/cards_produits.html' with produits=produits %}
+      </div>
+
+      <!-- BOUTON CHARGER PLUS -->
+      <div class="flex justify-center mt-12" id="conteneur-charger-plus">
+        {% if has_next %}
+        <button
+          id="btn-charger-plus"
+          data-next-page="{{ next_page }}"
+          data-url="{% url 'catalogue' %}"
+          data-q="{{ q }}"
+          data-categorie="{{ categorie_active }}"
+          data-poids="{{ poids_actif }}"
+          class="px-8 py-4 bg-white border-2 border-lime-900 text-lime-900 font-bold
+                 rounded-xl hover:bg-lime-50 active:scale-[.98] transition-all
+                 focus:outline-none focus:ring-2 focus:ring-lime-700 flex items-center gap-3">
+          <svg class="w-4 h-4 fill-lime-900" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+          Charger plus de produits
+        </button>
+        {% endif %}
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ===========================
+       FOOTER (original)
+  ============================ -->
+  <footer class="bg-lime-950 border-t-4 border-yellow-600 pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-8">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+
+        <!-- Colonne 1 : Présentation -->
+        <div>
+          <p class="text-white text-2xl font-extrabold uppercase mb-6">Yees Naa</p>
+          <p class="text-white/70 text-sm leading-6 mb-6">
+            Connecter les producteurs locaux de riz du Sénégal directement aux consommateurs.
+            Pour une agriculture durable et une économie circulaire forte.
+          </p>
+          <div class="flex gap-4">
+            <a href="#" aria-label="Facebook"
+               class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="#" aria-label="Twitter / X"
+               class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" aria-label="Instagram"
+               class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 stroke-white fill-none" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="2" y="2" width="20" height="20" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.5" fill="white"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Colonne 2 : Navigation rapide -->
+        <div>
+          <h3 class="text-white text-lg font-bold mb-6 pb-2 border-b border-white/20">Navigation Rapide</h3>
+          <ul class="space-y-3">
+            <li><a href="{% url 'accueil' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Accueil</a></li>
+            <li><a href="{% url 'catalogue' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Notre Catalogue</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Nos Producteurs</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> La Traçabilité</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Devenir Partenaire</a></li>
+          </ul>
+        </div>
+
+        <!-- Colonne 3 : Contact -->
+        <div>
+          <h3 class="text-white text-lg font-bold mb-6 pb-2 border-b border-white/20">Contactez-nous</h3>
+          <ul class="space-y-4 mb-6">
+            <li class="flex items-start gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 mt-0.5 shrink-0" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span class="text-white/70 text-sm leading-5">Dakar, Sénégal<br/>Point E, Rue 10</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C9.61 21 3 14.39 3 6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2z"/></svg>
+              <span class="text-white/70 text-sm">+221 77 123 45 67</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              <span class="text-white/70 text-sm">contact@yeesnaa.sn</span>
+            </li>
+          </ul>
+          <a href="#"
+             class="inline-flex items-center gap-2 px-5 py-2 bg-white/10 border border-white/30
+                    rounded-xl text-white text-sm hover:bg-white/20 transition-colors">
+            <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>
+            Support Client
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Bas de footer -->
+      <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-white/50 text-xs">© 2024 YEES NAA CONNECT. Tous droits réservés.</p>
+        <div class="flex gap-6">
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Mentions Légales</a>
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Politique de Confidentialité</a>
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">CGV</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ===========================
+       JAVASCRIPT
+  ============================ -->
+  <script>
+    function getCookie(name) {
+      let v = null;
+      if (document.cookie) {
+        document.cookie.split(';').forEach(c => {
+          c = c.trim();
+          if (c.startsWith(name + '=')) v = decodeURIComponent(c.slice(name.length + 1));
+        });
+      }
+      return v;
+    }
+
+    function mettreAJourBadge(nb) {
+      const badge = document.getElementById('badge-panier');
+      if (!badge) return;
+      badge.textContent = nb;
+      if (nb > 0) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+        badge.classList.add('scale-125');
+        setTimeout(() => badge.classList.remove('scale-125'), 200);
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+      }
+    }
+
+    function bindBoutonsAjouter() {
+      document.querySelectorAll('.btn-ajouter:not([data-bound])').forEach(btn => {
+        btn.setAttribute('data-bound', '1');
+        btn.addEventListener('click', function () {
+          const url = btn.dataset.url;
+          btn.disabled = true;
+          btn.textContent = 'Ajout...';
+          fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'quantite=1'
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              mettreAJourBadge(data.nb_panier);
+              btn.innerHTML = `<svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ajouté !`;
+              btn.classList.replace('bg-lime-900', 'bg-lime-700');
+              setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg> Ajouter au panier`;
+                btn.classList.replace('bg-lime-700', 'bg-lime-900');
+              }, 2000);
+            }
+          })
+          .catch(() => { btn.disabled = false; btn.textContent = 'Erreur'; });
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      bindBoutonsAjouter();
+
+      const btn = document.getElementById('btn-charger-plus');
+      if (!btn) return;
+
+      btn.addEventListener('click', function () {
+        const params = new URLSearchParams();
+        params.set('page', btn.dataset.nextPage);
+        if (btn.dataset.q)         params.set('q', btn.dataset.q);
+        if (btn.dataset.categorie) params.set('categorie', btn.dataset.categorie);
+        if (btn.dataset.poids)     params.set('poids', btn.dataset.poids);
+
+        btn.disabled = true;
+        btn.textContent = 'Chargement...';
+
+        fetch(`${btn.dataset.url}?${params}`, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('grille-produits').insertAdjacentHTML('beforeend', data.html);
+          bindBoutonsAjouter();
+          if (data.has_next) {
+            btn.dataset.nextPage = data.next_page;
+            btn.disabled = false;
+            btn.innerHTML = `<svg class="w-4 h-4 fill-lime-900" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg> Charger plus de produits`;
+          } else {
+            document.getElementById('conteneur-charger-plus').remove();
+          }
+        })
+        .catch(() => { btn.disabled = false; btn.textContent = 'Erreur — réessayez'; });
+      });
+    });
+  </script>
+
+</body>
+</html>

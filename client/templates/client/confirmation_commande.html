@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commande confirmée — YEES NAA CONNECT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white font-sans antialiased">
+
+  <!-- ===========================
+       NAVBAR
+  ============================ -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-1">
+        <span class="text-2xl font-extrabold text-lime-900">YEES NAA </span>
+        <span class="text-2xl font-bold text-lime-500">CONNECT</span>
+      </a>
+
+      <!-- Navigation -->
+      <nav class="flex items-center gap-8">
+        <a href="#" class="text-base font-medium text-lime-950 hover:text-lime-700 transition-colors">Accueil</a>
+        <a href="#" class="text-base font-medium text-lime-950 hover:text-lime-700 transition-colors">Produits</a>
+        <a href="#" class="text-base font-medium text-lime-950 hover:text-lime-700 transition-colors">Producteurs</a>
+        <a href="#" class="text-base font-medium text-lime-950 hover:text-lime-700 transition-colors">À Propos</a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-5">
+
+        <!-- Icône recherche -->
+        <button aria-label="Rechercher" class="text-lime-950 hover:text-lime-700 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+          </svg>
+        </button>
+
+        <!-- Icône panier avec badge -->
+        <a href="#" aria-label="Panier" class="relative text-lime-950 hover:text-lime-700 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+          </svg>
+          <span class="absolute -top-2 -right-2 w-5 h-5 bg-amber-700 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            0
+          </span>
+        </a>
+
+        <!-- Bouton Commander -->
+        <a href="#"
+           class="px-6 py-2.5 bg-lime-900 text-white text-base font-medium rounded-xl
+                  hover:bg-lime-800 transition-colors">
+          Commander
+        </a>
+
+      </div>
+    </div>
+  </header>
+
+
+  <!-- ===========================
+       CONTENU PRINCIPAL
+  ============================ -->
+  <main class="pt-16">
+    <div class="max-w-7xl mx-auto px-8 pt-16 pb-24 flex flex-col items-center">
+
+      <!-- ===========================
+           EN-TÊTE : CONFIRMATION
+      ============================ -->
+      <div class="flex flex-col items-center text-center mb-12">
+
+        <!-- Icône succès -->
+        <div class="w-20 h-20 bg-lime-200 rounded-full flex items-center justify-center mb-6">
+          <svg class="w-8 h-8 fill-lime-900" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">Commande confirmée !</h1>
+        <p class="text-lg text-gray-500">Merci de soutenir le riz local sénégalais 🌾</p>
+
+      </div>
+
+
+      <!-- ===========================
+           GRILLE : DÉTAILS + QR CODE
+      ============================ -->
+      <div class="w-full max-w-5xl flex items-start gap-10">
+
+
+        <!-- ---- COLONNE GAUCHE : Détails commande ---- -->
+        <div class="flex-1 flex flex-col gap-8">
+
+          <!-- Carte récapitulatif -->
+          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-8">
+
+            <!-- Numéro de commande + statut -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <h2 class="text-xl font-bold text-lime-950">#YEES-2026-014</h2>
+                <button aria-label="Copier le numéro de commande"
+                        class="text-gray-400 hover:text-lime-900 transition-colors">
+                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+                  </svg>
+                </button>
+              </div>
+              <span class="px-4 py-1.5 bg-orange-50 rounded-full text-yellow-600 text-sm font-bold uppercase tracking-wide">
+                En préparation
+              </span>
+            </div>
+
+            <!-- Articles commandés -->
+            <div class="flex flex-col gap-5 pb-8 border-b border-gray-100">
+
+              <!-- Article 1 -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 p-2">
+                    <img src="https://placehold.co/48x48" alt="Riz Parfumé Royal 5kg"
+                         class="w-full h-full object-contain" loading="lazy"/>
+                  </div>
+                  <div>
+                    <p class="text-base font-semibold text-lime-950">Riz Parfumé Royal 5kg</p>
+                    <p class="text-sm text-gray-500">Quantité : 02</p>
+                  </div>
+                </div>
+                <p class="text-base font-bold text-lime-950">11 000 FCFA</p>
+              </div>
+
+              <!-- Article 2 -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 p-2">
+                    <img src="https://placehold.co/48x48" alt="Riz Brisé 10kg"
+                         class="w-full h-full object-contain" loading="lazy"/>
+                  </div>
+                  <div>
+                    <p class="text-base font-semibold text-lime-950">Riz Brisé 10kg</p>
+                    <p class="text-sm text-gray-500">Quantité : 01</p>
+                  </div>
+                </div>
+                <p class="text-base font-bold text-lime-950">12 500 FCFA</p>
+              </div>
+
+            </div>
+
+            <!-- Adresse + Paiement -->
+            <div class="flex items-start gap-8">
+              <div class="flex-1 flex flex-col gap-1">
+                <p class="text-sm font-medium text-gray-500">Adresse de livraison</p>
+                <p class="text-base text-lime-950">Sacré-Cœur 3, Villa 123, Dakar</p>
+              </div>
+              <div class="flex-1 flex flex-col gap-1">
+                <p class="text-sm font-medium text-gray-500">Mode de paiement</p>
+                <p class="text-base text-lime-950">Paiement à la livraison</p>
+              </div>
+            </div>
+
+            <!-- Total payé -->
+            <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+              <p class="text-lg font-medium text-lime-950">Total payé</p>
+              <div class="text-right">
+                <p class="text-3xl font-bold text-yellow-600">33 000 FCFA</p>
+                <p class="text-xs text-gray-400">TVA incluse</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="flex items-center gap-4">
+            <a href="{% url 'suivre_commande' %}"
+               class="flex-1 py-5 bg-lime-900 text-white text-lg font-bold text-center rounded-xl
+                      hover:bg-lime-800 transition-colors">
+              Suivre ma commande
+            </a>
+            <a href="#"
+               class="flex-1 py-4 text-lime-900 text-lg font-bold text-center rounded-xl
+                      outline outline-2 outline-lime-900 hover:bg-lime-50 transition-colors">
+              Continuer mes achats
+            </a>
+          </div>
+
+        </div>
+
+
+        <!-- ---- COLONNE DROITE : QR Code ---- -->
+        <aside class="w-96 shrink-0 flex flex-col gap-5">
+
+          <!-- Carte QR code -->
+          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col items-center overflow-hidden relative">
+
+            <!-- Barre décorative top -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-700 to-yellow-600 rounded-t-3xl"></div>
+
+            <!-- Titre -->
+            <h2 class="text-xl font-bold text-lime-950 text-center mb-3">
+              Votre QR code de traçabilité
+            </h2>
+
+            <!-- Description -->
+            <p class="text-sm text-gray-500 text-center mb-8">
+              Scannez-le à la réception pour vérifier l'origine de votre riz
+            </p>
+
+            <!-- QR code image -->
+            <div class="w-60 h-60 bg-gray-50 rounded-2xl outline outline-1 outline-gray-200 flex items-center justify-center mb-8 p-5">
+              <img src="https://placehold.co/200x200" alt="QR code de traçabilité"
+                   class="w-full h-full object-contain" />
+            </div>
+
+            <!-- Bouton télécharger -->
+            <a href="#"
+               class="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl
+                      outline outline-2 outline-lime-900 text-lime-900 text-base font-bold
+                      hover:bg-lime-50 transition-colors">
+              <svg class="w-4 h-4 fill-lime-900 shrink-0" viewBox="0 0 24 24">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/>
+              </svg>
+              Télécharger le QR code
+            </a>
+
+          </div>
+
+          <!-- Notice SMS -->
+          <div class="flex items-center gap-2 justify-center text-gray-500 text-sm">
+            <svg class="w-4 h-4 fill-gray-500 shrink-0" viewBox="0 0 24 24">
+              <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
+            </svg>
+            Un SMS de confirmation a été envoyé au numéro fourni
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+
+  <!-- ===========================
+       FOOTER
+  ============================ -->
+  <footer class="bg-lime-950 border-t-4 border-yellow-600 pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-8">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+        <!-- Colonne 1 : Présentation -->
+        <div>
+          <p class="text-white text-2xl font-extrabold uppercase mb-6">Yees Naa</p>
+          <p class="text-white/70 text-sm leading-6 mb-6">
+            Connecter les producteurs locaux de riz du Sénégal directement aux consommateurs.
+            Pour une agriculture durable et une économie circulaire forte.
+          </p>
+          <div class="flex gap-4">
+            <a href="#" aria-label="Facebook"
+               class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Twitter / X"
+               class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram"
+               class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4 stroke-white fill-none" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="2" y="2" width="20" height="20" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.5" fill="white"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Colonne 2 : Navigation rapide -->
+        <div>
+          <h3 class="text-white text-lg font-bold mb-6 pb-2 border-b border-white/20">Navigation Rapide</h3>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Accueil</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Notre Catalogue</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Nos Producteurs</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> La Traçabilité</a></li>
+            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Devenir Partenaire</a></li>
+          </ul>
+        </div>
+
+        <!-- Colonne 3 : Contact -->
+        <div>
+          <h3 class="text-white text-lg font-bold mb-6 pb-2 border-b border-white/20">Contactez-nous</h3>
+          <ul class="space-y-4 mb-6">
+            <li class="flex items-start gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 mt-0.5 shrink-0" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <span class="text-white/70 text-sm leading-5">Dakar, Sénégal<br/>Point E, Rue 10</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24">
+                <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C9.61 21 3 14.39 3 6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2z"/>
+              </svg>
+              <span class="text-white/70 text-sm">+221 77 123 45 67</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24">
+                <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+              <span class="text-white/70 text-sm">contact@yeesnaa.sn</span>
+            </li>
+          </ul>
+          <a href="#"
+             class="inline-flex items-center gap-2 px-5 py-2 bg-white/10 border border-white/30
+                    rounded-xl text-white text-sm hover:bg-white/20 transition-colors">
+            <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24">
+              <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/>
+            </svg>
+            Support Client
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Bas de footer -->
+      <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-white/50 text-xs">© 2024 YEES NAA CONNECT. Tous droits réservés.</p>
+        <div class="flex gap-6">
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Mentions Légales</a>
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Politique de Confidentialité</a>
+          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">CGV</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+</body>
+</html>
