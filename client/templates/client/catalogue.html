@@ -102,14 +102,14 @@
       <!-- ===========================
            FILTRES DYNAMIQUES
            Chaque filtre est un <a> qui ajoute un paramètre GET dans l'URL.
-           La view Django lit ?q=, ?categorie=, ?poids= et filtre en base.
+           La view Django lit ?q=, ?type_riz=, ?poids= et filtre en base.
            Le filtre actif a le style "bg-lime-900 text-white".
       ============================ -->
       <div class="bg-stone-100 rounded-2xl p-6 flex flex-col gap-5">
 
         <!-- Ligne 1 : Recherche + Tri -->
         <form method="GET" action="{% url 'catalogue' %}">
-          {% if categorie_active %}<input type="hidden" name="categorie" value="{{ categorie_active }}">{% endif %}
+          {% if type_riz_actif %}<input type="hidden" name="type_riz" value="{{ type_riz_actif }}">{% endif %}
           {% if poids_actif %}<input type="hidden" name="poids" value="{{ poids_actif }}">{% endif %}
           <div class="flex items-center gap-4">
 
@@ -147,7 +147,7 @@
             </div>
 
             <!-- Bouton effacer si filtre actif -->
-            {% if q or categorie_active or poids_actif %}
+            {% if q or type_riz_actif or poids_actif %}
             <a href="{% url 'catalogue' %}" class="text-sm text-gray-400 hover:text-red-500 transition-colors whitespace-nowrap">
               ✕ Effacer
             </a>
@@ -156,22 +156,22 @@
           </div>
         </form>
 
-        <!-- Ligne 2 : Catégories + Conditionnement -->
+        <!-- Ligne 2 : Types de riz + Conditionnement -->
         <div class="flex items-center justify-between gap-3">
 
-          <!-- Catégories dynamiques -->
+          <!-- Types de riz dynamiques -->
           <div class="flex items-center gap-3">
 
             <a href="{% url 'catalogue' %}{% if q %}?q={{ q }}{% endif %}{% if poids_actif %}{% if q %}&{% else %}?{% endif %}poids={{ poids_actif }}{% endif %}"
                class="px-6 py-2 rounded-full text-sm font-semibold transition-colors
-                      {% if not categorie_active %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
+                      {% if not type_riz_actif %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
               Tous
             </a>
 
-            {% for val, label in categories %}
-            <a href="?{% if q %}q={{ q }}&{% endif %}categorie={{ val }}{% if poids_actif %}&poids={{ poids_actif }}{% endif %}"
+            {% for val, label in types_riz %}
+            <a href="?{% if q %}q={{ q }}&{% endif %}type_riz={{ val }}{% if poids_actif %}&poids={{ poids_actif }}{% endif %}"
                class="px-6 py-2 rounded-full text-sm font-semibold transition-colors
-                      {% if categorie_active == val %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
+                      {% if type_riz_actif == val %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
               {{ label }}
             </a>
             {% endfor %}
@@ -181,19 +181,19 @@
           <!-- Conditionnement dynamique -->
           <div class="flex items-center bg-white rounded-xl shadow-sm outline outline-1 outline-gray-50 p-1">
 
-            <a href="?{% if q %}q={{ q }}&{% endif %}{% if categorie_active %}categorie={{ categorie_active }}&{% endif %}poids=5kg"
+            <a href="?{% if q %}q={{ q }}&{% endif %}{% if type_riz_actif %}type_riz={{ type_riz_actif }}&{% endif %}poids=5"
                class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors
-                      {% if poids_actif == '5kg' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+                      {% if poids_actif == '5' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
               5kg
             </a>
-            <a href="?{% if q %}q={{ q }}&{% endif %}{% if categorie_active %}categorie={{ categorie_active }}&{% endif %}poids=10kg"
+            <a href="?{% if q %}q={{ q }}&{% endif %}{% if type_riz_actif %}type_riz={{ type_riz_actif }}&{% endif %}poids=10"
                class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors
-                      {% if poids_actif == '10kg' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+                      {% if poids_actif == '10' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
               10kg
             </a>
-            <a href="?{% if q %}q={{ q }}&{% endif %}{% if categorie_active %}categorie={{ categorie_active }}&{% endif %}poids=25kg"
+            <a href="?{% if q %}q={{ q }}&{% endif %}{% if type_riz_actif %}type_riz={{ type_riz_actif }}&{% endif %}poids=25"
                class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors
-                      {% if poids_actif == '25kg' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+                      {% if poids_actif == '25' %}bg-lime-900 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
               25kg
             </a>
 
@@ -222,7 +222,7 @@
           data-next-page="{{ next_page }}"
           data-url="{% url 'catalogue' %}"
           data-q="{{ q }}"
-          data-categorie="{{ categorie_active }}"
+          data-type-riz="{{ type_riz_actif }}"
           data-poids="{{ poids_actif }}"
           class="px-8 py-4 bg-white border-2 border-lime-900 text-lime-900 font-bold
                  rounded-xl hover:bg-lime-50 active:scale-[.98] transition-all
@@ -365,7 +365,10 @@
             headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'quantite=1'
           })
-          .then(r => r.json())
+          .then(r => {
+            if (!r.ok) throw new Error(`Erreur serveur (statut ${r.status})`);
+            return r.json();
+          })
           .then(data => {
             if (data.success) {
               mettreAJourBadge(data.nb_panier);
@@ -376,9 +379,21 @@
                 btn.innerHTML = `<svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg> Ajouter au panier`;
                 btn.classList.replace('bg-lime-700', 'bg-lime-900');
               }, 2000);
+            } else {
+              btn.disabled = false;
+              btn.textContent = data.error || 'Impossible d\'ajouter';
+              setTimeout(() => {
+                btn.innerHTML = `<svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg> Ajouter au panier`;
+              }, 2000);
             }
           })
-          .catch(() => { btn.disabled = false; btn.textContent = 'Erreur'; });
+          .catch(() => {
+            btn.disabled = false;
+            btn.textContent = 'Erreur';
+            setTimeout(() => {
+              btn.innerHTML = `<svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg> Ajouter au panier`;
+            }, 2000);
+          });
         });
       });
     }
@@ -392,9 +407,9 @@
       btn.addEventListener('click', function () {
         const params = new URLSearchParams();
         params.set('page', btn.dataset.nextPage);
-        if (btn.dataset.q)         params.set('q', btn.dataset.q);
-        if (btn.dataset.categorie) params.set('categorie', btn.dataset.categorie);
-        if (btn.dataset.poids)     params.set('poids', btn.dataset.poids);
+        if (btn.dataset.q)       params.set('q', btn.dataset.q);
+        if (btn.dataset.typeRiz) params.set('type_riz', btn.dataset.typeRiz);
+        if (btn.dataset.poids)   params.set('poids', btn.dataset.poids);
 
         btn.disabled = true;
         btn.textContent = 'Chargement...';
@@ -402,7 +417,10 @@
         fetch(`${btn.dataset.url}?${params}`, {
           headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) throw new Error(`Erreur serveur (statut ${r.status})`);
+          return r.json();
+        })
         .then(data => {
           document.getElementById('grille-produits').insertAdjacentHTML('beforeend', data.html);
           bindBoutonsAjouter();

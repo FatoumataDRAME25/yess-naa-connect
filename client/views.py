@@ -47,7 +47,7 @@ def total_panier(request):
 # ---------------------------------------------------------------------------
 
 def accueil(request):
-    produits = Produit.objects.filter(actif=True)[:4]
+    produits = Produit.objects.filter(est_actif=True)[:4]
     context = {
         'produits': produits,
         'nb_panier': nb_articles_panier(request),
@@ -57,35 +57,29 @@ def accueil(request):
 
 def catalogue(request):
     # --- Paramètres de filtrage depuis l'URL (GET) ---
-    # ex: /client/cat/?q=blanc&categorie=parfume&poids=5kg&page=2
-    q         = request.GET.get('q', '').strip()
-    categorie = request.GET.get('categorie', '')   # 'blanc','parfume','complet','brisure'
-    poids     = request.GET.get('poids', '')       # '5kg','10kg','25kg'
+    q        = request.GET.get('q', '').strip()
+    type_riz = request.GET.get('type_riz', '')   # 'blanc','etuve','parfume'
+    poids    = request.GET.get('poids', '')      # '5','10','25'
 
     # --- Construction du queryset avec filtres cumulatifs ---
-    produits = Produit.objects.filter(actif=True)
+    produits = Produit.objects.filter(est_actif=True)
 
     if q:
-        # Recherche insensible à la casse sur le nom
         produits = produits.filter(nom__icontains=q)
 
-    if categorie:
-        produits = produits.filter(categorie=categorie)
+    if type_riz:
+        produits = produits.filter(type_riz=type_riz)
 
     if poids:
-        # poids_options est une chaîne "5kg,10kg,25kg"
-        # on cherche si le poids demandé apparaît dans cette chaîne
-        produits = produits.filter(poids_options__icontains=poids)
+        produits = produits.filter(poids_kg=poids)
 
     # --- Pagination : 8 produits par page ---
     from django.core.paginator import Paginator
-    paginator  = Paginator(produits, 8)
-    page_num   = request.GET.get('page', 1)
-    page_obj   = paginator.get_page(page_num)
+    paginator = Paginator(produits, 8)
+    page_num  = request.GET.get('page', 1)
+    page_obj  = paginator.get_page(page_num)
 
     # --- Si requête AJAX (bouton "Charger plus") ---
-    # Le JS envoie un header X-Requested-With: XMLHttpRequest
-    # On retourne seulement le fragment HTML des nouvelles cards
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         from django.template.loader import render_to_string
         html = render_to_string(
@@ -104,19 +98,15 @@ def catalogue(request):
         'nb_panier':      nb_articles_panier(request),
         'has_next':       page_obj.has_next(),
         'next_page':      page_obj.next_page_number() if page_obj.has_next() else None,
-        # On renvoie les filtres actifs pour que le template puisse
-        # marquer le bon bouton comme actif
         'q':              q,
-        'categorie_active': categorie,
+        'type_riz_actif': type_riz,
         'poids_actif':    poids,
-        # Liste des catégories disponibles pour générer les boutons
-        'categories':     Produit.CATEGORIE_CHOICES,
+        'types_riz':      Produit.TypeRiz.choices,
     }
     return render(request, "client/catalogue.html", context)
 
-
 def produit_detail(request, produit_id):
-    produit = get_object_or_404(Produit, id=produit_id, actif=True)
+    produit = get_object_or_404(Produit, id=produit_id, est_actif=True)
 
     # Récupérer la quantité de ce produit déjà dans le panier
     panier = get_panier(request)
@@ -216,32 +206,27 @@ def suivre_commande(request):
 @require_POST
 def ajouter_au_panier(request, produit_id):
     """Ajoute un produit au panier ou incrémente sa quantité."""
-    produit = get_object_or_404(Produit, id=produit_id, actif=True)
+    produit = get_object_or_404(Produit, id=produit_id, est_actif=True)
     panier = get_panier(request)
 
     quantite = int(request.POST.get('quantite', 1))
-    poids = request.POST.get('poids', produit.get_poids_liste()[0])
-
     cle = str(produit_id)
 
     if cle in panier:
         panier[cle]['quantite'] += quantite
     else:
-        image_url = produit.image.url if produit.image else ''
         panier[cle] = {
             'nom': produit.nom,
             'prix': int(produit.prix),
-            'image': image_url,
+            'image': '',  # temporaire : à remplir une fois le champ image ajouté au modèle
             'quantite': quantite,
-            'poids': poids,
+            'poids': produit.poids_kg,
         }
 
     save_panier(request, panier)
 
-    # Retourne JSON pour la mise à jour dynamique du badge
     nb = nb_articles_panier(request)
     return JsonResponse({'success': True, 'nb_panier': nb})
-
 
 @require_POST
 def modifier_quantite(request, produit_id):
