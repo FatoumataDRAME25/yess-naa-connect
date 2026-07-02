@@ -4,8 +4,8 @@
 
   <a href="{% url 'produit_detail' produit.id %}">
     <div class="bg-gray-50 rounded-2xl overflow-hidden h-64">
-      {% if produit.image %}
-        <img src="{{ produit.image.url }}" class="w-full h-full object-cover" alt="{{ produit.nom }}"/>
+      {% if produit.photo %}
+        <img src="{{ produit.photo.url }}" class="w-full h-full object-cover" alt="{{ produit.nom }}"/>
       {% else %}
         <img src="{% static 'images/1sac5kg.jpg' %}" class="w-full h-full object-cover" alt="{{ produit.nom }}"/>
       {% endif %}

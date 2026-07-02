@@ -84,8 +84,8 @@
 
                 <!-- Image principale du produit -->
                 <div class="h-[400px] md:h-[600px] rounded-3xl shadow-xl overflow-hidden">
-                    {% if produit.image %}
-                    <img src="{{ produit.image.url }}"
+                    {% if produit.photo %}
+                    <img src="{{ produit.photo.url }}"
                          alt="{{ produit.nom }}"
                          class="w-full h-full object-cover">
                     {% else %}
@@ -97,8 +97,8 @@
 
                 <!-- Miniatures (image principale répétée pour l'instant) -->
                 <div class="grid grid-cols-4 gap-3">
-                    {% if produit.image %}
-                    <img src="{{ produit.image.url }}" class="h-20 md:h-24 w-full object-cover rounded-xl border-2 border-lime-900" />
+                    {% if produit.photo %}
+                    <img src="{{ produit.photo.url }}" class="h-20 md:h-24 w-full object-cover rounded-xl border-2 border-lime-900" />
                     {% else %}
                     <img src="{% static 'images/1sac5kg.jpg' %}" class="h-20 md:h-24 w-full object-cover rounded-xl border-2 border-lime-900" />
                     {% endif %}
@@ -121,8 +121,7 @@
                 <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
 
                 <div class="flex items-center gap-1 text-yellow-600 font-semibold">
-                    {{ produit.note }}
-                    <span class="w-3 h-3 bg-yellow-600"></span>
+                    ★★★★★
                     {% if produit.nb_avis > 0 %}
                     <span class="text-gray-500">({{ produit.nb_avis }} avis)</span>
                     {% endif %}
@@ -132,7 +131,7 @@
 
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 bg-lime-900"></span>
-                    {{ produit.origine }}
+                    {{ produit.description|truncatewords:6 }}
                 </div>
 
                 </div>
@@ -145,8 +144,12 @@
 
             <!-- PRODUCTOR -->
             <div class="p-4 bg-gray-50 border-l-4 border-lime-900 rounded-xl text-sm text-gray-600">
-                <span class="font-semibold text-lime-950">Producteur :</span>
-                {{ produit.producteur_info }}
+                <span class="font-semibold text-lime-950">Source :</span>
+                {% if produit.stock_source %}
+                    {{ produit.stock_source.stock.producteur.user.prenom }} {{ produit.stock_source.stock.producteur.user.nom }} — {{ produit.stock_source.stock.region }}
+                {% else %}
+                    Information non disponible
+                {% endif %}
             </div>
 
             <!-- FORMAT — boutons de sélection du poids

@@ -2,11 +2,24 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Sum, Count, F
 from datetime import date, datetime
-from urllib.parse import quote
-import random
 
-from client.models import Produit
+from producteur.models import StockPaddy
+from .models import CommandePaddy, Produit
+from client.models import CommandeClient
+
+
+# ── Décorateur utilitaire : réserve l'accès aux admins ──
+def admin_required(view_func):
+    @login_required(login_url='/espace-admin/connexion/')
+    def wrapper(request, *args, **kwargs):
+        if not request.user.role == 'admin' and not request.user.is_superuser:
+            messages.error(request, "Accès réservé aux administrateurs.")
+            return redirect('admin_transformatrice:admin_login')
+        return view_func(request, *args, **kwargs)
+    wrapper.__name__ = view_func.__name__
+    return wrapper
 
 
 # ============================================================
@@ -15,15 +28,18 @@ from client.models import Produit
 
 def admin_login(request):
     """Connexion de la transformatrice/admin."""
+    if request.user.is_authenticated:
+        return redirect('admin_transformatrice:admin_dashboard')
+
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect('admin_transformatrice:admin_dashboard')
         messages.error(request, "Identifiant ou mot de passe incorrect.")
-        return render(request, 'espace_admin/login.html', {'form': {'errors': True}})
+        return render(request, 'espace_admin/login.html', {'has_error': True})
     return render(request, 'espace_admin/login.html')
 
 
@@ -36,21 +52,42 @@ def admin_logout(request):
 #  TABLEAU DE BORD
 # ============================================================
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_dashboard(request):
+    today = date.today()
+
+    commandes_jour = CommandeClient.objects.filter(date__date=today).count()
+    producteurs_actifs = StockPaddy.objects.filter(
+        statut=StockPaddy.Statut.DISPONIBLE
+    ).values('producteur').distinct().count()
+    stock_paddy_total = StockPaddy.objects.filter(
+        statut=StockPaddy.Statut.DISPONIBLE
+    ).aggregate(total=Sum('quantite_kg'))['total'] or 0
+
+    ca_mois = CommandeClient.objects.filter(
+        date__year=today.year, date__month=today.month
+    ).aggregate(
+        total=Sum(F('lignes__quantite') * F('lignes__prix_unitaire'))
+    )['total'] or 0
+
+    commandes_recentes = CommandeClient.objects.select_related('client').order_by('-date')[:5]
+
+    total_commandes = CommandeClient.objects.count() or 1
+    en_livraison = CommandeClient.objects.filter(statut=CommandeClient.Statut.EN_LIVRAISON).count()
+    en_attente = CommandeClient.objects.filter(statut=CommandeClient.Statut.ATTENTE).count()
+
     context = {
         'active_nav': 'dashboard',
-        'today': date.today(),
+        'today': today,
         'stats': {
-            'commandes_jour': 8,
-            'ca_mois': '850 000',
-            'stock_paddy': '2 500',
-            'producteurs_actifs': 18,
+            'commandes_jour': commandes_jour,
+            'ca_mois': f"{int(ca_mois):,}".replace(',', ' '),
+            'stock_paddy': f"{int(stock_paddy_total):,}".replace(',', ' '),
+            'producteurs_actifs': producteurs_actifs,
         },
-        'ventes_semaine': [45000, 52000, 38000, 64000, 47000, 69000, 58000],
-        'pct_livraison': 65,
-        'pct_en_ligne': 35,
-        'commandes_recentes': _get_dummy_commandes()[:4],
+        'pct_livraison': round(en_livraison / total_commandes * 100),
+        'pct_en_ligne': round(en_attente / total_commandes * 100),
+        'commandes_recentes': commandes_recentes,
     }
     return render(request, 'espace_admin/dashboard.html', context)
 
@@ -59,50 +96,81 @@ def admin_dashboard(request):
 #  STOCKS PRODUCTEURS
 # ============================================================
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_stocks(request):
     commande_envoyee = request.session.pop('commande_envoyee', None)
+
+    stocks = StockPaddy.objects.filter(
+        statut=StockPaddy.Statut.DISPONIBLE
+    ).select_related('producteur__user').order_by('-id')
+
+    stock_total_kg = stocks.aggregate(total=Sum('quantite_kg'))['total'] or 0
+    nb_producteurs = stocks.values('producteur').distinct().count()
+    regions = list(stocks.values_list('region', flat=True).distinct())
+    varietes = [v[1] for v in StockPaddy.Variete.choices]
+
     context = {
         'active_nav': 'stocks',
-        'stock_total_kg': '2 500',
-        'nb_producteurs': 18,
-        'regions': ['Saint-Louis', 'Casamance', 'Thiès', 'Mbour'],
-        'varietes': ['Sahel 108', 'Nerica'],
-        'stocks_producteurs': _get_dummy_stocks(),
+        'stock_total_kg': f"{int(stock_total_kg):,}".replace(',', ' '),
+        'nb_producteurs': nb_producteurs,
+        'regions': regions,
+        'varietes': varietes,
+        'stocks_producteurs': stocks,
         'commande_envoyee': commande_envoyee,
     }
     return render(request, 'espace_admin/stocks_producteurs.html', context)
 
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_commander_paddy(request):
     if request.method == 'POST':
+        stock_id = request.POST.get('stock_id')
         quantite_kg = request.POST.get('quantite_kg', '0')
         date_livraison = request.POST.get('date_livraison', '')
-        prix_kg = request.POST.get('prix_kg', '0')
-        producteur_nom = request.POST.get('producteur_nom', '')
+        note = request.POST.get('note', '')
+
+        stock = get_object_or_404(StockPaddy, pk=stock_id)
 
         try:
-            total = int(quantite_kg) * int(prix_kg)
-            total_fmt = f"{total:,}".replace(',', ' ')
+            quantite = float(quantite_kg)
         except (ValueError, TypeError):
-            total_fmt = '0'
+            messages.error(request, "Quantité invalide.")
+            return redirect('admin_transformatrice:admin_stocks')
 
+        if quantite <= 0 or quantite > float(stock.quantite_kg):
+            messages.error(request, f"Quantité doit être entre 1 et {stock.quantite_kg} kg.")
+            return redirect('admin_transformatrice:admin_stocks')
+
+        date_liv = None
         if date_livraison:
             try:
-                date_fmt = datetime.strptime(date_livraison, '%Y-%m-%d').strftime('%d/%m/%Y')
+                date_liv = datetime.strptime(date_livraison, '%Y-%m-%d').date()
             except ValueError:
-                date_fmt = date_livraison
-        else:
-            date_fmt = ''
+                pass
+
+        commande = CommandePaddy.objects.create(
+            stock=stock,
+            commande_par=request.user,
+            quantite_commande=quantite,
+            date_livraison=date_liv,
+            note=note,
+            statut=CommandePaddy.Statut.EN_ATTENTE,
+        )
+
+        stock.statut = StockPaddy.Statut.COMMANDE
+        stock.save(update_fields=['statut'])
+
+        total = quantite * float(stock.prix_par_kg)
+        date_fmt = date_liv.strftime('%d/%m/%Y') if date_liv else '—'
 
         request.session['commande_envoyee'] = {
-            'producteur_nom': producteur_nom,
+            'producteur_nom': f"{stock.producteur.user.prenom} {stock.producteur.user.nom}",
             'quantite_kg': quantite_kg,
             'date_livraison': date_fmt,
-            'total': total_fmt,
-            'reference': f"#PAD-{date.today().year}-{random.randint(100, 9999):04d}",
+            'total': f"{int(total):,}".replace(',', ' '),
+            'reference': f"#PAD-{commande.pk:04d}",
         }
+
     return redirect('admin_transformatrice:admin_stocks')
 
 
@@ -110,74 +178,154 @@ def admin_commander_paddy(request):
 #  CATALOGUE
 # ============================================================
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_catalogue(request):
     produit_publie = request.session.pop('produit_publie', None)
     filtre = request.GET.get('filtre', 'tous')
 
-    tous_produits = Produit.objects.filter(actif=True)
-    produits_affiches = tous_produits
+    # Pré-sélection traçabilité : vient-on d'une commande paddy reçue ?
+    commande_paddy_preselect = None
+    commande_paddy_id_get = request.GET.get('commande_paddy_id', '').strip()
+    if commande_paddy_id_get:
+        try:
+            commande_paddy_preselect = CommandePaddy.objects.select_related(
+                'stock__producteur__user'
+            ).get(pk=int(commande_paddy_id_get), statut=CommandePaddy.Statut.RECUE)
+        except (CommandePaddy.DoesNotExist, ValueError):
+            messages.warning(request, "Commande paddy introuvable ou non reçue.")
+
+    tous_produits = Produit.objects.select_related('stock_source__stock__producteur__user').order_by('-cree_le')
+
+    if filtre == 'en_ligne':
+        produits_affiches = tous_produits.filter(est_actif=True, stock_sacs__gt=10)
+    elif filtre == 'rupture':
+        produits_affiches = tous_produits.filter(est_actif=True, stock_sacs__lte=10)
+    else:
+        produits_affiches = tous_produits
+
+    total = tous_produits.count()
+    en_ligne_count = tous_produits.filter(est_actif=True, stock_sacs__gt=10).count()
+    rupture_count = tous_produits.filter(est_actif=True, stock_sacs__lte=10).count()
+    produits_stock_faible = tous_produits.filter(est_actif=True, stock_sacs__gt=0, stock_sacs__lte=10)
+
+    # Commandes paddy reçues disponibles pour lier un nouveau produit
+    commandes_paddy_recues = CommandePaddy.objects.filter(
+        statut=CommandePaddy.Statut.RECUE
+    ).select_related('stock__producteur__user').order_by('-cree_le')
 
     context = {
         'active_nav': 'catalogue',
         'produits': produits_affiches,
-        'tous_produits_count': tous_produits.count(),
-        'en_ligne_count': tous_produits.count(),
-        'rupture_count': tous_produits.filter(stock=0).count(),
-        'produits_stock_faible': tous_produits.filter(stock__lte=5, stock__gt=0),
+        'tous_produits_count': total,
+        'en_ligne_count': en_ligne_count,
+        'rupture_count': rupture_count,
+        'produits_stock_faible': produits_stock_faible,
         'variantes_poids': ['5 kg', '10 kg', '25 kg'],
+        'type_riz_choices': Produit.TypeRiz.choices,
+        'commandes_paddy': commandes_paddy_recues,
+        'commande_paddy_preselect': commande_paddy_preselect,
         'produit_publie': produit_publie,
         'filtre_actif': filtre,
     }
     return render(request, 'espace_admin/catalogue.html', context)
 
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_produit_create(request):
     if request.method == 'POST':
-        nom         = request.POST.get('nom', '').strip()
-        categorie   = request.POST.get('type_riz', 'blanc')
+        nom = request.POST.get('nom', '').strip()
+        type_riz = request.POST.get('type_riz', 'blanc')
         description = request.POST.get('description', '')
-        stock       = int(request.POST.get('stock_initial') or 0)
-        photo       = request.FILES.get('photo')
-        prix        = int(float(request.POST.get('prix', 0) or 0))
+        stock_initial = int(request.POST.get('stock_initial') or 0)
+        photo = request.FILES.get('photo')
+        variantes = request.POST.getlist('variantes')
+        commande_paddy_id = request.POST.get('commande_paddy_id', '').strip() 
 
         if not nom:
             messages.error(request, "Le nom du produit est obligatoire.")
             return redirect('admin_transformatrice:admin_catalogue')
 
-        p = Produit.objects.create(
-            nom=nom,
-            categorie=categorie,
-            description=description,
-            stock=stock,
-            prix=prix,
-            image=photo if photo else None,
-            actif=True,
-        )
-        request.session['produit_publie'] = {'nom': nom, 'variantes': [], 'lot_code': '', 'qr_url': ''}
+        # Résoudre le lien de traçabilité vers la commande paddy source
+        stock_source = None
+        if commande_paddy_id:
+            try:
+                stock_source = CommandePaddy.objects.get(
+                    pk=int(commande_paddy_id),
+                    statut=CommandePaddy.Statut.RECUE,
+                )
+            except (CommandePaddy.DoesNotExist, ValueError):
+                messages.warning(request, "Commande paddy introuvable ou non reçue — produit créé sans lien de traçabilité.")
+
+        poids_list = [int(p) for p in variantes if p.isdigit()] if variantes else [5]
+        produits_crees = []
+
+        for poids in poids_list:
+            prix_val = request.POST.get(f'prix_{poids}', '0') or '0'
+            try:
+                prix = float(prix_val)
+            except ValueError:
+                prix = 0
+
+            p = Produit.objects.create(
+                nom=nom,
+                type_riz=type_riz,
+                poids_kg=poids,
+                prix=prix,
+                stock_sacs=stock_initial,
+                description=description,
+                photo=photo if photo else None,
+                est_actif=True,
+                stock_source=stock_source,
+            )
+            produits_crees.append(f"{poids} kg")
+
+        if produits_crees:
+            dernier = Produit.objects.filter(nom=nom).order_by('-cree_le').first()
+            code = dernier.code_lot
+            origine = (
+                f"{stock_source.stock.producteur.user.prenom} {stock_source.stock.producteur.user.nom}"
+                if stock_source else "Non renseignée"
+            )
+            request.session['produit_publie'] = {
+                'nom': nom,
+                'variantes': produits_crees,
+                'lot_code': code,
+                'origine': origine,
+                'qr_url': f"https://api.qrserver.com/v1/create-qr-code/?size=130x130&data={code}",
+            }
+            messages.success(request, f"Produit « {nom} » ajouté avec succès.")
+
     return redirect('admin_transformatrice:admin_catalogue')
 
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_produit_edit(request, pk):
     produit = get_object_or_404(Produit, pk=pk)
+
     if request.method == 'POST':
         nom = request.POST.get('nom', '').strip()
         if not nom:
             messages.error(request, "Le nom du produit est obligatoire.")
             return redirect('admin_transformatrice:admin_produit_edit', pk=pk)
-        produit.nom         = nom
-        produit.categorie   = request.POST.get('type_riz', produit.categorie)
+
+        produit.nom = nom
+        produit.type_riz = request.POST.get('type_riz', produit.type_riz)
         produit.description = request.POST.get('description', produit.description)
+
+        poids_val = request.POST.get('poids_kg', produit.poids_kg)
         try:
-            produit.prix  = int(float(request.POST.get('prix', produit.prix)))
-            produit.stock = int(request.POST.get('stock_sacs', produit.stock))
+            produit.poids_kg = int(poids_val)
+            produit.prix = float(request.POST.get('prix', produit.prix))
+            produit.stock_sacs = int(request.POST.get('stock_sacs', produit.stock_sacs))
         except (ValueError, TypeError):
-            messages.error(request, "Prix ou stock invalide.")
+            messages.error(request, "Valeurs numériques invalides.")
             return redirect('admin_transformatrice:admin_produit_edit', pk=pk)
+
+        produit.est_actif = request.POST.get('est_actif') == 'on'
+
         if request.FILES.get('photo'):
-            produit.image = request.FILES['photo']
+            produit.photo = request.FILES['photo']
+
         produit.save()
         messages.success(request, "Produit mis à jour.")
         return redirect('admin_transformatrice:admin_catalogue')
@@ -185,18 +333,19 @@ def admin_produit_edit(request, pk):
     context = {
         'active_nav': 'catalogue',
         'produit': produit,
-        'variantes_poids': ['5 kg', '10 kg', '25 kg'],
-        'type_riz_choices': Produit.CATEGORIE_CHOICES,
+        'poids_choices': Produit.Poids.choices,
+        'type_riz_choices': Produit.TypeRiz.choices,
     }
     return render(request, 'espace_admin/catalogue_edit.html', context)
 
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_produit_delete(request, pk):
     produit = get_object_or_404(Produit, pk=pk)
     if request.method == 'POST':
+        nom = produit.nom
         produit.delete()
-        messages.success(request, "Produit supprimé.")
+        messages.success(request, f"Produit « {nom} » supprimé.")
     return redirect('admin_transformatrice:admin_catalogue')
 
 
@@ -204,264 +353,186 @@ def admin_produit_delete(request, pk):
 #  COMMANDES CLIENTS
 # ============================================================
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_commandes(request):
     statut_filtre = request.GET.get('statut', 'toutes')
-    commandes = _get_dummy_commandes()
+
+    commandes_qs = CommandeClient.objects.select_related('client').prefetch_related(
+        'lignes__produit'
+    ).order_by('-date')
 
     if statut_filtre != 'toutes':
-        commandes = [c for c in commandes if c['statut'] == statut_filtre]
+        commandes_qs = commandes_qs.filter(statut=statut_filtre)
+
+    counts = {s: CommandeClient.objects.filter(statut=s).count() for s, _ in CommandeClient.Statut.choices}
+    total_all = CommandeClient.objects.count()
+
+    today = date.today()
+    commandes_jour = CommandeClient.objects.filter(date__date=today).count()
+    en_attente_count = counts.get('attente', 0)
+    en_livraison_count = counts.get('en_livraison', 0)
 
     context = {
         'active_nav': 'commandes',
         'stats': {
-            'total': '1,248',
-            'en_attente': 45,
-            'en_livraison': 18,
-            'revenu_jour': '845k',
+            'total': total_all,
+            'en_attente': en_attente_count,
+            'en_livraison': en_livraison_count,
+            'commandes_jour': commandes_jour,
         },
         'status_tabs': [
-            {'label': 'Toutes', 'value': 'toutes', 'count': 1248, 'active': statut_filtre == 'toutes'},
-            {'label': 'En attente', 'value': 'en_attente', 'count': 45, 'active': statut_filtre == 'en_attente'},
-            {'label': 'En préparation', 'value': 'en_preparation', 'count': 23, 'active': statut_filtre == 'en_preparation'},
-            {'label': 'En livraison', 'value': 'en_livraison', 'count': 18, 'active': statut_filtre == 'en_livraison'},
-            {'label': 'Livrée', 'value': 'livree', 'count': 1142, 'active': statut_filtre == 'livree'},
-            {'label': 'Annulée', 'value': 'annulee', 'count': 20, 'active': statut_filtre == 'annulee'},
+            {'label': 'Toutes',         'value': 'toutes',       'count': total_all,                    'active': statut_filtre == 'toutes'},
+            {'label': 'En attente',     'value': 'attente',      'count': counts.get('attente', 0),     'active': statut_filtre == 'attente'},
+            {'label': 'En préparation', 'value': 'preparation',  'count': counts.get('preparation', 0), 'active': statut_filtre == 'preparation'},
+            {'label': 'En livraison',   'value': 'en_livraison', 'count': counts.get('en_livraison', 0),'active': statut_filtre == 'en_livraison'},
+            {'label': 'Livrée',         'value': 'livree',       'count': counts.get('livree', 0),      'active': statut_filtre == 'livree'},
+            {'label': 'Annulée',        'value': 'annulee',      'count': counts.get('annulee', 0),     'active': statut_filtre == 'annulee'},
         ],
-        'commandes': commandes,
+        'commandes': commandes_qs,
+        'statut_filtre': statut_filtre,
     }
     return render(request, 'espace_admin/commandes.html', context)
 
 
-@login_required(login_url='/espace-admin/connexion/')
+@admin_required
 def admin_commande_detail(request, pk):
+    commande = get_object_or_404(
+        CommandeClient.objects.select_related('client').prefetch_related('lignes__produit'),
+        pk=pk,
+    )
+
     if request.method == 'POST':
         nouveau_statut = request.POST.get('statut')
-        messages.success(request, f"Commande #{pk} mise à jour.")
+        statuts_valides = [s for s, _ in CommandeClient.Statut.choices]
+        if nouveau_statut in statuts_valides:
+            commande.statut = nouveau_statut
+            commande.save(update_fields=['statut'])
+            messages.success(request, f"Commande #{pk} mise à jour.")
         return redirect('admin_transformatrice:admin_commandes')
 
-    commande = _get_dummy_commande_detail(pk)
+    statut = commande.statut
+    statut_labels = dict(CommandeClient.Statut.choices)
+
     etapes = [
-        {'label': 'Marquer en préparation', 'value': 'en_preparation',
-         'active': commande['statut'] == 'en_attente'},
-        {'label': 'Marquer en livraison', 'value': 'en_livraison',
-         'active': commande['statut'] == 'en_preparation'},
-        {'label': 'Marquer livrée', 'value': 'livree',
-         'active': commande['statut'] == 'en_livraison'},
+        {'label': 'Marquer en préparation', 'value': 'preparation',  'active': statut == 'attente'},
+        {'label': 'Marquer en livraison',   'value': 'en_livraison', 'active': statut == 'preparation'},
+        {'label': 'Marquer livrée',         'value': 'livree',       'active': statut == 'en_livraison'},
     ]
 
-    statut = commande['statut']
     stepper_steps = [
-        ('Attente',    statut in ('en_preparation', 'en_livraison', 'livree')),
+        ('Attente',     statut in ('preparation', 'en_livraison', 'livree')),
         ('Préparation', statut in ('en_livraison', 'livree')),
-        ('Livraison',  statut in ('en_livraison', 'livree')),
-        ('Livrée',     statut == 'livree'),
+        ('Livraison',   statut in ('en_livraison', 'livree')),
+        ('Livrée',      statut == 'livree'),
     ]
+
+    total = sum(l.quantite * l.prix_unitaire for l in commande.lignes.all())
 
     context = {
         'active_nav': 'commandes',
         'commande': commande,
+        'statut_label': statut_labels.get(statut, statut),
         'etapes': etapes,
         'stepper_steps': stepper_steps,
+        'total': total,
+        'qr_url': f'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=CMD-{pk:04d}',
     }
     return render(request, 'espace_admin/commande_detail.html', context)
 
 
-@login_required(login_url='/espace-admin/connexion/')
+# ============================================================
+#  COMMANDES PADDY (suivi + changement de statut)
+# ============================================================
+
+@admin_required
+def admin_commandes_paddy(request):
+    """Liste de toutes les commandes paddy passées aux producteurs."""
+    statut_filtre = request.GET.get('statut', 'toutes')
+
+    qs = CommandePaddy.objects.select_related(
+        'stock__producteur__user', 'commande_par'
+    ).order_by('-cree_le')
+
+    if statut_filtre != 'toutes':
+        qs = qs.filter(statut=statut_filtre)
+
+    counts = {s: CommandePaddy.objects.filter(statut=s).count() for s, _ in CommandePaddy.Statut.choices}
+    total = CommandePaddy.objects.count()
+
+    context = {
+        'active_nav': 'stocks',
+        'commandes': qs,
+        'statut_filtre': statut_filtre,
+        'total': total,
+        'counts': counts,
+        'status_tabs': [
+            {'label': 'Toutes',      'value': 'toutes',     'count': total,                         'active': statut_filtre == 'toutes'},
+            {'label': 'En attente',  'value': 'en_attente', 'count': counts.get('en_attente', 0),   'active': statut_filtre == 'en_attente'},
+            {'label': 'Confirmée',   'value': 'confirmee',  'count': counts.get('confirmee', 0),    'active': statut_filtre == 'confirmee'},
+            {'label': 'Reçue',       'value': 'recue',      'count': counts.get('recue', 0),        'active': statut_filtre == 'recue'},
+            {'label': 'Annulée',     'value': 'annulee',    'count': counts.get('annulee', 0),      'active': statut_filtre == 'annulee'},
+        ],
+    }
+    return render(request, 'espace_admin/commandes_paddy.html', context)
+
+
+@admin_required
+def admin_commande_paddy_statut(request, pk):
+    """Met à jour le statut d'une commande paddy."""
+    if request.method == 'POST':
+        commande = get_object_or_404(CommandePaddy, pk=pk)
+        nouveau_statut = request.POST.get('statut')
+        statuts_valides = [s for s, _ in CommandePaddy.Statut.choices]
+
+        if nouveau_statut in statuts_valides:
+            commande.statut = nouveau_statut
+            commande.save(update_fields=['statut'])
+
+            if nouveau_statut == CommandePaddy.Statut.RECUE:
+                messages.success(
+                    request,
+                    f"Commande #PAD-{pk:04d} marquée comme reçue. "
+                    "Vous pouvez maintenant créer des produits depuis cette commande."
+                )
+            else:
+                messages.success(request, f"Commande #PAD-{pk:04d} mise à jour.")
+
+    return redirect('admin_transformatrice:admin_commandes_paddy')
+
+
+# ============================================================
+#  À PROPOS
+# ============================================================
+
+@admin_required
 def admin_about(request):
     context = {'active_nav': 'about'}
     return render(request, 'espace_admin/about.html', context)
 
 
 # ============================================================
-#  TRAÇABILITÉ QR CODE (public — accessible sans connexion)
+#  TRAÇABILITÉ QR CODE (public — sans connexion)
 # ============================================================
 
 def tracabilite_produit(request, lot_code):
-    """Page publique scannée via QR code — affiche les infos du produit."""
-    produits = Produit.objects.filter(lot_code=lot_code)
-    if not produits.exists():
-        return render(request, 'espace_admin/tracabilite_introuvable.html', {'lot_code': lot_code}, status=404)
+    """Page publique scannée via QR code — affiche l'origine du riz paddy."""
+    produit = get_object_or_404(
+        Produit.objects.select_related(
+            'stock_source__stock__producteur__user',
+            'stock_source__commande_par',
+        ),
+        code_lot=lot_code,
+    )
 
-    produit = produits.first()
+    # Tous les formats (poids) issus du même lot et de la même commande paddy
+    tous_formats = Produit.objects.filter(
+        nom=produit.nom,
+        stock_source=produit.stock_source,
+    ).order_by('poids_kg')
+
     context = {
         'produit': produit,
         'lot_code': lot_code,
-        'tous_formats': produits,  # toutes les variantes du même lot
+        'tous_formats': tous_formats,
     }
     return render(request, 'espace_admin/tracabilite.html', context)
-
-
-# ============================================================
-#  DONNÉES FACTICES — à supprimer une fois les models branchés
-# ============================================================
-
-def _get_formats_produit(produit=None):
-    formats = ['5 kg', '10 kg', '25 kg']
-    if produit and produit.format and produit.format not in formats:
-        formats = [produit.format] + formats
-    return formats
-
-
-def _get_dummy_commande_detail(pk):
-    mois_fr = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-               'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
-    base = next((c for c in _get_dummy_commandes() if c['id'] == pk), _get_dummy_commandes()[0])
-    d = base['date']
-    statut_labels = {
-        'en_attente': 'En attente', 'en_preparation': 'En préparation',
-        'en_livraison': 'En livraison', 'livree': 'Livrée', 'annulee': 'Annulée',
-    }
-    return {
-        **base,
-        'numero': f"YEES-{pk:03d}",
-        'date_str': f"{d.day} {mois_fr[d.month]} {d.year}",
-        'heure': '10:45',
-        'statut_label': statut_labels.get(base['statut'], base['statut']),
-        'client': {
-            'nom': base['client_nom'],
-            'telephone': base['client_telephone'],
-            'email': f"{base['client_nom'].lower().replace(' ', '.')}@email.com",
-        },
-        'adresse': {
-            'ligne1': 'Cité Keur Gorgui, Immeuble Horizon',
-            'ligne2': 'Appartement 4B, 3ème étage',
-            'ville': 'Dakar, Sénégal',
-            'maps_url': 'https://www.google.com/maps/search/?api=1&query=' + quote(
-                'Cité Keur Gorgui, Immeuble Horizon, Appartement 4B, 3ème étage, Dakar, Sénégal'
-            ),
-        },
-        'articles': [
-            {
-                'nom': 'Riz Blanc Premium 10kg',
-                'photo_url': '/static/images/2sac10kg.jpg',
-                'quantite': 2, 'prix_unitaire': '8 500', 'sous_total': '17 000',
-            },
-            {
-                'nom': 'Riz Blanc Premium 5kg',
-                'photo_url': '/static/images/2sac5kg.jpg',
-                'quantite': 1, 'prix_unitaire': '4 500', 'sous_total': '4 500',
-            },
-        ],
-        'sous_total': '21 500',
-        'frais_livraison': '1 500',
-        'total': '23 000',
-        'qr_url': f'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=YEES-{pk:03d}',
-    }
-
-def _get_dummy_stocks():
-    return [
-        {
-            'id': 1,
-            'variete': 'Sahel 108',
-            'photo_url': '/static/images/paddy1.jpeg',
-            'producteur': {'nom': 'Moussa Diop', 'region': 'Ross Béthio, Saint-Louis',
-                           'photo_url': '/static/images/agri1.jpg'},
-            'quantite_kg': 450, 'prix_kg': 185,
-            'date_recolte': date(2023, 10, 12),
-        },
-        {
-            'id': 2,
-            'variete': 'Nerica',
-            'photo_url': '/static/images/riz-nerica-kolda-600x316.jpg',
-            'producteur': {'nom': 'Fatou Sow', 'region': 'Podor, Saint-Louis',
-                           'photo_url': '/static/images/qgri2.jpg'},
-            'quantite_kg': 820, 'prix_kg': 190,
-            'date_recolte': date(2023, 10, 5),
-        },
-        {
-            'id': 3,
-            'variete': 'Sahel 108',
-            'photo_url': '/static/images/PADDY3.jpg',
-            'producteur': {'nom': 'Amadou Ly', 'region': 'Sédhiou, Casamance',
-                           'photo_url': '/static/images/agri3.jpg'},
-            'quantite_kg': 310, 'prix_kg': 205,
-            'date_recolte': date(2023, 10, 18),
-        },
-    ]
-
-
-def _get_dummy_produits():
-    return [
-        {
-            'id': 1,
-            'nom': 'Riz Parfumé "Teranga"',
-            'type_riz': 'Riz long grain',
-            'format': '5 kg',
-            'prix': '4 500',
-            'stock_sacs': 42,
-            'statut': 'en_ligne',
-            'photo_url': '/static/images/1sac5kg.jpg',
-        },
-        {
-            'id': 2,
-            'nom': 'Riz Étuvé Nutrition+',
-            'type_riz': 'Riz brun étuvé',
-            'format': '10 kg',
-            'prix': '8 750',
-            'stock_sacs': 5,
-            'statut': 'stock_faible',
-            'photo_url': '/static/images/2sac10kg.jpg',
-        },
-        {
-            'id': 3,
-            'nom': 'Brisure de Riz (1/4)',
-            'type_riz': 'Qualité supérieure',
-            'format': '2 kg',
-            'prix': '2 200',
-            'stock_sacs': 0,
-            'statut': 'rupture',
-            'photo_url': '/static/images/3sac5kg.jpg',
-        },
-        {
-            'id': 4,
-            'nom': 'Riz Blanc Premium',
-            'type_riz': 'Riz long grain',
-            'format': '10 kg',
-            'prix': '8 500',
-            'stock_sacs': 78,
-            'statut': 'en_ligne',
-            'photo_url': '/static/images/1sac10kg.jpg',
-        },
-        {
-            'id': 5,
-            'nom': 'Riz Blanc Premium',
-            'type_riz': 'Riz long grain',
-            'format': '5 kg',
-            'prix': '4 500',
-            'stock_sacs': 34,
-            'statut': 'en_ligne',
-            'photo_url': '/static/images/2sac5kg.jpg',
-        },
-        {
-            'id': 6,
-            'nom': 'Riz Étuvé Classique',
-            'type_riz': 'Riz brun étuvé',
-            'format': '25 kg',
-            'prix': '21 000',
-            'stock_sacs': 12,
-            'statut': 'en_ligne',
-            'photo_url': '/static/images/4sac10kg.jpg',
-        },
-    ]
-
-
-def _get_dummy_commandes():
-    return [
-        {'id': 1, 'numero': 'CMD-2024-001', 'client_nom': 'Moussa Diop', 'client_telephone': '+221 77 123 45 67',
-         'produits_resume': 'Riz Blanc Premium 10kg × 2', 'montant': '17,000',
-         'mode_paiement': 'livraison', 'statut': 'livree', 'date': date(2026, 6, 12), 'heure': '10:30',
-         'client_photo': '/static/images/homme1.jpg'},
-        {'id': 2, 'numero': 'CMD-2024-002', 'client_nom': 'Fatou Sow', 'client_telephone': '+221 78 987 65 43',
-         'produits_resume': 'Riz Blanc Premium 5kg × 1', 'montant': '4,500',
-         'mode_paiement': 'en_ligne', 'statut': 'en_preparation', 'date': date(2026, 6, 13), 'heure': '14:30',
-         'client_photo': '/static/images/femme2.jpg'},
-        {'id': 3, 'numero': 'CMD-2024-003', 'client_nom': 'Amadou Ba', 'client_telephone': '+221 70 555 12 34',
-         'produits_resume': 'Riz Blanc Premium 10kg × 3', 'montant': '25,500',
-         'mode_paiement': 'livraison', 'statut': 'en_livraison', 'date': date(2026, 6, 14), 'heure': '16:05',
-         'client_photo': '/static/images/homme2.jpg'},
-        {'id': 4, 'numero': 'CMD-2024-004', 'client_nom': 'Khadidiatou Sy', 'client_telephone': '+221 33 444 55 66',
-         'produits_resume': 'Riz Blanc Premium 5kg × 2', 'montant': '9,000',
-         'mode_paiement': 'en_ligne', 'statut': 'en_attente', 'date': date(2026, 6, 15), 'heure': '10:20',
-         'client_photo': '/static/images/femme 1.jpg'},
-    ]

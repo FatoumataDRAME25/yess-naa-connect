@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 #cette ligne dit a django l’app qui contient la configuration Tailwind s’appelle theme sinon Django ne sait pas où chercher Tailwind
 TAILWIND_APP_NAME = "theme"
 
-AUTH_USER_MODEL = 'transformatrice_admin.User'
+AUTH_USER_MODEL = 'administration.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -127,5 +127,3 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-AUTH_USER_MODEL = 'transformatrice_admin.User'
