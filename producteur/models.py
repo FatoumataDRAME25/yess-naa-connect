@@ -25,6 +25,8 @@ class StockPaddy(models.Model):
     variete = models.CharField(max_length=20, choices=Variete.choices)
     quantite_kg = models.DecimalField(max_digits=10, decimal_places=2)
     prix_par_kg = models.DecimalField(max_digits=10, decimal_places=2)
+    photo = models.ImageField(upload_to='stocks_paddy/')
+    description = models.TextField(blank=True, default='')
     date_recolte = models.DateField()
     region = models.CharField(max_length=100)
     statut = models.CharField(max_length=20, choices=Statut.choices, default=Statut.DISPONIBLE)

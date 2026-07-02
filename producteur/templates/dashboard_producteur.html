@@ -11,10 +11,17 @@
       <!-- Header -->
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-green-brand">Bonjour, Mamadou</h1>
-          <p class="text-gray-500 text-base mt-1">Jeudi 12 Juin 2026</p>
+          <h1 class="text-3xl font-bold text-green-brand">Bonjour, {{ user.prenom }}</h1>
+          <p class="text-gray-500 text-base mt-1">{{ today|date:"l d F Y" }}</p>
         </div>
-        <img class="w-12 h-12 rounded-full border-2 border-green-accent/20 object-cover flex-shrink-0" src="https://placehold.co/48x48" alt="Avatar" />
+        {% if user.photo %}
+          <img class="w-12 h-12 rounded-full border-2 border-green-accent/20 object-cover flex-shrink-0"
+               src="{{ user.photo.url }}" alt="Avatar" />
+        {% else %}
+          <div class="w-12 h-12 rounded-full border-2 border-green-accent/20 bg-[#2d5a27] flex items-center justify-center flex-shrink-0">
+            <span class="text-white font-bold text-base">{{ user.prenom|first|upper }}{{ user.nom|first|upper }}</span>
+          </div>
+        {% endif %}
       </div>
 
       <!-- Stat cards -->
@@ -28,7 +35,7 @@
             </svg>
           </div>
           <p class="text-sm font-medium text-gray-500">Stock disponible</p>
-          <p class="text-2xl font-bold text-green-brand">850 kg</p>
+          <p class="text-2xl font-bold text-green-brand">{{ stock_disponible_kg }} kg</p>
         </div>
 
         <!-- Commandes reçues -->
@@ -39,7 +46,7 @@
             </svg>
           </div>
           <p class="text-sm font-medium text-gray-500">Commandes reçues</p>
-          <p class="text-2xl font-bold text-green-brand">12</p>
+          <p class="text-2xl font-bold text-green-brand">{{ nb_commandes }}</p>
         </div>
 
         <!-- En attente de validation -->
@@ -50,10 +57,10 @@
             </svg>
           </div>
           <p class="text-sm font-medium text-gray-500">En attente de validation</p>
-          <p class="text-2xl font-bold text-green-brand">2</p>
+          <p class="text-2xl font-bold text-green-brand">{{ nb_en_attente }}</p>
         </div>
 
-        <!-- Dernière vente -->
+        <!-- Dernière commande confirmée -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
           <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
             <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -62,7 +69,13 @@
             </svg>
           </div>
           <p class="text-sm font-medium text-gray-500">Dernière vente</p>
-          <p class="text-2xl font-bold text-green-brand">15 Juin 2026</p>
+          <p class="text-2xl font-bold text-green-brand">
+            {% if derniere_commande %}
+              {{ derniere_commande.cree_le|date:"d M Y" }}
+            {% else %}
+              —
+            {% endif %}
+          </p>
         </div>
 
       </div>
@@ -73,97 +86,61 @@
         <!-- Table header -->
         <div class="flex items-center justify-between px-6 py-6 border-b border-gray-100">
           <h2 class="text-2xl font-bold text-green-brand">Mes dernières déclarations</h2>
-          <a href="#" class="text-base font-semibold text-green-accent hover:underline">Voir tout</a>
+          <a href="{% url 'declaration' %}" class="text-base font-semibold text-green-accent hover:underline">Voir tout</a>
         </div>
 
         <!-- Table -->
         <table class="w-full text-left">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Photo</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Variété</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quantité</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Variété</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quantité</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Prix/kg</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date récolte</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Région</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
+            </tr>
+          </thead>
           <tbody class="divide-y divide-gray-100">
 
-            <!-- Row 1 -->
+            {% for stock in derniers_stocks %}
             <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                  <img class="w-full h-full object-cover" src="https://placehold.co/48x48" alt="Riz Parfumé" />
-                </div>
+              <td class="px-6 py-4 text-base font-medium text-green-brand whitespace-nowrap">
+                {{ stock.get_variete_display }}
+                {% if stock.est_bio %}
+                  <span class="ml-1 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">BIO</span>
+                {% endif %}
               </td>
-              <td class="px-6 py-4 text-base font-medium text-green-brand whitespace-nowrap">Riz Parfumé - Long Grain</td>
-              <td class="px-6 py-4 text-base text-gray-500 ">300 kg</td>
-              <td class="px-6 py-4 text-base text-gray-500 whitespace-nowrap">10 Juin 2026</td>
+              <td class="px-6 py-4 text-base text-gray-500">{{ stock.quantite_kg }} kg</td>
+              <td class="px-6 py-4 text-base text-gray-500">{{ stock.prix_par_kg }} FCFA</td>
+              <td class="px-6 py-4 text-base text-gray-500 whitespace-nowrap">{{ stock.date_recolte|date:"d M Y" }}</td>
+              <td class="px-6 py-4 text-base text-gray-500">{{ stock.region }}</td>
               <td class="px-6 py-4">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-green-bg">
-                  <span class="w-1.5 h-1.5 rounded-full bg-status-green-text flex-shrink-0"></span>
-                  <span class="text-xs font-medium text-status-green-text">Disponible</span>
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <button class="text-gray-400 hover:text-gray-600 p-1" aria-label="Plus d'actions">
-                  <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <circle cx="8" cy="2.5" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13.5" r="1.5"/>
-                  </svg>
-                </button>
+                {% if stock.statut == 'disponible' %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-green-bg">
+                    <span class="w-1.5 h-1.5 rounded-full bg-status-green-text flex-shrink-0"></span>
+                    <span class="text-xs font-medium text-status-green-text">Disponible</span>
+                  </span>
+                {% elif stock.statut == 'commande' %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-amber-bg">
+                    <span class="w-1.5 h-1.5 rounded-full bg-status-amber-text flex-shrink-0"></span>
+                    <span class="text-xs font-medium text-status-amber-text">Commandé</span>
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0"></span>
+                    <span class="text-xs font-medium text-gray-500">Épuisé</span>
+                  </span>
+                {% endif %}
               </td>
             </tr>
-
-            <!-- Row 2 -->
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                  <img class="w-full h-full object-cover" src="https://placehold.co/48x48" alt="Riz Complet BIO" />
-                </div>
-              </td>
-              <td class="px-6 py-4 text-base font-medium text-green-brand whitespace-nowrap">Riz Complet - BIO</td>
-              <td class="px-6 py-4 text-base text-gray-500">250 kg</td>
-              <td class="px-6 py-4 text-base text-gray-500 whitespace-nowrap">08 Juin 2026</td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-amber-bg">
-                  <span class="w-1.5 h-1.5 rounded-full bg-status-amber-text flex-shrink-0"></span>
-                  <span class="text-xs font-medium text-status-amber-text">Commandé</span>
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <button class="text-gray-400 hover:text-gray-600 p-1" aria-label="Plus d'actions">
-                  <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <circle cx="8" cy="2.5" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13.5" r="1.5"/>
-                  </svg>
-                </button>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="px-6 py-12 text-center text-gray-400 text-base">
+                Vous n'avez encore aucune déclaration de stock.
               </td>
             </tr>
-
-            <!-- Row 3 -->
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                  <img class="w-full h-full object-cover" src="https://placehold.co/48x48" alt="Riz Brisure" />
-                </div>
-              </td>
-              <td class="px-6 py-4 text-base font-medium text-green-brand whitespace-nowrap">Riz Brisure - Type 1</td>
-              <td class="px-6 py-4 text-base text-gray-500">300 kg</td>
-              <td class="px-6 py-4 text-base text-gray-500 whitespace-nowrap">01 Juin 2026</td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100">
-                  <span class="w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0"></span>
-                  <span class="text-xs font-medium text-gray-500">Épuisé</span>
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <button class="text-gray-400 hover:text-gray-600 p-1" aria-label="Plus d'actions">
-                  <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <circle cx="8" cy="2.5" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13.5" r="1.5"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
+            {% endfor %}
 
           </tbody>
         </table>
@@ -172,11 +149,12 @@
     </div>
 
     <!-- Floating action button -->
-    <button class="fixed bottom-10 right-10 flex items-center gap-2 bg-status-green-text text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:bg-green-900 transition-colors text-2xl">
+    <a href="{% url 'declaration' %}"
+       class="fixed bottom-10 right-10 flex items-center gap-2 bg-status-green-text text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:bg-green-900 transition-colors text-base">
       <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
       Déclarer une récolte
-    </button>
+    </a>
   
 {% endblock %}

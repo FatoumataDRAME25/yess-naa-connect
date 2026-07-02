@@ -1,112 +1,183 @@
 {% extends "sidebar.html" %}
-
 {% load static %}
 
-{% block title %}Declaration{% endblock  %}
+{% block title %}Déclaration Stocks Paddy — YEES NAA CONNECT{% endblock %}
 
 {% block content %}
 
-    <div class="w-full px-10 py-8 flex flex-col gap-8 items-center">
+<div class="w-full px-10 py-8 flex flex-col gap-8 items-center">
 
-      <!-- Page title -->
-      <h1 class="text-3xl font-bold text-green-brand w-full max-w-3xl">Déclaration Stocks Paddy</h1>
+  <!-- Page title -->
+  <div class="w-full max-w-3xl flex items-center justify-between">
+    <h1 class="text-3xl font-bold text-green-brand">Déclaration Stocks Paddy</h1>
+    <a href="{% url 'dashbord' %}" class="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
+      ← Retour au tableau de bord
+    </a>
+  </div>
 
-      <!-- Form card -->
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col gap-7 max-w-3xl mx-auto">
+  <!-- Messages -->
+  {% if messages %}
+    <div class="w-full max-w-3xl flex flex-col gap-2">
+      {% for message in messages %}
+        <div class="w-full px-4 py-3 rounded-xl text-sm font-medium
+          {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+          {% else %}bg-green-50 text-green-700 border border-[#D4EDB8]{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-        <!-- Photo de la récolte -->
-        <div class="flex flex-col gap-3">
-          <label class="text-sm font-semibold text-green-brand">Photo de la récolte</label>
-          <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50/50 flex flex-col items-center gap-3 cursor-pointer hover:border-green-accent transition-colors">
-            <!-- Preview zone -->
-            <div class="w-full h-48 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-              <img class="w-full h-full object-cover opacity-80" src="https://placehold.co/635x192" alt="Preview" />
-            </div>
-            <div class="flex flex-col items-center gap-1">
-              <p class="text-base font-semibold text-green-accent">Glissez une photo ou cliquez pour parcourir</p>
-              <p class="text-xs text-gray-500">Format JPG, PNG (Max 5MB)</p>
-            </div>
-            <input type="file" class="hidden" accept="image/*" />
+  <!-- Form card -->
+  <form method="POST" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col gap-7 w-full max-w-3xl">
+    {% csrf_token %}
+
+    <div class="flex flex-col gap-3">
+      <label class="text-sm font-semibold text-green-brand">
+        Photo de la récolte <span class="text-red-500">*</span>
+      </label>
+      <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50/50 flex flex-col items-center gap-3 cursor-pointer hover:border-green-accent transition-colors"
+           onclick="document.getElementById('id_photo').click()">
+
+        <!-- Zone aperçu -->
+        <div id="preview-container" class="w-full h-48 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+          <img id="preview-image" class="w-full h-full object-cover hidden" src="" alt="Aperçu" />
+          <div id="preview-placeholder" class="flex items-center justify-center w-full h-full">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
+            </svg>
           </div>
         </div>
 
-        <!-- Variété + Quantité -->
-        <div class="grid grid-cols-2 gap-6">
-          <!-- Variété de riz -->
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-green-brand">Variété de riz</label>
-            <div class="relative">
-              <select class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base text-green-brand appearance-none outline-none focus:border-green-accent focus:ring-2 focus:ring-green-accent/10 transition cursor-pointer">
-                <option>Riz Paddy Parfumé</option>
-                <option>Sahel 108</option>
-                <option>Nerica L19</option>
-                <option>Tox 728-1</option>
-              </select>
-              <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-          </div>
-
-          <!-- Quantité -->
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-green-brand">Quantité disponible (kg)</label>
-            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-              <button class="px-4 py-3 text-gray-500 hover:text-green-brand hover:bg-gray-100 transition-colors text-xl font-medium flex-shrink-0">−</button>
-              <input type="number" value="1200" class="flex-1 text-center py-3 bg-transparent text-base font-medium text-green-brand outline-none" />
-              <button class="px-4 py-3 text-gray-500 hover:text-green-brand hover:bg-gray-100 transition-colors text-xl font-medium flex-shrink-0">+</button>
-            </div>
-          </div>
+        <div class="flex flex-col items-center gap-1">
+          <p class="text-base font-semibold text-green-accent">Glissez une photo ou cliquez pour parcourir</p>
+          <p class="text-xs text-gray-500">Format JPG, PNG (Max 5MB)</p>
         </div>
 
-        <!-- Date + Région -->
-        <div class="grid grid-cols-2 gap-6">
-          <!-- Date de récolte -->
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-green-brand">Date de récolte</label>
-            <div class="relative">
-              <input type="date" value="2026-12-06" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base text-green-brand outline-none focus:border-green-accent focus:ring-2 focus:ring-green-accent/10 transition" />
-            </div>
-          </div>
-
-          <!-- Région de production -->
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-green-brand">Région de production</label>
-            <div class="relative">
-              <select class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base text-green-brand appearance-none outline-none focus:border-green-accent focus:ring-2 focus:ring-green-accent/10 transition cursor-pointer">
-                <option>Saint-Louis</option>
-                <option>Dakar</option>
-                <option>Thiès</option>
-                <option>Ziguinchor</option>
-                <option>Kaolack</option>
-              </select>
-              <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Prix proposé -->
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-semibold text-green-brand">Prix proposé (FCFA/kg)</label>
-          <div class="relative">
-            <input type="number" value="180" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-semibold text-green-brand outline-none focus:border-green-accent focus:ring-2 focus:ring-green-accent/10 transition pr-24" />
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">FCFA / kg</span>
-          </div>
-        </div>
-
-        <!-- Particularités -->
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-semibold text-green-brand">Particularités de votre récolte <span class="text-gray-400 font-normal">(optionnel)</span></label>
-          <textarea rows="4" placeholder="Ex: Grains très longs, récolte sous abri, faible taux d'humidité..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base text-green-brand placeholder-gray-400 outline-none focus:border-green-accent focus:ring-2 focus:ring-green-accent/10 transition resize-none"></textarea>
-        </div>
-
-        <!-- Submit button -->
-        <div class="flex justify-end">
-          <button class="flex items-center gap-2 bg-sidebar text-white px-8 py-4 rounded-xl text-lg font-bold shadow-md hover:bg-green-900 transition-colors">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            Publier ma récolte
-          </button>
-        </div>
-
+        {{ form.photo }}
       </div>
+      {% if form.photo.errors %}
+        <p class="text-xs text-red-500">{{ form.photo.errors.0 }}</p>
+      {% endif %}
     </div>
 
-{% endblock  %}
+    <!-- Variété + Quantité -->
+    <div class="grid grid-cols-2 gap-6">
+
+      <!-- Variété de riz -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-green-brand">{{ form.variete.label }}</label>
+        <div class="relative">
+          {{ form.variete }}
+          <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex-shrink-0"
+               fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+        {% if form.variete.errors %}
+          <p class="text-xs text-red-500">{{ form.variete.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Quantité avec boutons +/- -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-green-brand">{{ form.quantite_kg.label }}</label>
+        <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden
+                    {% if form.quantite_kg.errors %}border-red-300{% endif %}">
+          <button type="button" onclick="changeQty(-100)"
+                  class="px-4 py-3 text-gray-500 hover:text-green-brand hover:bg-gray-100 transition-colors text-xl font-medium flex-shrink-0">
+            −
+          </button>
+          {{ form.quantite_kg }}
+          <button type="button" onclick="changeQty(100)"
+                  class="px-4 py-3 text-gray-500 hover:text-green-brand hover:bg-gray-100 transition-colors text-xl font-medium flex-shrink-0">
+            +
+          </button>
+        </div>
+        {% if form.quantite_kg.errors %}
+          <p class="text-xs text-red-500">{{ form.quantite_kg.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Date + Région -->
+    <div class="grid grid-cols-2 gap-6">
+
+      <!-- Date de récolte -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-green-brand">{{ form.date_recolte.label }}</label>
+        {{ form.date_recolte }}
+        {% if form.date_recolte.errors %}
+          <p class="text-xs text-red-500">{{ form.date_recolte.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Région de production -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-green-brand">{{ form.region.label }}</label>
+        <div class="relative">
+          {{ form.region }}
+          <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex-shrink-0"
+               fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+        {% if form.region.errors %}
+          <p class="text-xs text-red-500">{{ form.region.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Prix proposé -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-semibold text-green-brand">{{ form.prix_par_kg.label }}</label>
+      <div class="relative">
+        {{ form.prix_par_kg }}
+        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500 pointer-events-none">
+          FCFA / kg
+        </span>
+      </div>
+      {% if form.prix_par_kg.errors %}
+        <p class="text-xs text-red-500">{{ form.prix_par_kg.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <!-- BIO -->
+    <div class="flex items-center gap-3">
+      {{ form.est_bio }}
+      <label for="{{ form.est_bio.id_for_label }}" class="text-sm font-medium text-gray-700 cursor-pointer">
+        {{ form.est_bio.label }}
+      </label>
+    </div>
+
+    <!-- Erreurs non liées à un champ -->
+    {% if form.non_field_errors %}
+      <div class="text-xs text-red-500">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <!-- Submit button -->
+    <div class="flex justify-end">
+      <button type="submit"
+              class="flex items-center gap-2 bg-sidebar text-white px-8 py-4 rounded-xl text-lg font-bold shadow-md hover:bg-green-900 transition-colors">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Publier ma récolte
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  function changeQty(delta) {
+    const input = document.getElementById('id_quantite_kg');
+    const current = parseFloat(input.value) || 0;
+    const next = Math.max(1, current + delta);
+    input.value = next;
+  }
+</script>
+
+{% endblock %}

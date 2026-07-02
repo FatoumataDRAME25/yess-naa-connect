@@ -1,16 +1,14 @@
-from django.shortcuts import render
-
-# Create your views here.
-
-
 from django.views import View
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
-from administration.models import User
-from producteur.models import Producteur
-from .forms import InscriptionProducteurForm, ConnexionForm
+from django.db.models import Sum
+from datetime import date
+from administration.models import User, CommandePaddy
+from producteur.models import Producteur, StockPaddy
+from .forms import InscriptionProducteurForm, ConnexionForm, ProfilForm, DeclarationPaddyForm
 
 class InscriptionView(View):
     template_name = 'inscription.html'
@@ -50,9 +48,9 @@ class ConnexionView(View):
     form_class = ConnexionForm
 
     def get(self, request):
-        # Si déjà connecté, rediriger vers dashboard
-        if request.user.is_authenticated:
-            return redirect('dashboard')
+        # Rediriger seulement si c'est bien un producteur connecté
+        if request.user.is_authenticated and request.user.role == 'producteur':
+            return redirect('dashbord')
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
@@ -81,7 +79,7 @@ class ConnexionView(View):
                         request.session.set_expiry(60 * 60 * 24 * 30)
 
                     messages.success(request, f"Bienvenue, {user.prenom} !")
-                    return redirect('dashboard')
+                    return redirect('dashbord')
                 else:
                     messages.error(request, "Vous n'avez pas accès à cet espace.")
             else:
@@ -90,21 +88,161 @@ class ConnexionView(View):
         return render(request, self.template_name, {'form': form})
 
 
-
-def connexion_producteur(request):
-    return render(request,'connexion.html')
-
+@login_required(login_url='/producteur/connexion/')
 def dashbord(request):
-    return render(request, 'dashboard_producteur.html')
+    # Vérifier que l'utilisateur connecté est bien un producteur
+    if request.user.role != 'producteur':
+        messages.error(request, "Accès réservé aux producteurs.")
+        return redirect('connexion')
+
+    try:
+        producteur = Producteur.objects.get(user=request.user)
+    except Producteur.DoesNotExist:
+        messages.error(request, "Profil producteur introuvable. Contactez l'administrateur.")
+        return redirect('connexion')
+
+    stocks = StockPaddy.objects.filter(producteur=producteur).order_by('-date_recolte')
+
+    # Stat cards
+    stock_disponible_kg = stocks.filter(
+        statut=StockPaddy.Statut.DISPONIBLE
+    ).aggregate(total=Sum('quantite_kg'))['total'] or 0
+
+    nb_commandes = CommandePaddy.objects.filter(
+        stock__producteur=producteur
+    ).count()
+
+    nb_en_attente = CommandePaddy.objects.filter(
+        stock__producteur=producteur,
+        statut=CommandePaddy.Statut.EN_ATTENTE
+    ).count()
+
+    derniere_commande = CommandePaddy.objects.filter(
+        stock__producteur=producteur,
+        statut__in=[CommandePaddy.Statut.CONFIRMEE, CommandePaddy.Statut.RECUE]
+    ).order_by('-cree_le').first()
+
+    context = {
+        'user': request.user,
+        'today': date.today(),
+        'stock_disponible_kg': stock_disponible_kg,
+        'nb_commandes': nb_commandes,
+        'nb_en_attente': nb_en_attente,
+        'derniere_commande': derniere_commande,
+        'derniers_stocks': stocks[:5],
+    }
+    return render(request, 'dashboard_producteur.html', context)
 
 
+@login_required(login_url='/producteur/connexion/')
 def commandes(request):
-    return render(request, 'comandes.html')
+    producteur = get_object_or_404(Producteur, user=request.user)
+
+    commandes_qs = CommandePaddy.objects.filter(
+        stock__producteur=producteur
+    ).select_related('stock').order_by('-cree_le')
+
+    # Filtre par statut via GET ?statut=
+    filtre = request.GET.get('statut', '')
+    if filtre and filtre in CommandePaddy.Statut.values:
+        commandes_qs = commandes_qs.filter(statut=filtre)
+
+    # Stats identiques au dashboard (réutilisées dans le header)
+    stocks = StockPaddy.objects.filter(producteur=producteur)
+    stock_disponible_kg = stocks.filter(
+        statut=StockPaddy.Statut.DISPONIBLE
+    ).aggregate(total=Sum('quantite_kg'))['total'] or 0
+
+    nb_commandes_total = CommandePaddy.objects.filter(
+        stock__producteur=producteur
+    ).count()
+
+    nb_en_attente = CommandePaddy.objects.filter(
+        stock__producteur=producteur,
+        statut=CommandePaddy.Statut.EN_ATTENTE
+    ).count()
+
+    derniere_commande = CommandePaddy.objects.filter(
+        stock__producteur=producteur,
+        statut__in=[CommandePaddy.Statut.CONFIRMEE, CommandePaddy.Statut.RECUE]
+    ).order_by('-cree_le').first()
+
+    # Calcul du montant pour chaque commande
+    commandes_avec_montant = []
+    for cmd in commandes_qs:
+        montant = cmd.quantite_commande * cmd.stock.prix_par_kg
+        commandes_avec_montant.append({
+            'commande': cmd,
+            'montant': montant,
+        })
+
+    context = {
+        'user': request.user,
+        'today': date.today(),
+        'stock_disponible_kg': stock_disponible_kg,
+        'nb_commandes': nb_commandes_total,
+        'nb_en_attente': nb_en_attente,
+        'derniere_commande': derniere_commande,
+        'commandes': commandes_avec_montant,
+        'filtre_actif': filtre,
+        'nb_resultats': commandes_qs.count(),
+        'statuts': CommandePaddy.Statut.choices,
+    }
+    return render(request, 'comandes.html', context)
 
 
+@login_required(login_url='/producteur/connexion/')
 def profil(request):
-    return render(request, 'profil.html')
+    edit_mode = False
+    if request.method == 'POST':
+        form = ProfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Vos informations ont été mises à jour.")
+            return redirect('profil')
+        else:
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+            edit_mode = True
+    else:
+        form = ProfilForm(instance=request.user)
+
+    producteur = get_object_or_404(Producteur, user=request.user)
+    nb_stocks = StockPaddy.objects.filter(producteur=producteur).count()
+    nb_commandes = CommandePaddy.objects.filter(stock__producteur=producteur).count()
+
+    context = {
+        'user': request.user,
+        'form': form,
+        'nb_stocks': nb_stocks,
+        'nb_commandes': nb_commandes,
+        'edit_mode': edit_mode,
+    }
+    return render(request, 'profil.html', context)
 
 
+@login_required(login_url='/producteur/connexion/')
 def declaration(request):
-    return render(request, 'declaration_paddy.html')
+    producteur = get_object_or_404(Producteur, user=request.user)
+
+    if request.method == 'POST':
+        form = DeclarationPaddyForm(request.POST, request.FILES)  # ← request.FILES pour la photo
+        if form.is_valid():
+            stock = form.save(commit=False)
+            stock.producteur = producteur
+            stock.region = form.cleaned_data['region']
+            stock.save()
+            messages.success(request, "Votre stock a été déclaré avec succès !")
+            return redirect('dashbord')
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+    else:
+        initial = {}
+        if request.user.adresse:
+            initial['region'] = request.user.adresse
+        form = DeclarationPaddyForm(initial=initial)
+
+    context = {
+        'user': request.user,
+        'form': form,
+    }
+    return render(request, 'declaration_paddy.html', context)
