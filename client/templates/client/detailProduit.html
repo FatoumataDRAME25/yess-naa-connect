@@ -110,8 +110,8 @@ YEES NAA CONNECT
             <!-- STOCK -->
             <div class="flex items-center gap-2 text-lime-600 font-semibold">
                 <span class="w-2 h-2 bg-lime-500 rounded-full"></span>
-                {% if produit.stock > 0 %}
-                  {{ produit.stock }} sacs disponibles
+                {% if produit.stock_sacs > 0 %}
+                  {{ produit.stock_sacs }} sacs disponibles
                 {% else %}
                   Rupture de stock
                 {% endif %}
@@ -144,9 +144,11 @@ YEES NAA CONNECT
 
             </div>
 
-            <button class="w-full border-2 border-lime-900 text-lime-900 py-3 rounded-xl font-bold">
-                Commander maintenant
-            </button>
+            <div class="w-full border-2 border-lime-900 text-lime-900 py-3 rounded-xl font-bold flex justify-center items-center">
+              <a href="{% url 'panier' %}">
+                  Commander maintenant
+              </a>
+            </div>
 
             <!-- FEATURES -->
             <div class="grid grid-cols-3 gap-4 pt-6 border-t text-center text-xs text-lime-950 font-semibold">
