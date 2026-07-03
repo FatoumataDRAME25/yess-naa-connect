@@ -24,7 +24,7 @@
   {% endfor %}
 </div>
 {% endif %}
-<!-- ===== ZONE DESKTOP (sidebar + contenu large) ===== -->
+<!-- ===== ZONE DESKTOP ===== -->
 <div class="hidden md:block">
 
   <!-- Header desktop -->
@@ -50,7 +50,7 @@
       <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.516 11.59c.75 1.334-.213 2.985-1.743 2.985H3.483c-1.53 0-2.493-1.65-1.743-2.985L8.257 3.1zM11 14a1 1 0 11-2 0 1 1 0 012 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v4a1 1 0 01-1 1z" clip-rule="evenodd"/>
       </svg>
-      ⚠ {{ p.nom }} {{ p.format }} — stock faible ({{ p.stock_sacs }} sacs restants)
+      ⚠ {{ p.nom }} {{ p.poids_kg }} kg — stock faible ({{ p.stock_sacs }} sacs restants)
     </span>
   </div>
   {% endfor %}
@@ -106,9 +106,9 @@
             {{ produit.stock_sacs }} sacs
           </td>
           <td class="px-6 py-4">
-            {% if produit.statut == 'en_ligne' %}
+            {% if produit.est_actif and produit.stock_sacs > 10 %}
               <span class="inline-block bg-yn-green text-white text-xs font-bold px-3 py-1 rounded-full">EN LIGNE</span>
-            {% elif produit.statut == 'stock_faible' %}
+            {% elif produit.est_actif and produit.stock_sacs > 0 %}
               <span class="inline-block bg-amber-400 text-white text-xs font-bold px-3 py-1 rounded-full">STOCK FAIBLE</span>
             {% else %}
               <span class="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">RUPTURE</span>
@@ -145,7 +145,7 @@
 </div><!-- fin desktop -->
 
 
-<!-- ===== ZONE MOBILE ===== -->
+<!-- ===== ZONE MOBILE + TABLETTE ===== -->
 <div class="md:hidden min-h-screen bg-gray-50 pb-24">
 
   <!-- Header mobile -->
@@ -186,7 +186,7 @@
         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.516 11.59c.75 1.334-.213 2.985-1.743 2.985H3.483c-1.53 0-2.493-1.65-1.743-2.985L8.257 3.1zM11 14a1 1 0 11-2 0 1 1 0 012 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v4a1 1 0 01-1 1z" clip-rule="evenodd"/>
       </svg>
       <p class="text-xs font-semibold text-amber-700">
-        ⚠ {{ p.nom }} {{ p.format }} — stock faible ({{ p.stock_sacs }} sacs restants)
+        ⚠ {{ p.nom }} {{ p.poids_kg }} kg — stock faible ({{ p.stock_sacs }} sacs restants)
       </p>
     </div>
     {% endfor %}
@@ -212,8 +212,8 @@
   </div>
   <div class="h-px bg-gray-200 mx-4 mb-4"></div>
 
-  <!-- Liste produits mobile -->
-  <div class="px-4 space-y-4">
+  <!-- Liste produits mobile / tablet grid -->
+  <div class="px-4 space-y-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0 sm:max-w-3xl sm:mx-auto md:grid-cols-3 md:max-w-none lg:grid-cols-3">
     {% for produit in produits %}
     <div class="product-card bg-white rounded-2xl overflow-hidden">
 
@@ -224,11 +224,11 @@
 
         <!-- Badge statut -->
         <span class="absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full
-          {% if produit.statut == 'en_ligne' %}bg-yn-green text-white
-          {% elif produit.statut == 'stock_faible' %}bg-amber-400 text-white
+          {% if produit.est_actif and produit.stock_sacs > 10 %}bg-yn-green text-white
+          {% elif produit.est_actif and produit.stock_sacs > 0 %}bg-amber-400 text-white
           {% else %}bg-red-500 text-white{% endif %}">
-          {% if produit.statut == 'en_ligne' %}EN LIGNE
-          {% elif produit.statut == 'stock_faible' %}STOCK FAIBLE
+          {% if produit.est_actif and produit.stock_sacs > 10 %}EN LIGNE
+          {% elif produit.est_actif and produit.stock_sacs > 0 %}STOCK FAIBLE
           {% else %}RUPTURE{% endif %}
         </span>
 
@@ -541,22 +541,26 @@
         </p>
       </div>
 
-      <div class="flex gap-2">
-        <button onclick="document.getElementById('produitPublieModal').remove()"
-                class="flex-1 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl py-3 hover:bg-gray-50 transition">
-          Fermer
-        </button>
+      <div class="flex flex-col gap-2">
+        <!-- Bouton principal : Télécharger QR (pleine largeur) -->
         <a href="{% url 'admin_transformatrice:admin_qr_download' produit_publie.lot_code %}"
-           class="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-yn-green hover:bg-yn-green-dark rounded-xl py-3 transition">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           class="w-full flex items-center justify-center gap-2 text-sm font-bold text-white bg-yn-green hover:bg-yn-green-dark rounded-xl py-3.5 transition">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
-          Télécharger QR
+          Télécharger le QR code
         </a>
-        <a href="{% url 'admin_transformatrice:admin_catalogue' %}"
-           class="flex-1 text-center text-sm font-semibold text-yn-green-dark border border-yn-green rounded-xl py-3 hover:bg-yn-green-pale/30 transition">
-          Voir catalogue
-        </a>
+        <!-- Boutons secondaires -->
+        <div class="flex gap-2">
+          <button onclick="document.getElementById('produitPublieModal').remove()"
+                  class="flex-1 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl py-3 hover:bg-gray-50 transition whitespace-nowrap">
+            Fermer
+          </button>
+          <a href="{% url 'admin_transformatrice:admin_catalogue' %}"
+             class="flex-1 text-center text-sm font-semibold text-yn-green-dark border border-yn-green rounded-xl py-3 hover:bg-yn-green-pale/30 transition whitespace-nowrap">
+            Voir catalogue
+          </a>
+        </div>
       </div>
     </div>
   </div>

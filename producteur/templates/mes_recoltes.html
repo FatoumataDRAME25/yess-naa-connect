@@ -1,0 +1,222 @@
+{% extends "sidebar.html" %}
+{% load static %}
+
+{% block title %}Mes Récoltes — YEES NAA CONNECT{% endblock %}
+
+{% block content %}
+<!-- ════════ MAIN ════════ -->
+  
+    <div class="max-w-full mx-auto p-10 flex flex-col gap-10">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-green-brand">Mes Récoltes</h1>
+          <p class="text-gray-500 text-base mt-1">Toutes vos déclarations de stock paddy</p>
+        </div>
+        <a href="{% url 'declaration' %}"
+           class="flex items-center gap-2 bg-status-green-text text-white px-6 py-3 rounded-xl font-bold shadow-sm hover:bg-green-900 transition-colors text-base">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Nouvelle déclaration
+        </a>
+      </div>
+
+      <!-- Stats cards rapides -->
+      <div class="grid grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-green-soft/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-green-soft flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20 7L12 3 4 7v10l8 4 8-4z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Stock disponible</p>
+            <p class="text-2xl font-bold text-green-brand">{{ stock_disponible_kg }} kg</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-green-accent/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-green-accent flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="7" width="18" height="14" rx="2"/><path d="M16 3.5a4 4 0 0 0-8 0V7h8z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Total déclarations</p>
+            <p class="text-2xl font-bold text-green-brand">{{ counts.tous }}</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-status-amber-text/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-status-amber-text flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Commandes reçues</p>
+            <p class="text-2xl font-bold text-green-brand">{{ nb_commandes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres et table -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+        <!-- Header avec filtres -->
+        <div class="px-6 py-6 border-b border-gray-100">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold text-green-brand">Liste des déclarations</h2>
+            <p class="text-base text-gray-500">{{ nb_resultats }} résultat{{ nb_resultats|pluralize }}</p>
+          </div>
+
+          <!-- Tabs filtres -->
+          <div class="flex items-center gap-2">
+            <a href="{% url 'mes_recoltes' %}"
+               class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if not filtre_statut %}bg-green-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+              Tous ({{ counts.tous }})
+            </a>
+            <a href="{% url 'mes_recoltes' %}?statut=disponible"
+               class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if filtre_statut == 'disponible' %}bg-green-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+              Disponible ({{ counts.disponible }})
+            </a>
+            <a href="{% url 'mes_recoltes' %}?statut=commande"
+               class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if filtre_statut == 'commande' %}bg-green-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+              Commandé ({{ counts.commande }})
+            </a>
+            <a href="{% url 'mes_recoltes' %}?statut=epuise"
+               class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if filtre_statut == 'epuise' %}bg-green-brand text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+              Épuisé ({{ counts.epuise }})
+            </a>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <table class="w-full text-left">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Photo</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Variété</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quantité</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Prix/kg</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date récolte</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Région</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+
+            {% for stock in page_obj %}
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4">
+                {% if stock.photo %}
+                  <img src="{{ stock.photo.url }}" class="w-16 h-16 rounded-lg object-cover" alt="Paddy">
+                {% else %}
+                  <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path d="M20 7L12 3 4 7v10l8 4 8-4z"/>
+                    </svg>
+                  </div>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-base font-medium text-green-brand whitespace-nowrap">
+                {{ stock.get_variete_display }}
+              </td>
+              <td class="px-6 py-4 text-base text-gray-700 font-semibold">{{ stock.quantite_kg }} kg</td>
+              <td class="px-6 py-4 text-base text-gray-500">{{ stock.prix_par_kg }} FCFA</td>
+              <td class="px-6 py-4 text-base text-gray-500 whitespace-nowrap">{{ stock.date_recolte|date:"d M Y" }}</td>
+              <td class="px-6 py-4 text-base text-gray-500">{{ stock.region }}</td>
+              <td class="px-6 py-4">
+                {% if stock.statut == 'disponible' %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-green-bg">
+                    <span class="w-1.5 h-1.5 rounded-full bg-status-green-text flex-shrink-0"></span>
+                    <span class="text-xs font-medium text-status-green-text">Disponible</span>
+                  </span>
+                {% elif stock.statut == 'commande' %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-amber-bg">
+                    <span class="w-1.5 h-1.5 rounded-full bg-status-amber-text flex-shrink-0"></span>
+                    <span class="text-xs font-medium text-status-amber-text">Commandé</span>
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0"></span>
+                    <span class="text-xs font-medium text-gray-500">Épuisé</span>
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="px-6 py-12 text-center text-gray-400 text-base">
+                {% if filtre_statut %}
+                  Aucune déclaration avec le statut "{{ filtre_statut }}".
+                {% else %}
+                  Vous n'avez encore aucune déclaration de stock.
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <p class="text-sm text-gray-500">
+            Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+            <span class="mx-2">•</span>
+            {{ page_obj.start_index }} à {{ page_obj.end_index }} sur {{ page_obj.paginator.count }} résultats
+          </p>
+
+          <div class="flex items-center gap-2">
+            {% if page_obj.has_previous %}
+              <a href="?page=1{% if filtre_statut %}&statut={{ filtre_statut }}{% endif %}"
+                 class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition">
+                Première
+              </a>
+              <a href="?page={{ page_obj.previous_page_number }}{% if filtre_statut %}&statut={{ filtre_statut }}{% endif %}"
+                 class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition">
+                Précédent
+              </a>
+            {% else %}
+              <span class="px-3 py-2 rounded-lg bg-gray-50 text-gray-400 text-sm font-medium cursor-not-allowed">
+                Première
+              </span>
+              <span class="px-3 py-2 rounded-lg bg-gray-50 text-gray-400 text-sm font-medium cursor-not-allowed">
+                Précédent
+              </span>
+            {% endif %}
+
+            <span class="px-4 py-2 bg-green-brand text-white rounded-lg text-sm font-bold">
+              {{ page_obj.number }}
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{% if filtre_statut %}&statut={{ filtre_statut }}{% endif %}"
+                 class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition">
+                Suivant
+              </a>
+              <a href="?page={{ page_obj.paginator.num_pages }}{% if filtre_statut %}&statut={{ filtre_statut }}{% endif %}"
+                 class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition">
+                Dernière
+              </a>
+            {% else %}
+              <span class="px-3 py-2 rounded-lg bg-gray-50 text-gray-400 text-sm font-medium cursor-not-allowed">
+                Suivant
+              </span>
+              <span class="px-3 py-2 rounded-lg bg-gray-50 text-gray-400 text-sm font-medium cursor-not-allowed">
+                Dernière
+              </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  
+{% endblock %}

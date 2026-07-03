@@ -54,7 +54,7 @@
         </div>
         <div>
             <p class="text-sm text-yn-gray">Commandes du jour</p>
-            <p class="text-2xl font-bold text-yn-green-dark">{{ stats.commandes_jour|default:8 }}</p>
+            <p class="text-2xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.commandes_jour|default:8 }}</span></p>
         </div>
     </div>
 
@@ -64,7 +64,7 @@
         </div>
         <div>
             <p class="text-sm text-yn-gray">Chiffre d'affaires du mois</p>
-            <p class="text-2xl font-bold text-yn-green-dark">{{ stats.ca_mois|default:"850 000" }} <span class="text-sm font-semibold">FCFA</span></p>
+            <p class="text-2xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.ca_mois|default:"850 000" }}</span> <span class="text-sm font-semibold">FCFA</span></p>
         </div>
     </div>
 
@@ -74,7 +74,7 @@
         </div>
         <div>
             <p class="text-sm text-yn-gray">Stock paddy (producteurs)</p>
-            <p class="text-2xl font-bold text-yn-green-dark">{{ stats.stock_paddy|default:"2 500" }} <span class="text-sm font-semibold">kg</span></p>
+            <p class="text-2xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.stock_paddy|default:"2 500" }}</span> <span class="text-sm font-semibold">kg</span></p>
         </div>
     </div>
 
@@ -84,7 +84,7 @@
         </div>
         <div>
             <p class="text-sm text-yn-gray">Producteurs actifs</p>
-            <p class="text-2xl font-bold text-yn-green-dark">{{ stats.producteurs_actifs|default:18 }}</p>
+            <p class="text-2xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.producteurs_actifs|default:18 }}</span></p>
         </div>
     </div>
 
@@ -154,7 +154,7 @@
                         <p class="font-semibold text-gray-800">{{ commande.client_nom }}</p>
                         <p class="text-yn-gray text-xs">{{ commande.client_telephone }}</p>
                     </td>
-                    <td class="px-6 py-4 text-gray-700">{{ commande.produits_resume }}</td>
+                    <td class="px-6 py-4 text-gray-700 max-w-xs truncate">{{ commande.produits_resume }}</td>
                     <td class="px-6 py-4 font-bold text-gray-800">{{ commande.montant }} FCFA</td>
                     <td class="px-6 py-4">
                         {% if commande.mode_paiement == 'livraison' %}
@@ -212,7 +212,7 @@
 </div><!-- fin desktop -->
 
 <!-- ================================================================ -->
-<!-- VERSION MOBILE                                                    -->
+<!-- VERSION MOBILE + TABLETTE                                         -->
 <!-- ================================================================ -->
 <div class="md:hidden min-h-screen bg-gray-50 pb-24">
 
@@ -247,8 +247,8 @@
       <p class="text-yn-gray text-xs mt-0.5">{{ today|date:"l j F Y"|capfirst }}</p>
     </div>
 
-    <!-- Grille stats 2×2 -->
-    <div class="grid grid-cols-2 gap-3 mb-5">
+    <!-- Grille stats 2×2 / 4 sur tablette -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
 
       <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-yn-green flex items-center justify-center text-white flex-shrink-0">
@@ -258,7 +258,7 @@
         </div>
         <div>
           <p class="text-xs text-yn-gray leading-tight">Commandes</p>
-          <p class="text-xl font-bold text-yn-green-dark">{{ stats.commandes_jour }}</p>
+          <p class="text-xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.commandes_jour }}</span></p>
         </div>
       </div>
 
@@ -270,7 +270,7 @@
         </div>
         <div>
           <p class="text-xs text-yn-gray leading-tight">CA du mois</p>
-          <p class="text-base font-bold text-yn-green-dark">{{ stats.ca_mois }}<span class="text-xs font-semibold"> F</span></p>
+          <p class="text-base font-bold text-yn-green-dark"><span class="yn-count">{{ stats.ca_mois }}</span><span class="text-xs font-semibold"> F</span></p>
         </div>
       </div>
 
@@ -282,7 +282,7 @@
         </div>
         <div>
           <p class="text-xs text-yn-gray leading-tight">Stock paddy</p>
-          <p class="text-xl font-bold text-yn-green-dark">{{ stats.stock_paddy }}<span class="text-xs font-semibold"> kg</span></p>
+          <p class="text-xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.stock_paddy }}</span><span class="text-xs font-semibold"> kg</span></p>
         </div>
       </div>
 
@@ -294,7 +294,7 @@
         </div>
         <div>
           <p class="text-xs text-yn-gray leading-tight">Producteurs</p>
-          <p class="text-xl font-bold text-yn-green-dark">{{ stats.producteurs_actifs }}</p>
+          <p class="text-xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.producteurs_actifs }}</span></p>
         </div>
       </div>
 
@@ -352,8 +352,9 @@
       <div class="divide-y divide-gray-50">
         {% for commande in commandes_recentes %}
         <div class="px-4 py-3 flex items-center gap-3">
-          <img src="{{ commande.client_photo }}" alt="{{ commande.client_nom }}"
-               class="w-10 h-10 rounded-full object-cover flex-shrink-0 bg-gray-100">
+          <div class="w-10 h-10 rounded-full bg-yn-green-pale flex items-center justify-center flex-shrink-0 text-yn-green-dark font-bold text-sm">
+            {{ commande.client.prenom|first|upper }}{{ commande.client.nom|first|upper }}
+          </div>
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm text-gray-900 truncate">{{ commande.client_nom }}</p>
             <p class="text-xs text-yn-gray truncate">{{ commande.produits_resume }}</p>

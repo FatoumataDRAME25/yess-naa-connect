@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum, Count, F
+from django.db.models import Sum, Count, F, Q
 from django.http import HttpResponse
 from django.urls import reverse
 from datetime import date, datetime
@@ -77,7 +77,9 @@ def admin_dashboard(request):
         total=Sum(F('lignes__quantite') * F('lignes__prix_unitaire'))
     )['total'] or 0
 
-    commandes_recentes = CommandeClient.objects.select_related('client').order_by('-date')[:5]
+    commandes_recentes = CommandeClient.objects.select_related('client').prefetch_related(
+        'lignes__produit'
+    ).order_by('-date')[:5]
 
     total_commandes = CommandeClient.objects.count() or 1
     en_livraison = CommandeClient.objects.filter(statut=CommandeClient.Statut.EN_LIVRAISON).count()
@@ -107,17 +109,41 @@ def admin_dashboard(request):
 def admin_stocks(request):
     commande_envoyee = request.session.pop('commande_envoyee', None)
 
-    # Stocks disponibles + déjà commandés (pour afficher les états dans les cartes)
-    stocks = StockPaddy.objects.filter(
-        statut__in=[StockPaddy.Statut.DISPONIBLE, StockPaddy.Statut.COMMANDE]
-    ).select_related('producteur__user').order_by('-id')
+    q = request.GET.get('q', '').strip()
+    region_filtre = request.GET.get('region', '').strip()
+    variete_filtre = request.GET.get('variete', '').strip()
+    tri = request.GET.get('tri', 'recent')
 
-    stock_total_kg = stocks.filter(
+    # Toujours calculer les stats globales (non filtrées)
+    stocks_base = StockPaddy.objects.filter(
+        statut__in=[StockPaddy.Statut.DISPONIBLE, StockPaddy.Statut.COMMANDE]
+    )
+    stock_total_kg = stocks_base.filter(
         statut=StockPaddy.Statut.DISPONIBLE
     ).aggregate(total=Sum('quantite_kg'))['total'] or 0
-    nb_producteurs = stocks.values('producteur').distinct().count()
-    regions = list(stocks.values_list('region', flat=True).distinct())
+    nb_producteurs = stocks_base.values('producteur').distinct().count()
+    regions = list(stocks_base.values_list('region', flat=True).distinct().order_by('region'))
     varietes = [v[1] for v in StockPaddy.Variete.choices]
+
+    # Stocks filtrés pour l'affichage
+    stocks = stocks_base.select_related('producteur__user')
+
+    if q:
+        stocks = stocks.filter(
+            Q(producteur__user__prenom__icontains=q) |
+            Q(producteur__user__nom__icontains=q) |
+            Q(region__icontains=q) |
+            Q(variete__icontains=q)
+        )
+    if region_filtre:
+        stocks = stocks.filter(region=region_filtre)
+    if variete_filtre:
+        stocks = stocks.filter(variete=variete_filtre)
+
+    if tri == 'quantite':
+        stocks = stocks.order_by('-quantite_kg')
+    else:
+        stocks = stocks.order_by('-id')
 
     # Annoter chaque stock avec sa commande active (en_attente ou confirmee)
     commandes_actives = CommandePaddy.objects.filter(
@@ -137,6 +163,10 @@ def admin_stocks(request):
         'stocks_producteurs': stocks,
         'commande_envoyee': commande_envoyee,
         'commandes_par_stock': commandes_par_stock,
+        'q': q,
+        'region_filtre': region_filtre,
+        'variete_filtre': variete_filtre,
+        'tri': tri,
     }
     return render(request, 'espace_admin/stocks_producteurs.html', context)
 
@@ -404,6 +434,7 @@ def admin_produit_delete(request, pk):
 @admin_required
 def admin_commandes(request):
     statut_filtre = request.GET.get('statut', 'toutes')
+    q = request.GET.get('q', '').strip()
 
     commandes_qs = CommandeClient.objects.select_related('client').prefetch_related(
         'lignes__produit'
@@ -411,6 +442,13 @@ def admin_commandes(request):
 
     if statut_filtre != 'toutes':
         commandes_qs = commandes_qs.filter(statut=statut_filtre)
+
+    if q:
+        commandes_qs = commandes_qs.filter(
+            Q(client__prenom__icontains=q) |
+            Q(client__nom__icontains=q) |
+            Q(client__telephone__icontains=q)
+        )
 
     counts = {s: CommandeClient.objects.filter(statut=s).count() for s, _ in CommandeClient.Statut.choices}
     total_all = CommandeClient.objects.count()
@@ -438,6 +476,7 @@ def admin_commandes(request):
         ],
         'commandes': commandes_qs,
         'statut_filtre': statut_filtre,
+        'q': q,
     }
     return render(request, 'espace_admin/commandes.html', context)
 

@@ -32,31 +32,43 @@
 </div>
 
 <!-- Filtres -->
-<div class="flex items-center gap-4 mb-8">
+<form method="get" id="desktopStocksForm" class="flex items-center gap-4 mb-8">
+    <input type="hidden" name="tri" id="triDesktop" value="{{ tri }}">
     <div class="relative flex-1 max-w-md">
         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </span>
-        <input type="text" name="q" placeholder="Rechercher un producteur..."
+        <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un producteur..."
                class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm
                       focus:outline-none focus:ring-2 focus:ring-yn-green focus:border-transparent">
     </div>
 
-    <select name="region" class="bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yn-green">
-        <option>Région (Toutes)</option>
-        {% for region in regions %}<option value="{{ region }}">{{ region }}</option>{% endfor %}
+    <select name="region" onchange="document.getElementById('desktopStocksForm').submit()"
+            class="bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yn-green">
+        <option value="">Région (Toutes)</option>
+        {% for region in regions %}<option value="{{ region }}" {% if region == region_filtre %}selected{% endif %}>{{ region }}</option>{% endfor %}
     </select>
 
-    <select name="variete" class="bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yn-green">
-        <option>Variété (Toutes)</option>
-        {% for variete in varietes %}<option value="{{ variete }}">{{ variete }}</option>{% endfor %}
+    <select name="variete" onchange="document.getElementById('desktopStocksForm').submit()"
+            class="bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yn-green">
+        <option value="">Variété (Toutes)</option>
+        {% for variete in varietes %}<option value="{{ variete }}" {% if variete == variete_filtre %}selected{% endif %}>{{ variete }}</option>{% endfor %}
     </select>
 
-    <button class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 text-gray-700 hover:bg-gray-50">
-        Plus récent
+    <button type="button"
+            onclick="document.getElementById('triDesktop').value='{% if tri == 'recent' %}quantite{% else %}recent{% endif %}'; document.getElementById('desktopStocksForm').submit()"
+            class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 text-gray-700 hover:bg-gray-50 {% if tri == 'quantite' %}border-yn-green text-yn-green{% endif %}">
+        {% if tri == 'quantite' %}Par quantité{% else %}Plus récent{% endif %}
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h5m6-8l4 16m0 0l-4-4m4 4l4-4"/></svg>
     </button>
-</div>
+
+    {% if q or region_filtre or variete_filtre %}
+    <a href="{% url 'admin_transformatrice:admin_stocks' %}"
+       class="text-sm text-gray-400 hover:text-red-500 font-semibold whitespace-nowrap">
+        ✕ Réinitialiser
+    </a>
+    {% endif %}
+</form>
 
 <!-- Grille des stocks -->
 <div class="grid grid-cols-3 gap-6">
@@ -146,7 +158,13 @@
         </div>
     </div>
     {% empty %}
-    <p class="col-span-3 text-center text-yn-gray py-12">Aucun stock producteur disponible pour le moment.</p>
+    <p class="col-span-3 text-center text-yn-gray py-12">
+        {% if q or region_filtre or variete_filtre %}
+            Aucun résultat pour votre recherche. <a href="{% url 'admin_transformatrice:admin_stocks' %}" class="text-yn-green font-semibold">Réinitialiser</a>
+        {% else %}
+            Aucun stock producteur disponible pour le moment.
+        {% endif %}
+    </p>
     {% endfor %}
 </div>
 
@@ -303,7 +321,7 @@
 </div><!-- fin desktop -->
 
 <!-- ================================================================ -->
-<!-- VERSION MOBILE                                                    -->
+<!-- VERSION MOBILE + TABLETTE                                         -->
 <!-- ================================================================ -->
 <div class="md:hidden min-h-screen bg-yn-green-dark pb-24">
 
@@ -349,26 +367,30 @@
   </div>
 
   <!-- Barre recherche + filtre -->
-  <div class="flex items-center gap-2 px-4 mb-4">
+  <form method="get" id="mobileSearchForm" class="flex items-center gap-2 px-4 mb-4">
+    {% if region_filtre %}<input type="hidden" name="region" value="{{ region_filtre }}">{% endif %}
+    {% if variete_filtre %}<input type="hidden" name="variete" value="{{ variete_filtre }}">{% endif %}
+    <input type="hidden" name="tri" value="{{ tri }}">
     <div class="relative flex-1">
       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
         </svg>
       </span>
-      <input type="text" placeholder="Rechercher un producteur..."
+      <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un producteur..."
              class="w-full pl-9 pr-4 py-2.5 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
     </div>
-    <button onclick="document.getElementById('filterModal').classList.remove('hidden')"
-            class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
+    <button type="button" onclick="document.getElementById('filterModal').classList.remove('hidden')"
+            class="w-11 h-11 {% if region_filtre or variete_filtre %}bg-yn-green-light{% else %}bg-white/10{% endif %} rounded-xl flex items-center justify-center flex-shrink-0 relative">
       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
       </svg>
+      {% if region_filtre or variete_filtre %}<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>{% endif %}
     </button>
-  </div>
+  </form>
 
-  <!-- Liste producteurs mobile -->
-  <div class="space-y-4 px-4">
+  <!-- Liste producteurs mobile / tablet grid -->
+  <div class="space-y-4 px-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0 sm:max-w-3xl sm:mx-auto md:max-w-none md:grid-cols-3">
     {% for stock in stocks_producteurs %}
     <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
       <!-- Photo paddy -->
@@ -499,7 +521,7 @@
 
 <!-- ============ MODAL FILTRES (mobile) ============ -->
 <div id="filterModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
-  <div class="bg-white w-full rounded-t-[28px] px-6 pt-4 pb-8">
+  <div class="bg-white w-full rounded-t-[28px] px-6 pt-4 pb-8 sm:max-w-md sm:mx-auto">
     <!-- Drag handle -->
     <div class="flex justify-center mb-4">
       <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
@@ -513,81 +535,77 @@
       </button>
     </div>
 
-    <!-- Région -->
-    <div class="mb-5">
-      <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Région</p>
-      <div class="relative">
-        <select class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-yn-green">
-          <option>Toutes les régions</option>
-          {% for region in regions %}<option>{{ region }}</option>{% endfor %}
-        </select>
-        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+    <form method="get" id="mobileFilterForm">
+      <input type="hidden" name="q" value="{{ q }}">
+
+      <!-- Région -->
+      <div class="mb-5">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Région</p>
+        <div class="relative">
+          <select id="mobileRegionSelect" name="region"
+                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-yn-green">
+            <option value="">Toutes les régions</option>
+            {% for region in regions %}<option value="{{ region }}" {% if region == region_filtre %}selected{% endif %}>{{ region }}</option>{% endfor %}
+          </select>
+          <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Variété -->
+      <div class="mb-5">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Variété de riz</p>
+        <div class="relative">
+          <select id="mobileVarieteSelect" name="variete"
+                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-yn-green">
+            <option value="">Toutes les variétés</option>
+            {% for variete in varietes %}<option value="{{ variete }}" {% if variete == variete_filtre %}selected{% endif %}>{{ variete }}</option>{% endfor %}
+          </select>
+          <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Trier par -->
+      <div class="mb-6">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Trier par</p>
+        <div class="space-y-2">
+          <label class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3.5 cursor-pointer">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-yn-green" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <span class="font-bold text-gray-800">Plus récent</span>
+            </div>
+            <input type="radio" name="tri" value="recent" {% if tri != 'quantite' %}checked{% endif %} class="accent-yn-green w-5 h-5">
+          </label>
+          <label class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3.5 cursor-pointer">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-yn-gold" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a1 1 0 01.894.553l1.448 2.894 3.196.465a1 1 0 01.554 1.706l-2.312 2.253.546 3.18a1 1 0 01-1.451 1.054L10 12.347l-2.875 1.512a1 1 0 01-1.45-1.054l.545-3.18-2.312-2.253a1 1 0 01.554-1.706l3.196-.465L9.106 2.553A1 1 0 0110 2z"/>
+              </svg>
+              <span class="font-bold text-gray-800">Quantité</span>
+            </div>
+            <input type="radio" name="tri" value="quantite" {% if tri == 'quantite' %}checked{% endif %} class="accent-yn-green w-5 h-5">
+          </label>
+        </div>
+      </div>
+
+      <!-- Boutons -->
+      <button type="submit"
+              class="w-full flex items-center justify-center gap-2 bg-yn-green-dark text-white font-bold py-4 rounded-2xl mb-3">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
         </svg>
-      </div>
-    </div>
-
-    <!-- Variété -->
-    <div class="mb-5">
-      <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Variété de riz</p>
-      <div class="relative">
-        <select class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-yn-green">
-          <option>Toutes les variétés</option>
-          {% for variete in varietes %}<option>{{ variete }}</option>{% endfor %}
-        </select>
-        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
-      </div>
-    </div>
-
-    <!-- Trier par -->
-    <div class="mb-5">
-      <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Trier par</p>
-      <div class="space-y-2">
-        <label class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3.5 cursor-pointer">
-          <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-yn-green" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-            <span class="font-bold text-gray-800">Plus récent</span>
-          </div>
-          <input type="radio" name="tri" value="recent" checked class="accent-yn-green w-5 h-5">
-        </label>
-        <label class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3.5 cursor-pointer">
-          <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-yn-gold" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a1 1 0 01.894.553l1.448 2.894 3.196.465a1 1 0 01.554 1.706l-2.312 2.253.546 3.18a1 1 0 01-1.451 1.054L10 12.347l-2.875 1.512a1 1 0 01-1.45-1.054l.545-3.18-2.312-2.253a1 1 0 01.554-1.706l3.196-.465L9.106 2.553A1 1 0 0110 2z"/>
-            </svg>
-            <span class="font-bold text-gray-800">Quantité</span>
-          </div>
-          <input type="radio" name="tri" value="quantite" class="accent-yn-green w-5 h-5">
-        </label>
-      </div>
-    </div>
-
-    <!-- Fourchette prix -->
-    <div class="mb-6">
-      <div class="flex items-center justify-between mb-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Fourchette de prix (FCFA/kg)</p>
-        <span class="text-xs font-bold text-yn-green">150 – 250</span>
-      </div>
-      <input type="range" min="150" max="250" value="250"
-             class="w-full h-1.5 bg-yn-green rounded-full accent-yn-green">
-    </div>
-
-    <!-- Boutons -->
-    <button onclick="document.getElementById('filterModal').classList.add('hidden')"
-            class="w-full flex items-center justify-center gap-2 bg-yn-green-dark text-white font-bold py-4 rounded-2xl mb-3">
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-      </svg>
-      Appliquer les filtres
-    </button>
-    <button onclick="document.getElementById('filterModal').classList.add('hidden')"
-            class="w-full text-center text-sm font-semibold text-gray-500 border border-gray-200 rounded-2xl py-3.5">
+        Appliquer les filtres
+      </button>
+    </form>
+    <a href="{% url 'admin_transformatrice:admin_stocks' %}"
+       class="block w-full text-center text-sm font-semibold text-gray-500 border border-gray-200 rounded-2xl py-3.5">
       Réinitialiser tout
-    </button>
+    </a>
   </div>
 </div>
 

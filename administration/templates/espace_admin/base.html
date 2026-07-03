@@ -17,6 +17,106 @@
         /* Masquer scrollbar menu mobile */
         #mobile-menu::-webkit-scrollbar { display: none; }
         #mobile-menu { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ═══════════════════════════════════════
+           ANIMATIONS — Yess Naa Connect
+        ═══════════════════════════════════════ */
+
+        /* Keyframes */
+        @keyframes ynFadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes ynRipple {
+            to { transform: scale(4); opacity: 0; }
+        }
+        @keyframes ynSpin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes ynPop {
+            0%   { transform: scale(0.95); opacity: 0; }
+            60%  { transform: scale(1.02); }
+            100% { transform: scale(1);    opacity: 1; }
+        }
+        @keyframes ynSlideLeft {
+            from { opacity: 0; transform: translateX(-10px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Page entry */
+        .yn-page-enter {
+            animation: ynFadeUp 0.4s ease both;
+        }
+
+        /* Scroll reveal */
+        .yn-reveal {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+        .yn-reveal.yn-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Card hover lift — desktop uniquement, direct enfant de .grid */
+        @media (min-width: 768px) {
+            .grid > div.bg-white {
+                transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+            }
+            .grid > div.bg-white:hover {
+                transform: translateY(-4px) !important;
+                box-shadow: 0 16px 40px rgba(0, 0, 0, 0.09) !important;
+            }
+            /* Lift sur les cartes stock producteurs */
+            .grid > div.bg-white.rounded-\[20px\] {
+                transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+            }
+        }
+
+        /* Ripple */
+        .yn-ripple { position: relative; overflow: hidden; }
+        .yn-wave {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.30);
+            transform: scale(0);
+            animation: ynRipple 0.6s linear;
+            pointer-events: none;
+        }
+
+        /* Bouton loading */
+        .yn-loading {
+            position: relative !important;
+            color: transparent !important;
+            pointer-events: none;
+        }
+        .yn-loading > * { visibility: hidden; }
+        .yn-loading::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            top: 50%; left: 50%;
+            margin-top: -9px; margin-left: -9px;
+            border: 2.5px solid rgba(255,255,255,0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: ynSpin 0.65s linear infinite;
+            visibility: visible;
+        }
+
+        /* Sidebar nav — hover fluide */
+        aside nav a {
+            transition: background-color 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+        }
+
+        /* Badge notification pulse */
+        .yn-badge-pulse {
+            animation: ynPop 0.4s ease both;
+        }
+
+        /* Entrée drawer mobile */
+        #mobile-menu { transition-property: transform; }
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -65,6 +165,12 @@
                           {% if active_nav == 'commandes' %}bg-white/10 border-l-4 border-yn-gold font-semibold{% endif %}">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/></svg>
                     Commandes Clients
+                </a>
+                <a href="{% url 'admin_transformatrice:admin_commandes_paddy' %}"
+                   class="flex items-center gap-3 px-8 py-4 text-white/90 hover:bg-white/5 transition
+                          {% if active_nav == 'commandes_paddy' %}bg-white/10 border-l-4 border-yn-gold font-semibold{% endif %}">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2L3 6v8l7 4 7-4V6l-7-4z"/></svg>
+                    Commandes Paddy
                 </a>
                 <a href="{% url 'admin_transformatrice:admin_about' %}"
                    class="flex items-center gap-3 px-8 py-4 text-white/90 hover:bg-white/5 transition
@@ -151,7 +257,12 @@
                           {% if active_nav == 'commandes' %}bg-white/10 border-l-4 border-yn-gold font-semibold{% endif %}">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/></svg>
                     Commandes Clients
-                    <span class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">12</span>
+                </a>
+                <a href="{% url 'admin_transformatrice:admin_commandes_paddy' %}"
+                   class="flex items-center gap-4 px-6 py-4 text-white/90 hover:bg-white/5 transition
+                          {% if active_nav == 'commandes_paddy' %}bg-white/10 border-l-4 border-yn-gold font-semibold{% endif %}">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2L3 6v8l7 4 7-4V6l-7-4z"/></svg>
+                    Commandes Paddy
                 </a>
                 <a href="#"
                    class="flex items-center gap-4 px-6 py-4 text-white/90 hover:bg-white/5 transition">
@@ -205,6 +316,156 @@ function closeMobileMenu() {
     document.getElementById('menu-overlay').classList.add('hidden');
     document.body.style.overflow = '';
 }
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     ANIMATIONS GLOBALES — Yess Naa Connect
+════════════════════════════════════════════════════ -->
+<script>
+(function () {
+    'use strict';
+
+    /* ── 1. Page fade-in ─────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+        const main = document.querySelector('main');
+        if (main) main.classList.add('yn-page-enter');
+    });
+
+    /* ── 2. Scroll reveal (IntersectionObserver) ─── */
+    function initReveal() {
+        const selectors = [
+            'tbody tr',
+            '.grid > div:not(nav *)',
+            '.space-y-3 > a',
+            '.space-y-4 > div.bg-white',
+            '.space-y-4 > a',
+        ];
+        const all = [];
+        selectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                if (!el.closest('aside') && !el.closest('nav.flex')) all.push(el);
+            });
+        });
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('yn-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.05, rootMargin: '0px 0px -24px 0px' });
+
+        all.forEach(function (el, i) {
+            el.classList.add('yn-reveal');
+            el.style.transitionDelay = Math.min(i * 45, 420) + 'ms';
+            observer.observe(el);
+        });
+    }
+
+    /* ── 3. Counter animation (.yn-count) ──────────── */
+    function animateCount(el) {
+        const raw = el.dataset.count !== undefined ? el.dataset.count : el.textContent;
+        const target = parseInt(raw.replace(/[\s ,.]/g, ''), 10);
+        if (isNaN(target) || target === 0) return;
+        const duration = 950;
+        let t0 = null;
+        function tick(ts) {
+            if (!t0) t0 = ts;
+            const p = Math.min((ts - t0) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.round(eased * target).toLocaleString('fr-FR');
+            if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    function initCounters() {
+        const obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    animateCount(entry.target);
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('.yn-count').forEach(function (el) {
+            obs.observe(el);
+        });
+    }
+
+    /* ── 4. Ripple sur boutons verts ────────────────── */
+    function addRipple(btn) {
+        if (btn.dataset.ripple) return;
+        btn.dataset.ripple = '1';
+        btn.classList.add('yn-ripple');
+        btn.addEventListener('click', function (e) {
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const wave = document.createElement('span');
+            wave.className = 'yn-wave';
+            wave.style.width  = size + 'px';
+            wave.style.height = size + 'px';
+            wave.style.left   = (e.clientX - rect.left - size / 2) + 'px';
+            wave.style.top    = (e.clientY - rect.top  - size / 2) + 'px';
+            btn.appendChild(wave);
+            wave.addEventListener('animationend', function () { wave.remove(); });
+        });
+    }
+
+    function initRipple() {
+        var sel = [
+            'button.bg-yn-green',
+            'button.bg-yn-green-dark',
+            'a.bg-yn-green',
+            'a.bg-yn-green-dark',
+            'button.border-yn-green',
+        ].join(',');
+        document.querySelectorAll(sel).forEach(addRipple);
+    }
+
+    /* ── 5. Loading state sur POST forms ───────────── */
+    function initFormLoading() {
+        document.querySelectorAll('form[method="post"]').forEach(function (form) {
+            form.addEventListener('submit', function () {
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn && !btn.dataset.noLoading) {
+                    btn.classList.add('yn-loading');
+                    setTimeout(function () { btn.classList.remove('yn-loading'); }, 8000);
+                }
+            });
+        });
+    }
+
+    /* ── 6. Stagger entrée des cartes mobiles ───────── */
+    function initMobileStagger() {
+        var grids = document.querySelectorAll(
+            '.space-y-4.px-4, .space-y-3.px-4'
+        );
+        grids.forEach(function (grid) {
+            Array.from(grid.children).forEach(function (card, i) {
+                card.style.animationDelay = (i * 60) + 'ms';
+            });
+        });
+    }
+
+    /* ── 7. Notification badge pop ──────────────────── */
+    function initBadges() {
+        document.querySelectorAll('.bg-red-500.rounded-full').forEach(function (b) {
+            b.classList.add('yn-badge-pulse');
+        });
+    }
+
+    /* ── Init ──────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+        initReveal();
+        initCounters();
+        initRipple();
+        initFormLoading();
+        initMobileStagger();
+        initBadges();
+    });
+})();
 </script>
 
 {% block extra_js %}{% endblock %}

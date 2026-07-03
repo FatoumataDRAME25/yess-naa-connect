@@ -42,6 +42,30 @@ class CommandeClient(models.Model):
     def __str__(self):
         return f"Commande #{self.pk} — {self.client}"
 
+    @property
+    def numero(self):
+        return f"YEES-{self.pk:03d}"
+
+    @property
+    def client_nom(self):
+        return f"{self.client.prenom} {self.client.nom}"
+
+    @property
+    def client_telephone(self):
+        return self.client.telephone
+
+    @property
+    def montant(self):
+        total = sum(l.quantite * l.prix_unitaire for l in self.lignes.all())
+        return f"{int(total):,}".replace(",", " ")
+
+    @property
+    def produits_resume(self):
+        return ", ".join(
+            f"{l.quantite}× {l.produit.nom} {l.produit.poids_kg}kg"
+            for l in self.lignes.all()
+        )
+
 
 class LigneCommande(models.Model):
     """Relie une commande client à ses produits avec quantité et prix."""

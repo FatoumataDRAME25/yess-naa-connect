@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum
+from django.core.paginator import Paginator
 from datetime import date
 from administration.models import User, CommandePaddy
 from producteur.models import Producteur, StockPaddy
@@ -283,3 +284,65 @@ def declaration(request):
         'form': form,
     }
     return render(request, 'declaration_paddy.html', context)
+
+
+@login_required(login_url='/producteur/connexion/')
+def mes_recoltes(request):
+    """Liste toutes les déclarations de récolte du producteur avec pagination."""
+    if request.user.role != 'producteur':
+        messages.error(request, "Accès réservé aux producteurs.")
+        return redirect('connexion')
+
+    try:
+        producteur = Producteur.objects.get(user=request.user)
+    except Producteur.DoesNotExist:
+        messages.error(request, "Profil producteur introuvable.")
+        return redirect('connexion')
+
+    # Filtrer par statut si demandé
+    filtre_statut = request.GET.get('statut', '')
+    stocks_qs = StockPaddy.objects.filter(producteur=producteur).order_by('-date_recolte')
+    
+    if filtre_statut and filtre_statut in StockPaddy.Statut.values:
+        stocks_qs = stocks_qs.filter(statut=filtre_statut)
+
+    # Pagination : 10 items par page
+    paginator = Paginator(stocks_qs, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    # Stats pour le header
+    stock_disponible_kg = StockPaddy.objects.filter(
+        producteur=producteur,
+        statut=StockPaddy.Statut.DISPONIBLE
+    ).aggregate(total=Sum('quantite_kg'))['total'] or 0
+
+    nb_commandes = CommandePaddy.objects.filter(
+        stock__producteur=producteur
+    ).count()
+
+    nb_en_attente = CommandePaddy.objects.filter(
+        stock__producteur=producteur,
+        statut=CommandePaddy.Statut.EN_ATTENTE
+    ).count()
+
+    # Counts par statut pour les tabs
+    counts = {
+        'tous': stocks_qs.model.objects.filter(producteur=producteur).count(),
+        'disponible': stocks_qs.model.objects.filter(producteur=producteur, statut=StockPaddy.Statut.DISPONIBLE).count(),
+        'commande': stocks_qs.model.objects.filter(producteur=producteur, statut=StockPaddy.Statut.COMMANDE).count(),
+        'epuise': stocks_qs.model.objects.filter(producteur=producteur, statut=StockPaddy.Statut.EPUISE).count(),
+    }
+
+    context = {
+        'user': request.user,
+        'today': date.today(),
+        'stock_disponible_kg': stock_disponible_kg,
+        'nb_commandes': nb_commandes,
+        'nb_en_attente': nb_en_attente,
+        'page_obj': page_obj,
+        'filtre_statut': filtre_statut,
+        'counts': counts,
+        'nb_resultats': stocks_qs.count(),
+    }
+    return render(request, 'mes_recoltes.html', context)

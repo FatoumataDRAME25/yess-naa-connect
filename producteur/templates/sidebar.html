@@ -32,6 +32,22 @@
                     Tableau de bord
                 </a>
 
+                <!-- Mes récoltes -->
+                <a href="{% url 'mes_recoltes' %}"
+                   class="flex items-center gap-3 py-3 pl-5 pr-4 text-base font-semibold transition-colors
+                          {% if request.resolver_match.url_name == 'mes_recoltes' %}
+                              bg-white text-[#2d5a27]
+                          {% else %}
+                              text-white hover:bg-white/10 rounded-lg mx-2 px-3
+                          {% endif %}">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7L12 3 4 7v10l8 4 8-4z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7l8 4 8-4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v10"/>
+                    </svg>
+                    Mes récoltes
+                </a>
+
                 <!-- Mes commandes -->
                 <a href="{% url 'commandes' %}"
                    class="flex items-center gap-3 py-3 pl-5 pr-4 text-base font-semibold transition-colors

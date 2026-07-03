@@ -13,6 +13,7 @@ urlpatterns = [
     path('commandes/<int:pk>/refuser/', views.refuser_commande, name='refuser_commande'),
     path('profil/', views.profil, name='profil'),
     path('declaration/', views.declaration, name='declaration'),
+    path('mes-recoltes/', views.mes_recoltes, name='mes_recoltes'),
     path('profil/mot-de-passe/', auth_views.PasswordChangeView.as_view(
         template_name='changer_mot_de_passe.html',
         success_url='/producteur/profil/',
