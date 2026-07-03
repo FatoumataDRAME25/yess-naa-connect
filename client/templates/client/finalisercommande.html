@@ -1,0 +1,260 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}
+YEES NAA CONNECT
+{% endblock %}
+
+{% block content %}
+
+  <main class="pt-20">
+    <div class="max-w-7xl mx-auto px-8 py-12">
+
+      <div class="mb-10">
+        <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">Finaliser ma commande</h1>
+        <p class="text-lg text-gray-500">Quelques informations pour vous livrer votre riz</p>
+      </div>
+
+      <!-- Erreur globale -->
+      {% if erreurs.global %}
+      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
+        {{ erreurs.global }}
+      </div>
+      {% endif %}
+
+      <!-- FORMULAIRE POST -->
+      <form method="POST" action="{% url 'finaliser_commande' %}">
+        {% csrf_token %}
+
+        <div class="flex items-start gap-10">
+
+          <!-- COLONNE GAUCHE : FORMULAIRE -->
+          <div class="flex-1 flex flex-col gap-8">
+            <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-10">
+
+              <!-- Vos informations -->
+              <section class="flex flex-col gap-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 fill-lime-950" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+                  </div>
+                  <h2 class="text-xl font-bold text-lime-950">Vos informations</h2>
+                </div>
+
+                <div class="flex flex-col gap-4">
+
+                  <!-- Nom complet -->
+                  <div class="flex flex-col gap-2">
+                    <label for="nom" class="text-sm font-medium text-gray-700">Nom complet</label>
+                    <input id="nom" name="nom" type="text"
+                           value="{{ form_nom }}"
+                           placeholder="Abdoulaye Diop"
+                           class="w-full px-4 py-4 bg-gray-50 rounded-xl outline outline-1 {% if erreurs.nom %}outline-red-400{% else %}outline-gray-200{% endif %} text-base text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-700 transition"/>
+                    {% if erreurs.nom %}<p class="text-red-500 text-xs">{{ erreurs.nom }}</p>{% endif %}
+                  </div>
+
+                  <!-- Téléphone -->
+                  <div class="flex flex-col gap-2">
+                    <label for="telephone" class="text-sm font-medium text-gray-700">Numéro de téléphone</label>
+                    <div class="flex">
+                      <span class="px-4 py-4 bg-gray-100 border border-gray-200 rounded-l-xl text-gray-500 text-base shrink-0">+221</span>
+                      <input id="telephone" name="telephone" type="tel"
+                             value="{{ form_telephone }}"
+                             placeholder="77 000 00 00"
+                             class="flex-1 px-4 py-4 bg-gray-50 rounded-r-xl outline outline-1 {% if erreurs.telephone %}outline-red-400{% else %}outline-gray-200{% endif %} text-base text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-700 transition"/>
+                    </div>
+                    {% if erreurs.telephone %}<p class="text-red-500 text-xs">{{ erreurs.telephone }}</p>{% endif %}
+                  </div>
+
+                </div>
+              </section>
+
+              <!-- Adresse de livraison -->
+              <section class="flex flex-col gap-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 fill-lime-950" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                  </div>
+                  <h2 class="text-xl font-bold text-lime-950">Adresse de livraison</h2>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                  <div class="flex flex-col gap-2">
+                    <label for="adresse" class="text-sm font-medium text-gray-700">Adresse exacte</label>
+                    <input id="adresse" name="adresse" type="text"
+                           value="{{ form_adresse }}"
+                           placeholder="Ex: Rue 10, Villa 45, Sacré-Cœur 3"
+                           class="w-full px-4 py-4 bg-gray-50 rounded-xl outline outline-1 {% if erreurs.adresse %}outline-red-400{% else %}outline-gray-200{% endif %} text-base text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-700 transition"/>
+                    {% if erreurs.adresse %}<p class="text-red-500 text-xs">{{ erreurs.adresse }}</p>{% endif %}
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <label for="ville" class="text-sm font-medium text-gray-700">Ville</label>
+                    <select id="ville" name="ville"
+                            class="w-full px-4 py-4 bg-gray-50 rounded-xl outline outline-1 outline-gray-200 text-base text-lime-950 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-lime-700 transition">
+                      <option value="dakar"       {% if form_ville == 'dakar' %}selected{% endif %}>Dakar</option>
+                      <option value="thies"       {% if form_ville == 'thies' %}selected{% endif %}>Thiès</option>
+                      <option value="saint-louis" {% if form_ville == 'saint-louis' %}selected{% endif %}>Saint-Louis</option>
+                      <option value="ziguinchor"  {% if form_ville == 'ziguinchor' %}selected{% endif %}>Ziguinchor</option>
+                      <option value="kaolack"     {% if form_ville == 'kaolack' %}selected{% endif %}>Kaolack</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Mode de paiement -->
+              <section class="flex flex-col gap-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 fill-lime-950" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                  </div>
+                  <h2 class="text-xl font-bold text-lime-950">Mode de paiement</h2>
+                </div>
+
+                <div class="flex gap-4">
+                  <!-- Paiement à la livraison -->
+                  <label for="paiement-livraison"
+                         class="flex-1 p-6 rounded-2xl outline outline-2 cursor-pointer transition-colors
+                                {% if form_paiement == 'livraison' %}outline-lime-900 bg-gray-50{% else %}outline-gray-100 hover:outline-lime-200{% endif %}">
+                    <input id="paiement-livraison" type="radio" name="paiement" value="livraison"
+                           {% if form_paiement == 'livraison' %}checked{% endif %} class="sr-only"/>
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="w-12 h-12 bg-lime-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 fill-lime-500" viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2a3 3 0 0 0 6 0h6a3 3 0 0 0 6 0h2v-5l-3-4zm-4 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3-4l-1.5-4H17l1.88 4H13zM5 17a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
+                      </div>
+                      <div class="w-5 h-5 rounded-full {% if form_paiement == 'livraison' %}bg-lime-900{% else %}border border-gray-300{% endif %} flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                      </div>
+                    </div>
+                    <p class="text-base font-bold text-lime-950 mb-1">Paiement à la livraison</p>
+                    <p class="text-sm text-gray-500">Payez en espèces ou par Wave à réception.</p>
+                  </label>
+
+                  <!-- Paiement en ligne -->
+                  <label for="paiement-enligne"
+                         class="flex-1 p-6 rounded-2xl outline outline-2 cursor-pointer transition-colors
+                                {% if form_paiement == 'enligne' %}outline-lime-900 bg-gray-50{% else %}outline-gray-100 hover:outline-lime-200{% endif %}">
+                    <input id="paiement-enligne" type="radio" name="paiement" value="enligne"
+                           {% if form_paiement == 'enligne' %}checked{% endif %} class="sr-only"/>
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 fill-lime-700" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                      </div>
+                      <div class="w-5 h-5 rounded-full {% if form_paiement == 'enligne' %}bg-lime-900{% else %}border border-gray-300{% endif %} flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                      </div>
+                    </div>
+                    <p class="text-base font-bold text-lime-950 mb-1">Paiement en ligne</p>
+                    <p class="text-sm text-gray-500">Sécurisé via Orange Money ou Wave.</p>
+                  </label>
+                </div>
+              </section>
+
+            </div>
+
+            <!-- Retour panier -->
+            <a href="{% url 'panier' %}" class="flex items-center gap-3 py-4 text-lime-900 font-semibold hover:text-lime-700 transition-colors w-fit">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              Retour au panier
+            </a>
+          </div>
+
+          <!-- COLONNE DROITE : RÉSUMÉ -->
+          <aside class="w-96 shrink-0">
+            <div class="bg-white rounded-3xl outline outline-1 outline-gray-100 p-8 flex flex-col gap-6 sticky top-28">
+
+              <h2 class="text-xl font-bold text-lime-950">Résumé de la commande</h2>
+
+              <!-- Articles depuis la session -->
+              <div class="flex flex-col gap-4">
+                {% for article in articles %}
+                <div class="flex items-start gap-4">
+                  <div class="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden shrink-0">
+                    {% if article.image %}
+                      <img src="{{ article.image }}" class="w-full h-full object-cover" alt="{{ article.nom }}"/>
+                    {% else %}
+                      <img src="{% static 'images/1sac5kg.jpg' %}" class="w-full h-full object-cover" alt="{{ article.nom }}"/>
+                    {% endif %}
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-sm font-semibold text-lime-950">{{ article.nom }} — {{ article.poids }} kg</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Quantité : {{ article.quantite }}</p>
+                    <p class="text-sm font-bold text-lime-950 mt-1">{{ article.ligne_total }} FCFA</p>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+
+              <!-- Totaux -->
+              <div class="border-t border-b border-gray-100 py-6 flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-base text-gray-600">Sous-total</span>
+                  <span class="text-base font-semibold text-lime-950">{{ sous_total }} FCFA</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-base text-gray-600">Livraison</span>
+                  <span class="text-base font-semibold text-lime-950">{{ frais_livraison }} FCFA</span>
+                </div>
+              </div>
+
+              <!-- Total final -->
+              <div class="flex justify-between items-end pb-2">
+                <span class="text-lg font-medium text-lime-950">Total</span>
+                <div class="text-right">
+                  <p class="text-3xl font-bold text-yellow-600">{{ total }} FCFA</p>
+                  <p class="text-[10px] uppercase tracking-wide text-gray-400">TVA incluse</p>
+                </div>
+              </div>
+
+              <!-- Bouton soumettre le formulaire -->
+              <button type="submit"
+                      class="w-full flex items-center justify-center gap-3 py-5 bg-lime-900 text-white
+                             text-lg font-bold rounded-xl shadow-lg shadow-lime-900/20
+                             hover:bg-lime-800 active:scale-[.98] transition-all
+                             focus:outline-none focus:ring-2 focus:ring-lime-700 focus:ring-offset-2">
+                <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                Confirmer ma commande
+              </button>
+
+              <div class="flex items-center justify-center gap-2 text-gray-500 text-xs">
+                <svg class="w-3 h-3 fill-gray-500 shrink-0" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                Paiement et données sécurisés
+              </div>
+
+            </div>
+          </aside>
+
+        </div>
+      </form>
+    </div>
+  </main>
+
+{% endblock %}
+
+{% block extra_js %}
+  <!-- JS : sélection visuelle des cartes paiement -->
+  <script>
+    document.querySelectorAll('input[name="paiement"]').forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        document.querySelectorAll('input[name="paiement"]').forEach(function(r) {
+          const label = r.closest('label');
+          const dot   = label.querySelector('.rounded-full');
+          if (r.checked) {
+            label.classList.add('outline-lime-900', 'bg-gray-50');
+            label.classList.remove('outline-gray-100');
+            dot.classList.add('bg-lime-900');
+            dot.classList.remove('border', 'border-gray-300');
+          } else {
+            label.classList.remove('outline-lime-900', 'bg-gray-50');
+            label.classList.add('outline-gray-100');
+            dot.classList.remove('bg-lime-900');
+            dot.classList.add('border', 'border-gray-300');
+          }
+        });
+      });
+    });
+  </script>
+
+  {% endblock %}

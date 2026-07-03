@@ -1,0 +1,349 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}
+YEES NAA CONNECT
+{% endblock %}
+
+{% block content %}
+
+  <main class="pt-20 min-h-screen bg-white">
+
+    <div class="flex items-end gap-2 pt-12 pb-6 px-6 max-w-7xl mx-auto">
+      <h1 class="text-2xl lg:text-3xl font-bold text-lime-950">Votre Panier</h1>
+      {% if not panier_vide %}
+      <span class="text-gray-400 text-lg">({{ articles|length }} article{{ articles|length|pluralize }})</span>
+      {% endif %}
+    </div>
+
+    <!-- ============================================================
+         CAS PANIER VIDE
+         - panier_vide est une variable booléenne envoyée par la view
+         - Si True : on affiche un message avec un lien vers le catalogue
+         - Si False : on affiche les articles et le récapitulatif
+    ============================================================ -->
+    {% if panier_vide %}
+
+    <div class="max-w-7xl mx-auto px-6 pb-32 flex flex-col items-center justify-center py-24 gap-8">
+      <!-- Icône panier vide -->
+      <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center">
+        <svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+        </svg>
+      </div>
+      <div class="text-center">
+        <h2 class="text-2xl font-bold text-lime-950 mb-2">Votre panier est vide</h2>
+        <p class="text-gray-500">Parcourez notre catalogue et ajoutez des produits.</p>
+      </div>
+      <a href="{% url 'catalogue' %}"
+         class="px-8 py-4 bg-lime-900 text-white font-bold rounded-xl hover:bg-lime-800 transition-colors">
+        Découvrir le catalogue
+      </a>
+    </div>
+
+    {% else %}
+
+    <!-- PANIER AVEC ARTICLES -->
+    <div class="max-w-7xl mx-auto px-6 pb-20 flex flex-col lg:flex-row gap-12">
+
+      <!-- COLONNE GAUCHE : liste des articles -->
+      <div class="flex-1 space-y-4">
+
+        <!-- ============================================================
+             BOUCLE SUR LES ARTICLES DU PANIER
+             articles est la liste construite dans la view panier()
+             depuis request.session['panier']
+        ============================================================ -->
+        {% for article in articles %}
+        <!-- data-prix stocke le prix unitaire pour que le JS puisse
+             recalculer le total de ligne sans redemander au serveur -->
+        <div class="flex items-center gap-6 p-5 bg-white border border-gray-100 rounded-2xl"
+             id="article-{{ article.id }}"
+             data-prix="{{ article.prix }}">
+
+          <!-- Image produit -->
+          <div class="w-24 h-24 bg-gray-50 rounded-xl overflow-hidden shrink-0">
+            {% if article.image %}
+              <img src="{{ article.image }}" class="w-full h-full object-cover" alt="{{ article.nom }}"/>
+            {% else %}
+              <img src="{% static 'images/1sac5kg.jpg' %}" class="w-full h-full object-cover" alt="{{ article.nom }}"/>
+            {% endif %}
+          </div>
+
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold text-lime-950">{{ article.nom }}</h3>
+            {% if article.poids %}
+            <p class="text-sm text-gray-500">Format : {{ article.poids }}</p>
+            {% endif %}
+
+            <div class="mt-4 flex items-center justify-between">
+
+              <!-- CONTRÔLE QUANTITÉ
+                   Les boutons - et + envoient une requête POST via JS
+                   data-url pointe vers modifier_quantite en Django
+                   data-action indique si c'est "increment" ou "decrement"
+              -->
+              <div class="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
+                <button
+                  class="btn-quantite text-gray-500 hover:text-lime-900 font-bold w-6 text-center"
+                  data-action="decrement"
+                  data-url="{% url 'modifier_quantite' article.id %}"
+                  data-article-id="{{ article.id }}">
+                  −
+                </button>
+                <span class="font-bold text-lime-950 w-6 text-center" id="qte-{{ article.id }}">
+                  {{ article.quantite|stringformat:"02d" }}
+                </span>
+                <button
+                  class="btn-quantite text-gray-500 hover:text-lime-900 font-bold w-6 text-center"
+                  data-action="increment"
+                  data-url="{% url 'modifier_quantite' article.id %}"
+                  data-article-id="{{ article.id }}">
+                  +
+                </button>
+              </div>
+
+              <!-- Prix ligne -->
+              <div class="text-right">
+                <p class="text-sm text-gray-400">{{ article.prix }} FCFA / unité</p>
+                <p class="text-lg font-bold text-lime-950" id="total-{{ article.id }}">
+                  {{ article.ligne_total }} FCFA
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton supprimer
+               data-url pointe vers supprimer_du_panier en Django
+          -->
+          <button
+            class="btn-supprimer text-gray-300 hover:text-red-500 transition-colors text-xl"
+            data-url="{% url 'supprimer_du_panier' article.id %}"
+            data-article-id="{{ article.id }}"
+            aria-label="Supprimer {{ article.nom }}">
+            ✕
+          </button>
+        </div>
+        {% endfor %}
+
+        <a href="{% url 'catalogue' %}" class="inline-flex items-center gap-2 text-lime-900 font-semibold mt-4">
+          ← Continuer mes achats
+        </a>
+      </div>
+
+      <!-- COLONNE DROITE : récapitulatif -->
+      <div class="w-full lg:w-96">
+        <div class="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm" id="recapitulatif">
+          <h2 class="text-2xl font-bold text-lime-950 mb-6">Récapitulatif</h2>
+
+          <div class="space-y-4 border-b pb-6">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Sous-total</span>
+              <span class="font-semibold text-lime-950" id="sous-total">{{ sous_total }} FCFA</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Livraison</span>
+              <span class="font-semibold text-lime-950">{{ frais_livraison }} FCFA</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Remise</span>
+              <span class="font-semibold text-green-600">- 0 FCFA</span>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-end mt-6">
+            <div class="text-lg font-medium text-lime-950">Total</div>
+            <div class="text-right">
+              <p class="text-3xl font-bold text-yellow-600" id="total-general">{{ total }} FCFA</p>
+              <p class="text-xs text-gray-400">TVA incluse</p>
+            </div>
+          </div>
+
+          <a href="{% url 'confirmationCommande' %}"
+             class="mt-6 flex justify-center items-center w-full bg-lime-900 text-white py-3 rounded-xl font-semibold hover:bg-lime-800 transition">
+            Passer la commanded
+          </a>
+          <p class="text-center text-sm text-gray-500 mt-4">Aucun compte requis — commandez en 2 minutes</p>
+        </div>
+      </div>
+    </div>
+
+    {% endif %}
+  </main>
+
+{% endblock %}
+
+{% block extra_js %}
+
+  <!-- ============================================================
+       JAVASCRIPT DU PANIER
+       
+       Deux actions gérées ici :
+       
+       1. Modifier la quantité (boutons + et −)
+          → POST vers /panier/modifier/<id>/ avec action=increment/decrement
+          → Django met à jour la session et retourne { quantite, nb_panier }
+          → JS met à jour l'affichage de la quantité et du badge
+       
+       2. Supprimer un article (bouton ✕)
+          → POST vers /panier/supprimer/<id>/
+          → Django supprime l'article de la session
+          → JS retire la card du DOM (sans rechargement)
+          → Si plus d'articles, JS redirige vers la page panier
+            pour afficher le message "panier vide"
+  ============================================================ -->
+  <script>
+    /* ----------------------------------------------------------------
+       UTILITAIRES
+    ---------------------------------------------------------------- */
+    function getCookie(name) {
+      let v = null;
+      if (document.cookie) {
+        document.cookie.split(';').forEach(c => {
+          c = c.trim();
+          if (c.startsWith(name + '=')) v = decodeURIComponent(c.slice(name.length + 1));
+        });
+      }
+      return v;
+    }
+
+    function post(url, body) {
+      return fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: body
+      }).then(r => r.json());
+    }
+
+    /* ----------------------------------------------------------------
+       BADGE PANIER (icône header)
+    ---------------------------------------------------------------- */
+    function mettreAJourBadge(nb) {
+      const badge = document.getElementById('badge-panier');
+      if (!badge) return;
+      badge.textContent = nb;
+      if (nb > 0) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+      }
+    }
+
+    /* ----------------------------------------------------------------
+       RECALCUL DES TOTAUX
+       - Parcourt toutes les cards encore présentes dans le DOM
+       - Lit data-prix et la quantité affichée pour chaque ligne
+       - Recalcule le sous-total, applique les frais de livraison,
+         et met à jour l'affichage sans recharger la page
+    ---------------------------------------------------------------- */
+    const FRAIS_LIVRAISON = 2000;
+
+    function recalculerTotaux() {
+      let sousTotal = 0;
+
+      // Pour chaque article encore dans le DOM
+      document.querySelectorAll('[id^="article-"]').forEach(card => {
+        const articleId = card.id.replace('article-', '');
+        const prix      = parseInt(card.dataset.prix, 10);         // prix unitaire
+        const qteSpan   = document.getElementById('qte-' + articleId);
+        const quantite  = qteSpan ? parseInt(qteSpan.textContent, 10) : 0;
+        const lignTotal = prix * quantite;
+
+        // Mettre à jour le total de la ligne
+        const totalLigne = document.getElementById('total-' + articleId);
+        if (totalLigne) totalLigne.textContent = lignTotal.toLocaleString('fr-FR') + ' FCFA';
+
+        sousTotal += lignTotal;
+      });
+
+      const total = sousTotal + FRAIS_LIVRAISON;
+
+      // Mettre à jour les éléments du récapitulatif
+      const elSousTotal = document.getElementById('sous-total');
+      const elTotal     = document.getElementById('total-general');
+      if (elSousTotal) elSousTotal.textContent = sousTotal.toLocaleString('fr-FR') + ' FCFA';
+      if (elTotal)     elTotal.textContent     = total.toLocaleString('fr-FR') + ' FCFA';
+    }
+
+    /* ----------------------------------------------------------------
+       INITIALISATION
+    ---------------------------------------------------------------- */
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* --- Boutons + et − --- */
+      document.querySelectorAll('.btn-quantite').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const url       = btn.dataset.url;
+          const action    = btn.dataset.action;     // 'increment' ou 'decrement'
+          const articleId = btn.dataset.articleId;
+
+          // Feedback visuel immédiat : on désactive les boutons pendant la requête
+          const card = document.getElementById('article-' + articleId);
+          card.querySelectorAll('.btn-quantite').forEach(b => b.disabled = true);
+
+          post(url, 'action=' + action).then(data => {
+            mettreAJourBadge(data.nb_panier);
+
+            if (data.quantite === 0) {
+              // L'article a été retiré (quantité passée à 0 via decrement)
+              card.style.transition = 'opacity 0.3s';
+              card.style.opacity = '0';
+              setTimeout(() => {
+                card.remove();
+                recalculerTotaux();
+                if (document.querySelectorAll('[id^="article-"]').length === 0) {
+                  window.location.reload(); // afficher "panier vide"
+                }
+              }, 300);
+            } else {
+              // Mettre à jour la quantité affichée
+              const qteSpan = document.getElementById('qte-' + articleId);
+              if (qteSpan) qteSpan.textContent = String(data.quantite).padStart(2, '0');
+
+              // Recalculer tous les totaux immédiatement
+              recalculerTotaux();
+
+              // Réactiver les boutons
+              card.querySelectorAll('.btn-quantite').forEach(b => b.disabled = false);
+            }
+          }).catch(() => {
+            // En cas d'erreur réseau, on réactive quand même les boutons
+            card.querySelectorAll('.btn-quantite').forEach(b => b.disabled = false);
+          });
+        });
+      });
+
+      /* --- Bouton supprimer (✕) --- */
+      document.querySelectorAll('.btn-supprimer').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const url       = btn.dataset.url;
+          const articleId = btn.dataset.articleId;
+          const card      = document.getElementById('article-' + articleId);
+
+          // Animation de disparition
+          card.style.transition = 'opacity 0.3s, transform 0.3s';
+          card.style.opacity    = '0';
+          card.style.transform  = 'translateX(20px)';
+
+          post(url, '').then(data => {
+            mettreAJourBadge(data.nb_panier);
+            setTimeout(() => {
+              card.remove();
+              recalculerTotaux();
+              if (document.querySelectorAll('[id^="article-"]').length === 0) {
+                window.location.reload();
+              }
+            }, 300);
+          });
+        });
+      });
+
+    });
+  </script>
+
+ {% endblock %}
