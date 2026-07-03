@@ -22,10 +22,15 @@ def save_panier(request, panier):
     request.session.modified = True
 
 
+#def nb_articles_panier(request):
+    #"""Retourne le nombre total d'articles dans le panier."""
+    #panier = get_panier(request)
+    #return sum(item['quantite'] for item in panier.values())
+
 def nb_articles_panier(request):
-    """Retourne le nombre total d'articles dans le panier."""
+    """Retourne le nombre de produits DIFFÉRENTS dans le panier."""
     panier = get_panier(request)
-    return sum(item['quantite'] for item in panier.values())
+    return len(panier)
 
 
 def total_panier(request):

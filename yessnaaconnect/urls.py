@@ -10,7 +10,7 @@ admin.site.index_title  = "Tableau de bord administrateur"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('client/', include('client.urls')),
+    path('', include('client.urls')),
     path('espace-admin/', include('administration.urls')),
 ]
 
