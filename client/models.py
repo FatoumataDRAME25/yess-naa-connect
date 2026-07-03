@@ -68,13 +68,6 @@ class CommandeClient(models.Model):
     def total(self):
         return self.sous_total + self.frais_livraison
 
-    def __str__(self):
-        return f"Commande {self.numero} — {self.client}"
-
-    @property
-    def numero(self):
-        return f"YEES-{self.pk:03d}"
-
     @property
     def client_nom(self):
         return f"{self.client.prenom} {self.client.nom}"
@@ -94,6 +87,9 @@ class CommandeClient(models.Model):
             f"{l.quantite}× {l.produit.nom} {l.produit.poids_kg}kg"
             for l in self.lignes.all()
         )
+
+    def __str__(self):
+        return f"Commande {self.numero} — {self.client}"
 
 
 class LigneCommande(models.Model):
