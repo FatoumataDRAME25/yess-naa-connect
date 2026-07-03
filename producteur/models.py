@@ -34,5 +34,3 @@ class StockPaddy(models.Model):
 
     def __str__(self):
         return f"Stock #{self.pk} - {self.get_variete_display()} ({self.quantite_kg} kg)"
-
-

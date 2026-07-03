@@ -1,0 +1,168 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}
+YEES NAA CONNECT
+{% endblock %}
+
+{% block content %}
+
+  <main class="pt-16">
+    <div class="max-w-7xl mx-auto px-8 pt-16 pb-24 flex flex-col items-center">
+
+      <!-- EN-TÊTE -->
+      <div class="flex flex-col items-center text-center mb-12">
+        <div class="w-20 h-20 bg-lime-200 rounded-full flex items-center justify-center mb-6">
+          <svg class="w-8 h-8 fill-lime-900" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+        </div>
+        <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">Commande confirmée !</h1>
+        <p class="text-lg text-gray-500">Merci de soutenir le riz local sénégalais 🌾</p>
+      </div>
+
+      <!-- GRILLE DÉTAILS + QR -->
+      <div class="w-full max-w-5xl flex items-start gap-10">
+
+        <!-- COLONNE GAUCHE -->
+        <div class="flex-1 flex flex-col gap-8">
+
+          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-8">
+
+            <!-- Numéro + statut -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <h2 class="text-xl font-bold text-lime-950">#{{ commande.numero }}</h2>
+                <!-- Bouton copier -->
+                <button onclick="navigator.clipboard.writeText('{{ commande.numero }}')"
+                        aria-label="Copier le numéro"
+                        class="text-gray-400 hover:text-lime-900 transition-colors">
+                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+                  </svg>
+                </button>
+              </div>
+              <span class="px-4 py-1.5 bg-orange-50 rounded-full text-yellow-600 text-sm font-bold uppercase tracking-wide">
+                {{ commande.get_statut_display }}
+              </span>
+            </div>
+
+            <!-- Articles commandés -->
+            <div class="flex flex-col gap-5 pb-8 border-b border-gray-100">
+              {% for ligne in lignes %}
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden shrink-0">
+                    {% if ligne.image %}
+                      <img src="{{ ligne.image }}" class="w-full h-full object-cover" alt="{{ ligne.nom }}"/>
+                    {% else %}
+                      <img src="{% static 'images/1sac5kg.jpg' %}" class="w-full h-full object-cover" alt="{{ ligne.nom }}"/>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <p class="text-base font-semibold text-lime-950">{{ ligne.nom }} — {{ ligne.poids }} kg</p>
+                    <p class="text-sm text-gray-500">Quantité : {{ ligne.quantite }}</p>
+                  </div>
+                </div>
+                <p class="text-base font-bold text-lime-950">{{ ligne.ligne_total }} FCFA</p>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Adresse + Paiement -->
+            <div class="flex items-start gap-8">
+              <div class="flex-1 flex flex-col gap-1">
+                <p class="text-sm font-medium text-gray-500">Adresse de livraison</p>
+                <p class="text-base text-lime-950">{{ commande.adresse_livraison }}</p>
+              </div>
+              <div class="flex-1 flex flex-col gap-1">
+                <p class="text-sm font-medium text-gray-500">Mode de paiement</p>
+                <p class="text-base text-lime-950">
+                  {% if commande.mode_paiement == 'livraison' %}
+                    Paiement à la livraison
+                  {% else %}
+                    Paiement en ligne
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+
+            <!-- Totaux -->
+            <div class="flex flex-col gap-2 pt-4 border-t border-gray-100">
+              <div class="flex justify-between text-sm text-gray-500">
+                <span>Sous-total</span>
+                <span>{{ commande.sous_total }} FCFA</span>
+              </div>
+              <div class="flex justify-between text-sm text-gray-500">
+                <span>Livraison</span>
+                <span>{{ commande.frais_livraison }} FCFA</span>
+              </div>
+            </div>
+
+            <!-- Total payé -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+              <p class="text-lg font-medium text-lime-950">Total payé</p>
+              <div class="text-right">
+                <p class="text-3xl font-bold text-yellow-600">{{ commande.total }} FCFA</p>
+                <p class="text-xs text-gray-400">TVA incluse</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Boutons -->
+          <div class="flex items-center gap-4">
+            <a href="{% url 'suivre_commande' %}"
+               class="flex-1 py-5 bg-lime-900 text-white text-lg font-bold text-center rounded-xl hover:bg-lime-800 transition-colors">
+              Suivre ma commande
+            </a>
+            <a href="{% url 'catalogue' %}"
+               class="flex-1 py-4 text-lime-900 text-lg font-bold text-center rounded-xl outline outline-2 outline-lime-900 hover:bg-lime-50 transition-colors">
+              Continuer mes achats
+            </a>
+          </div>
+
+        </div>
+
+        <!-- COLONNE DROITE : Récap client -->
+        <aside class="w-96 shrink-0 flex flex-col gap-5">
+          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-6 relative overflow-hidden">
+
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-700 to-yellow-600 rounded-t-3xl"></div>
+
+            <h2 class="text-xl font-bold text-lime-950 text-center mt-2">Récapitulatif client</h2>
+
+            <div class="flex flex-col gap-4 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Nom</span>
+                <span class="font-semibold text-lime-950">{{ commande.client.prenom }} {{ commande.client.nom }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Téléphone</span>
+                <span class="font-semibold text-lime-950">{{ commande.client.telephone }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Adresse</span>
+                <span class="font-semibold text-lime-950 text-right max-w-[200px]">{{ commande.adresse_livraison }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Date</span>
+                <span class="font-semibold text-lime-950">{{ commande.date|date:"d/m/Y à H:i" }}</span>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-100 pt-4 text-center">
+              <p class="text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5 fill-gray-400 inline mr-1" viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
+                Un SMS de confirmation a été envoyé au numéro fourni
+              </p>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+{% endblock %}

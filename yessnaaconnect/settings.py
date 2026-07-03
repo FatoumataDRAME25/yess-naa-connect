@@ -36,13 +36,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "tailwind",
+    "theme",
     'administration.apps.AdminConfig',
     'client',
     'livreur',
     'producteur',
 ]
+#cette ligne dit a django l’app qui contient la configuration Tailwind s’appelle theme sinon Django ne sait pas où chercher Tailwind
+TAILWIND_APP_NAME = "theme"
 
-AUTH_USER_MODEL = 'transformatrice_admin.User'
+AUTH_USER_MODEL = 'administration.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
