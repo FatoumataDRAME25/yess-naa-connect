@@ -1,10 +1,16 @@
+import io
+from urllib.parse import quote
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count, F
+from django.http import HttpResponse
 from django.urls import reverse
 from datetime import date, datetime
+
+import qrcode
 
 from producteur.models import StockPaddy
 from administration.models import Produit, CommandePaddy
@@ -189,29 +195,6 @@ def admin_commander_paddy(request):
 
 
 @admin_required
-def admin_commandes_paddy(request):
-    """Liste toutes les commandes paddy passées par l'admin."""
-    statut_filtre = request.GET.get('statut', '')
-    commandes_qs = CommandePaddy.objects.select_related(
-        'stock__producteur__user'
-    ).order_by('-cree_le')
-
-    if statut_filtre and statut_filtre in CommandePaddy.Statut.values:
-        commandes_qs = commandes_qs.filter(statut=statut_filtre)
-
-    counts = {s: CommandePaddy.objects.filter(statut=s).count() for s, _ in CommandePaddy.Statut.choices}
-
-    context = {
-        'active_nav': 'stocks',
-        'commandes': commandes_qs,
-        'statuts': CommandePaddy.Statut.choices,
-        'filtre_actif': statut_filtre,
-        'counts': counts,
-    }
-    return render(request, 'espace_admin/commandes_paddy.html', context)
-
-
-@admin_required
 def admin_marquer_paddy_recu(request, pk):
     """L'admin marque une commande paddy comme reçue après livraison physique."""
     commande = get_object_or_404(
@@ -279,7 +262,7 @@ def admin_catalogue(request):
         'en_ligne_count': en_ligne_count,
         'rupture_count': rupture_count,
         'produits_stock_faible': produits_stock_faible,
-        'variantes_poids': ['5 kg', '10 kg', '25 kg'],
+        'variantes_poids': Produit.Poids.choices,
         'type_riz_choices': Produit.TypeRiz.choices,
         'commandes_paddy': commandes_paddy_recues,
         'commande_paddy_preselect': commande_paddy_preselect,
@@ -345,12 +328,18 @@ def admin_produit_create(request):
                 f"{stock_source.stock.producteur.user.prenom} {stock_source.stock.producteur.user.nom}"
                 if stock_source else "Non renseignée"
             )
+            tracabilite_url = request.build_absolute_uri(
+                reverse('admin_transformatrice:tracabilite_produit', args=[code])
+            )
+            qr_display_url = (
+                f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={quote(tracabilite_url)}"
+            )
             request.session['produit_publie'] = {
                 'nom': nom,
                 'variantes': produits_crees,
                 'lot_code': code,
                 'origine': origine,
-                'qr_url': f"https://api.qrserver.com/v1/create-qr-code/?size=130x130&data={code}",
+                'qr_url': qr_display_url,
             }
             messages.success(request, f"Produit « {nom} » ajouté avec succès.")
 
@@ -567,6 +556,31 @@ def admin_commande_paddy_statut(request, pk):
 def admin_about(request):
     context = {'active_nav': 'about'}
     return render(request, 'espace_admin/about.html', context)
+
+
+# ============================================================
+#  TÉLÉCHARGEMENT QR CODE (admin connecté)
+# ============================================================
+
+@admin_required
+def admin_qr_download(request, lot_code):
+    """Génère et télécharge le QR code d'un produit — encode l'URL de traçabilité."""
+    get_object_or_404(Produit, code_lot=lot_code)
+    tracabilite_url = request.build_absolute_uri(
+        reverse('admin_transformatrice:tracabilite_produit', args=[lot_code])
+    )
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
+    qr.add_data(tracabilite_url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="#1a5c32", back_color="white")
+
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+
+    response = HttpResponse(buf.getvalue(), content_type='image/png')
+    response['Content-Disposition'] = f'attachment; filename="qr_{lot_code}.png"'
+    return response
 
 
 # ============================================================

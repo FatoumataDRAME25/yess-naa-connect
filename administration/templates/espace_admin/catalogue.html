@@ -1,4 +1,5 @@
 {% extends "espace_admin/base.html" %}
+{% load static %}
 {% block title %}Mon Catalogue — Riz Local{% endblock %}
 
 {% block extra_head %}
@@ -91,15 +92,16 @@
         <tr class="border-b border-gray-50 hover:bg-gray-50/60">
           <td class="px-6 py-4">
             <div class="flex items-center gap-3">
-              <img src="{{ produit.photo_url }}" class="w-12 h-12 rounded-xl object-cover bg-gray-100" alt="{{ produit.nom }}">
+              <img src="{% if produit.photo %}{{ produit.photo.url }}{% else %}{% static 'images/1sac5kg.jpg' %}{% endif %}"
+                   class="w-12 h-12 rounded-xl object-cover bg-gray-100" alt="{{ produit.nom }}">
               <div>
                 <p class="font-bold text-gray-800">{{ produit.nom }}</p>
-                <p class="text-xs text-yn-gray">{{ produit.type_riz }}</p>
+                <p class="text-xs text-yn-gray">{{ produit.get_type_riz_display }}</p>
               </div>
             </div>
           </td>
-          <td class="px-6 py-4 text-gray-700 font-medium">{{ produit.format }}</td>
-          <td class="px-6 py-4 font-bold text-yn-terracotta">{{ produit.prix_formate }} FCFA</td>
+          <td class="px-6 py-4 text-gray-700 font-medium">{{ produit.poids_kg }} kg</td>
+          <td class="px-6 py-4 font-bold text-yn-terracotta">{{ produit.prix|floatformat:0 }} FCFA</td>
           <td class="px-6 py-4 font-semibold {% if produit.stock_sacs == 0 %}text-red-500{% elif produit.stock_sacs <= 10 %}text-amber-500{% else %}text-gray-700{% endif %}">
             {{ produit.stock_sacs }} sacs
           </td>
@@ -217,8 +219,8 @@
 
       <!-- Badge statut + menu -->
       <div class="relative">
-        <img src="{{ produit.photo_url }}" alt="{{ produit.nom }}"
-             class="w-full h-44 object-contain bg-gray-50 px-6 pt-4">
+        <img src="{% if produit.photo %}{{ produit.photo.url }}{% else %}{% static 'images/1sac5kg.jpg' %}{% endif %}"
+             alt="{{ produit.nom }}" class="w-full h-44 object-contain bg-gray-50 px-6 pt-4">
 
         <!-- Badge statut -->
         <span class="absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full
@@ -243,9 +245,9 @@
         <div class="flex items-start justify-between gap-2">
           <div class="flex-1 min-w-0">
             <h3 class="font-bold text-gray-900 text-sm leading-tight">{{ produit.nom }}</h3>
-            <p class="text-xs text-gray-500 mt-0.5">Format : {{ produit.format }} • {{ produit.type_riz }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">Format : {{ produit.poids_kg }} kg • {{ produit.get_type_riz_display }}</p>
           </div>
-          <p class="font-bold text-yn-terracotta text-base flex-shrink-0">{{ produit.prix_formate }} FCFA</p>
+          <p class="font-bold text-yn-terracotta text-base flex-shrink-0">{{ produit.prix|floatformat:0 }} FCFA</p>
         </div>
 
         <!-- Stock + actions -->
@@ -404,12 +406,12 @@
       <div>
         <label class="block text-sm font-semibold text-yn-green-dark mb-2">Variantes de poids et Prix</label>
         <div class="space-y-3">
-          {% for poids in variantes_poids %}
+          {% for poids_val, poids_label in variantes_poids %}
           <div class="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3">
-            <input type="checkbox" name="variantes" value="{{ poids }}"
+            <input type="checkbox" name="variantes" value="{{ poids_val }}"
                    class="w-4 h-4 rounded border-gray-300 text-yn-green focus:ring-yn-green">
-            <span class="font-semibold text-gray-700 w-14">{{ poids }}</span>
-            <input type="number" name="prix_{{ poids }}" placeholder="Prix"
+            <span class="font-semibold text-gray-700 w-14">{{ poids_label }}</span>
+            <input type="number" name="prix_{{ poids_val }}" placeholder="Prix" min="0"
                    class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
             <span class="text-xs text-yn-gray font-semibold">FCFA</span>
           </div>
@@ -504,22 +506,39 @@
         <span class="text-xs font-bold text-yn-green">ACTIF</span>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 mb-4">
-        <div class="border border-gray-200 rounded-xl p-3">
-          <p class="text-xs font-bold text-yn-gray uppercase tracking-wide mb-2">Code de lot</p>
-          <p class="font-bold text-yn-green text-sm mb-3 break-all">{{ produit_publie.lot_code }}</p>
+      <!-- Code lot + QR -->
+      <div class="border border-gray-100 rounded-2xl overflow-hidden mb-4">
+        <!-- Code de lot -->
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <div>
+            <p class="text-xs font-bold text-yn-gray uppercase tracking-wide">Code de lot</p>
+            <p class="font-bold text-yn-green text-sm font-mono mt-0.5">{{ produit_publie.lot_code }}</p>
+          </div>
           <button onclick="navigator.clipboard.writeText('{{ produit_publie.lot_code }}')"
                   class="flex items-center gap-1 text-xs font-semibold text-gray-600 border border-gray-200
-                         rounded-lg px-2 py-1.5 hover:bg-gray-50 w-full justify-center">
+                         rounded-lg px-2.5 py-1.5 hover:bg-gray-50">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
             </svg>
             Copier
           </button>
         </div>
-        <div class="border border-gray-200 rounded-xl p-3 flex flex-col items-center justify-center gap-2">
-          <img src="{{ produit_publie.qr_url }}" alt="QR Code" class="w-20 h-20">
+        <!-- QR Code -->
+        <div class="flex flex-col items-center gap-3 px-4 py-4">
+          <p class="text-xs font-bold text-yn-gray uppercase tracking-wide self-start">QR Code de traçabilité</p>
+          <img src="{{ produit_publie.qr_url }}" alt="QR Code traçabilité" class="w-28 h-28 rounded-lg">
+          <p class="text-xs text-center text-gray-400">Scannez pour voir l'origine du produit</p>
         </div>
+      </div>
+
+      <!-- Origine -->
+      <div class="flex items-center gap-2 bg-yn-green-pale rounded-xl px-4 py-2.5 mb-4">
+        <svg class="w-4 h-4 text-yn-green flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+        </svg>
+        <p class="text-xs text-yn-green-dark">
+          <span class="font-bold">Origine paddy :</span> {{ produit_publie.origine }}
+        </p>
       </div>
 
       <div class="flex gap-2">
@@ -527,16 +546,16 @@
                 class="flex-1 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl py-3 hover:bg-gray-50 transition">
           Fermer
         </button>
-        <a href="{% url 'admin_transformatrice:admin_catalogue' %}"
-           class="flex-1 text-center text-sm font-semibold text-yn-green-dark border border-yn-green rounded-xl py-3 hover:bg-yn-green-pale/30 transition">
-          Voir catalogue
-        </a>
-        <a href="{{ produit_publie.qr_url }}" download="qr_{{ produit_publie.lot_code }}.png"
-           class="flex-1 flex items-center justify-center gap-1 text-xs font-semibold text-white bg-yn-green-dark hover:bg-yn-green rounded-xl py-3 transition">
+        <a href="{% url 'admin_transformatrice:admin_qr_download' produit_publie.lot_code %}"
+           class="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-yn-green hover:bg-yn-green-dark rounded-xl py-3 transition">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
-          QR
+          Télécharger QR
+        </a>
+        <a href="{% url 'admin_transformatrice:admin_catalogue' %}"
+           class="flex-1 text-center text-sm font-semibold text-yn-green-dark border border-yn-green rounded-xl py-3 hover:bg-yn-green-pale/30 transition">
+          Voir catalogue
         </a>
       </div>
     </div>

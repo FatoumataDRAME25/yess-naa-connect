@@ -20,9 +20,6 @@ urlpatterns = [
     path('stocks/commander/', views.admin_commander_paddy, name='admin_commander_paddy'),
     path('stocks/commandes-paddy/', views.admin_commandes_paddy, name='admin_commandes_paddy'),
     path('stocks/commandes-paddy/<int:pk>/recu/', views.admin_marquer_paddy_recu, name='admin_marquer_paddy_recu'),
-
-    # Commandes paddy (suivi + changement statut)
-    path('stocks/commandes-paddy/', views.admin_commandes_paddy, name='admin_commandes_paddy'),
     path('stocks/commandes-paddy/<int:pk>/statut/', views.admin_commande_paddy_statut, name='admin_commande_paddy_statut'),
 
     # Catalogue
@@ -37,6 +34,9 @@ urlpatterns = [
 
     # Démo & À propos
     path('a-propos/', views.admin_about, name='admin_about'),
+
+    # QR code téléchargement (admin connecté)
+    path('catalogue/<str:lot_code>/qr/', views.admin_qr_download, name='admin_qr_download'),
 
     # Traçabilité QR (public)
     path('tracabilite/<str:lot_code>/', views.tracabilite_produit, name='tracabilite_produit'),
