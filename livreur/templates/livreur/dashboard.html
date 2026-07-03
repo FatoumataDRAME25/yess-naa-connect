@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Livreur Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'livreur/css/dashboard.css' %}">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Bonjour, {{ request.user.prenom }} 👋</h1>
+      <p>{{ aujourdhui|date:"l j F Y" }}</p>
+    </div>
+    <button class="notif-btn" aria-label="Notifications">
+      <i class="ti ti-bell"></i>
+    </button>
+  </header>
+
+  <nav class="sidenav">
+    <div class="sidenav-item active">
+      <i class="ti ti-truck"></i>
+      <span>Livraisons</span>
+    </div>
+    <a class="sidenav-item" href="{% url 'livreur:profil' %}" style="text-decoration:none; color:inherit;">
+      <i class="ti ti-user"></i>
+      <span>Profil</span>
+    </a>
+  </nav>
+
+  <main class="content">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-truck"></i></div>
+        <p class="stat-label">Livraisons</p>
+        <p class="stat-value">{{ total_livraisons|stringformat:"02d" }}</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-cash"></i></div>
+        <p class="stat-label">À encaisser</p>
+        <p class="stat-value amber">{{ total_a_encaisser|floatformat:0 }} FCFA</p>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <h2>Mes livraisons du jour</h2>
+      <span class="badge">{{ livraisons|length }}</span>
+    </div>
+
+    {% for livraison in livraisons %}
+    <article class="delivery-card {% if livraison.confirme_le %}done{% endif %}">
+      <div class="card-top">
+        <div>
+          <p class="card-id">#YNC-{{ livraison.commande.id|stringformat:"04d" }}</p>
+          <div class="card-name-row">
+            <i class="ti ti-map-pin"></i>
+            <span class="card-name" {% if livraison.confirme_le %}style="color:#9ca3af"{% endif %}>
+              {{ livraison.commande.client.prenom }} {{ livraison.commande.client.nom }}
+            </span>
+          </div>
+        </div>
+        {% if livraison.confirme_le %}
+          <span class="status-pill done">Livrée</span>
+        {% else %}
+          <span class="status-pill pending">À livrer</span>
+        {% endif %}
+      </div>
+      <div class="card-info">
+        <div class="info-row">
+          <i class="ti ti-location"></i>
+          <span>{{ livraison.commande.client.adresse }}</span>
+        </div>
+        <div class="info-row">
+          <i class="ti ti-package"></i>
+          <span>{{ livraison.commande.lignes.count }} article{{ livraison.commande.lignes.count|pluralize }} ·
+            {% for ligne in livraison.commande.lignes.all %}{{ ligne.produit.nom }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          </span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div>
+          <p class="payment-label">Paiement</p>
+          {% if livraison.commande.mode_paiement == 'especes' %}
+            <p class="payment-value">À encaisser : {{ livraison.commande.montant_total|floatformat:0 }} FCFA</p>
+          {% elif livraison.confirme_le %}
+            <p class="payment-value gray">Payé en ligne</p>
+          {% else %}
+            <p class="payment-value paid">Payé en ligne</p>
+          {% endif %}
+        </div>
+        <a class="btn-detail" {% if livraison.confirme_le %}style="color:#9ca3af"{% endif %}
+           href="{% url 'livreur:detail_livraison' livraison.pk %}">Voir les détails</a>
+      </div>
+      {% if not livraison.confirme_le %}
+        <a class="btn-confirm" href="{% url 'livreur:detail_livraison' livraison.pk %}">Confirmer la livraison</a>
+      {% endif %}
+    </article>
+    {% endfor %}
+
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active">
+      <i class="ti ti-truck"></i>
+      <span>Livraisons</span>
+    </div>
+    <a class="nav-item" href="{% url 'livreur:profil' %}" style="text-decoration:none;">
+      <i class="ti ti-user"></i>
+      <span>Profil</span>
+    </a>
+  </nav>
+
+</div>
+
+</body>
+</html>

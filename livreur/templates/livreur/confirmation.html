@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Livraison confirmée</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'livreur/css/confirmation.css' %}">
+</head>
+<body>
+
+<div class="app">
+
+  <div class="success-icon">
+    <i class="ti ti-check"></i>
+  </div>
+
+  <h1 class="success-title">Livraison confirmée ✅</h1>
+  <p class="success-sub">Merci d'avoir livré ce sac de riz local jusqu'à destination 🌾</p>
+
+  <div class="summary-card">
+
+    <div class="summary-top">
+      <div>
+        <p class="summary-label">Référence commande</p>
+        <div class="ref-pill">
+          <span>#YNC-{{ livraison.commande.id|stringformat:"04d" }}</span>
+          <i class="ti ti-copy"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-row">
+      <div class="avatar"><i class="ti ti-user"></i></div>
+      <div>
+        <p class="summary-row-label">Client</p>
+        <p class="summary-row-value">{{ livraison.commande.client.prenom }} {{ livraison.commande.client.nom }}</p>
+      </div>
+    </div>
+
+    <div class="summary-meta">
+      <i class="ti ti-clock"></i>
+      <span>Livrée le {{ livraison.confirme_le|date:"j F Y" }} à {{ livraison.confirme_le|time:"H:i" }}</span>
+    </div>
+
+    <div class="amount-banner">
+      <div class="amount-left">
+        <div class="amount-icon"><i class="ti ti-cash"></i></div>
+        <span class="amount-label">Montant encaissé</span>
+      </div>
+      <span class="amount-value">{{ livraison.montant_encaisse|floatformat:0 }} FCFA</span>
+    </div>
+
+  </div>
+
+  <p class="sms-note">Le client a été notifié automatiquement par SMS.</p>
+
+  <div class="actions">
+    <a class="btn-primary" href="{% url 'livreur:dashboard' %}">
+      Retour à mes livraisons
+      <i class="ti ti-arrow-right"></i>
+    </a>
+    <a class="btn-link" href="{% url 'livreur:detail_livraison' livraison.pk %}">
+      <i class="ti ti-file-text"></i>
+      Voir le récapitulatif
+    </a>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,338 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f3f4f6;
+    color: #111;
+}
+
+.app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #fff;
+    position: relative;
+    padding-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .app {
+        max-width: 100%;
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        grid-template-rows: auto 1fr;
+        min-height: 100vh;
+    }
+
+    .topbar {
+        grid-column: 1 / -1;
+    }
+
+    .sidenav {
+        display: flex !important;
+        flex-direction: column;
+        background: #f9fafb;
+        border-right: 1px solid #e5e7eb;
+        padding: 24px 0;
+    }
+
+    .content {
+        padding: 24px;
+        overflow-y: auto;
+    }
+
+    .bottom-nav {
+        display: none !important;
+    }
+
+    .empty-state {
+        max-width: 440px;
+        margin: 40px auto;
+    }
+}
+
+/* ── Top bar ── */
+.topbar {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.topbar-left h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a3a0a;
+}
+
+.topbar-left p {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.notif-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.notif-btn i {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+/* ── Sidebar (desktop only) ── */
+.sidenav {
+    display: none;
+}
+
+.sidenav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #6b7280;
+    border-left: 3px solid transparent;
+}
+
+.sidenav-item.active {
+    color: #2d5a16;
+    border-left-color: #2d5a16;
+    background: rgba(45, 90, 22, 0.07);
+}
+
+.sidenav-item i {
+    font-size: 20px;
+}
+
+/* ── Main content ── */
+.content {
+    padding: 16px;
+    flex: 1;
+}
+
+/* ── Stat cards (grisées car 0) ── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: rgba(204, 243, 173, 0.15);
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid rgba(45, 90, 22, 0.1);
+}
+
+.stat-icon {
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-icon i {
+    font-size: 16px;
+    color: rgba(45, 90, 22, 0.4);
+}
+
+.stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a3a0a;
+}
+
+.stat-value.amber {
+    font-size: 16px;
+    color: rgba(212, 160, 23, 0.6);
+}
+
+/* ── Section header ── */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.section-header h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a3a0a;
+}
+
+.badge {
+    background: #e5e7eb;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 999px;
+}
+
+/* ── Empty state ── */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-illustration {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    background: #f7f3ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.empty-illustration i.ti-package-off {
+    font-size: 60px;
+    color: rgba(45, 90, 22, 0.2);
+}
+
+.empty-illustration .badge-icon {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-illustration .badge-icon i {
+    font-size: 18px;
+    color: #d4a017;
+}
+
+.empty-state h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a3a0a;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    max-width: 260px;
+    margin: 0 auto 32px;
+}
+
+.btn-support {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #2d5a16;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(45, 90, 22, 0.2);
+    transition: background 0.15s;
+}
+
+.btn-support:hover {
+    background: #234411;
+}
+
+.btn-support i {
+    font-size: 16px;
+}
+
+/* ── Bottom nav (mobile) ── */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    height: 68px;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 40px;
+    z-index: 10;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    min-width: 60px;
+}
+
+.nav-item i {
+    font-size: 22px;
+}
+
+.nav-item span {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.nav-item.active i,
+.nav-item.active span {
+    color: #2d5a16;
+}
+
+.nav-item:not(.active) i,
+.nav-item:not(.active) span {
+    color: #9ca3af;
+}

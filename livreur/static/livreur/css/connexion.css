@@ -1,0 +1,297 @@
+* {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+ }
+
+ body {
+     font-family: 'Inter', sans-serif;
+     background: #fff;
+     color: #111;
+ }
+
+ .app {
+     width: 100%;
+     min-height: 100vh;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     padding: 32px 24px;
+ }
+
+ .login-card {
+     width: 100%;
+     max-width: 400px;
+     display: flex;
+     flex-direction: column;
+     gap: 32px;
+ }
+
+ /* ── Logo ── */
+ .brand {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: 12px;
+ }
+
+ .brand-icon {
+     width: 32px;
+     height: 32px;
+     background: #2d5a16;
+     border-radius: 50%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     flex-shrink: 0;
+ }
+
+ .brand-icon i {
+     font-size: 16px;
+     color: #fff;
+ }
+
+ .brand h1 {
+     font-family: 'Sora', sans-serif;
+     font-size: 18px;
+     font-weight: 700;
+     color: #1a3a0a;
+ }
+
+ /* ── Heading ── */
+ .heading {
+     text-align: center;
+ }
+
+ .heading h2 {
+     font-family: 'Sora', sans-serif;
+     font-size: 24px;
+     font-weight: 700;
+     color: #1a3a0a;
+     margin-bottom: 8px;
+ }
+
+ .heading p {
+     font-size: 14px;
+     color: #6b7280;
+     line-height: 1.5;
+ }
+
+ /* ── Form ── */
+ form {
+     display: flex;
+     flex-direction: column;
+     gap: 20px;
+ }
+
+ .field-group {
+     display: flex;
+     flex-direction: column;
+     gap: 8px;
+ }
+
+ .field-label {
+     font-size: 14px;
+     font-weight: 600;
+     color: #1a3a0a;
+ }
+
+ .field-wrap {
+     display: flex;
+     align-items: center;
+     background: #fff;
+     border: 1px solid #e5e7eb;
+     border-radius: 12px;
+     overflow: hidden;
+ }
+
+ .field-wrap:focus-within {
+     border-color: #2d5a16;
+ }
+
+ .field-prefix {
+     display: flex;
+     align-items: center;
+     gap: 6px;
+     padding: 0 16px;
+     border-right: 1px solid #e5e7eb;
+     font-size: 14px;
+     font-weight: 500;
+     color: #6b7280;
+     white-space: nowrap;
+     flex-shrink: 0;
+ }
+
+ .field-prefix .flag {
+     font-size: 16px;
+ }
+
+ .field-wrap input {
+     flex: 1;
+     min-width: 0;
+     border: none;
+     outline: none;
+     padding: 17px 16px;
+     font-size: 14px;
+     font-family: 'Inter', sans-serif;
+     color: #1a3a0a;
+     background: transparent;
+ }
+
+ .field-wrap input::placeholder {
+     color: #9ca3af;
+ }
+
+ .field-icon-btn {
+     background: none;
+     border: none;
+     cursor: pointer;
+     padding: 0 16px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     flex-shrink: 0;
+ }
+
+ .field-icon-btn i {
+     font-size: 18px;
+     color: #9ca3af;
+ }
+
+ /* ── Submit button ── */
+ .btn-submit {
+     width: 100%;
+     background: #2d5a16;
+     color: #fff;
+     border: none;
+     font-size: 16px;
+     font-weight: 700;
+     padding: 18px;
+     border-radius: 999px;
+     cursor: pointer;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: 10px;
+     box-shadow: 0 4px 6px rgba(45, 90, 22, 0.2);
+ }
+
+ .btn-submit:hover {
+     background: #234411;
+ }
+
+ .btn-submit i {
+     font-size: 16px;
+ }
+
+ .helper-text {
+     font-size: 12px;
+     color: #9ca3af;
+     text-align: center;
+     line-height: 1.5;
+ }
+
+ /* ── Footer badge ── */
+ .footer-badge {
+     width: 100%;
+     max-width: 400px;
+     margin-top: 40px;
+     background: rgba(204, 243, 173, 0.2);
+     border-radius: 24px;
+     padding: 16px 20px;
+     display: flex;
+     align-items: center;
+     gap: 14px;
+ }
+
+ .footer-badge-icon {
+     width: 32px;
+     height: 32px;
+     background: #fff;
+     border-radius: 8px;
+     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     flex-shrink: 0;
+ }
+
+ .footer-badge-icon i {
+     font-size: 16px;
+     color: #2d5a16;
+ }
+
+ .footer-badge p {
+     font-size: 12px;
+     font-weight: 500;
+     color: #6b7280;
+ }
+
+ /* ≥640px : un peu plus d'air, formulaire centré déjà optimal */
+ @media (min-width: 640px) {
+     .app {
+         padding: 48px 24px;
+     }
+ }
+
+ /* ≥1024px : split-screen — formulaire à gauche, panneau visuel à droite */
+ @media (min-width: 1024px) {
+     .app {
+         flex-direction: row;
+         align-items: stretch;
+         justify-content: center;
+         padding: 0;
+         max-width: 1280px;
+         margin: 0 auto;
+         gap: 64px;
+     }
+
+     .login-side {
+         flex: 1;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         padding: 48px;
+     }
+
+     .visual-side {
+         flex: 1;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         background: rgba(204, 243, 173, 0.15);
+         border-radius: 0;
+     }
+
+     .visual-side-inner {
+         text-align: center;
+         max-width: 360px;
+         padding: 24px;
+     }
+
+     .visual-side-inner i {
+         font-size: 64px;
+         color: #2d5a16;
+         margin-bottom: 24px;
+     }
+
+     .visual-side-inner h3 {
+         font-family: 'Sora', sans-serif;
+         font-size: 22px;
+         font-weight: 700;
+         color: #1a3a0a;
+         margin-bottom: 12px;
+     }
+
+     .visual-side-inner p {
+         font-size: 14px;
+         color: #6b7280;
+         line-height: 1.6;
+     }
+
+     .footer-badge {
+         margin-top: 32px;
+     }
+ }

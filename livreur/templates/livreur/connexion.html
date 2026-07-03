@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion — YEES NAA CONNECT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'livreur/css/connexion.css' %}">
+</head>
+<body>
+
+<div class="app">
+
+  <div class="login-side">
+    <div class="login-card">
+
+      <div class="brand">
+        <div class="brand-icon"><i class="ti ti-truck"></i></div>
+        <h1>YEES NAA CONNECT</h1>
+      </div>
+
+      <div class="heading">
+        <h2>Espace Livreur</h2>
+        <p>Connectez-vous pour voir vos livraisons du jour</p>
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="form-errors">
+          {% for error in form.non_field_errors %}
+            <p style="color:#c85a1a; font-size:13px; margin-bottom:8px;">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="field-group">
+          <label class="field-label" for="{{ form.telephone.id_for_label }}">Numéro de téléphone</label>
+          <div class="field-wrap">
+            <span class="field-prefix">
+              <i class="ti ti-phone" style="font-size:14px"></i>
+              +221
+            </span>
+            {{ form.telephone }}
+          </div>
+          {% if form.telephone.errors %}
+            <p style="color:#c85a1a; font-size:12px;">{{ form.telephone.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="{{ form.password.id_for_label }}">Mot de passe</label>
+          <div class="field-wrap">
+            {{ form.password }}
+            <button type="button" class="field-icon-btn toggle-password" aria-label="Afficher le mot de passe">
+              <i class="ti ti-eye"></i>
+            </button>
+          </div>
+          {% if form.password.errors %}
+            <p style="color:#c85a1a; font-size:12px;">{{ form.password.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit">
+          Se connecter
+          <i class="ti ti-arrow-right"></i>
+        </button>
+      </form>
+
+      <p class="helper-text">Vos identifiants vous ont été fournis par l'administration YEES NAA CONNECT.</p>
+
+    </div>
+
+    <div class="footer-badge">
+      <div class="footer-badge-icon"><i class="ti ti-shield-check"></i></div>
+      <p>LIVRAISON FIABLE, TRAÇABILITÉ GARANTIE</p>
+    </div>
+  </div>
+
+  <div class="visual-side">
+    <div class="visual-side-inner">
+      <i class="ti ti-truck-delivery"></i>
+      <h3>Suivi en temps réel</h3>
+      <p>Gérez vos livraisons quotidiennes, encaissez vos paiements et gardez une traçabilité complète de chaque commande.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Bascule simple d'affichage du mot de passe
+  document.querySelector('.toggle-password')?.addEventListener('click', function () {
+    const input = document.getElementById('{{ form.password.id_for_label }}');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+</script>
+
+</body>
+</html>

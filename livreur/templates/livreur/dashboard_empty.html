@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Livreur Dashboard — Aucune livraison</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@700&family=Sora:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'livreur/css/dashboard_empty.css' %}">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Bonjour, {{ request.user.prenom }} 👋</h1>
+      <p>{{ aujourdhui|date:"l j F Y" }}</p>
+    </div>
+    <button class="notif-btn" aria-label="Notifications">
+      <i class="ti ti-bell"></i>
+    </button>
+  </header>
+
+  <nav class="sidenav">
+    <div class="sidenav-item active">
+      <i class="ti ti-truck"></i>
+      <span>Livraisons</span>
+    </div>
+    <a class="sidenav-item" href="{% url 'livreur:profil' %}" style="text-decoration:none; color:inherit;">
+      <i class="ti ti-user"></i>
+      <span>Profil</span>
+    </a>
+  </nav>
+
+  <main class="content">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-truck"></i></div>
+        <p class="stat-label">Livraisons</p>
+        <p class="stat-value">0</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-cash"></i></div>
+        <p class="stat-label">À encaisser</p>
+        <p class="stat-value amber">0 FCFA</p>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <h2>Mes livraisons du jour</h2>
+      <span class="badge">0</span>
+    </div>
+
+    <div class="empty-state">
+      <div class="empty-illustration">
+        <i class="ti ti-package-off"></i>
+        <div class="badge-icon">
+          <i class="ti ti-clock"></i>
+        </div>
+      </div>
+      <h2>Aucune livraison aujourd'hui</h2>
+      <p>Revenez plus tard ou contactez l'administration pour plus d'informations.</p>
+      <a class="btn-support" href="tel:+221338000000">
+        <i class="ti ti-headset"></i>
+        Contacter le support
+      </a>
+    </div>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active">
+      <i class="ti ti-truck"></i>
+      <span>Livraisons</span>
+    </div>
+    <a class="nav-item" href="{% url 'livreur:profil' %}" style="text-decoration:none;">
+      <i class="ti ti-user"></i>
+      <span>Profil</span>
+    </a>
+  </nav>
+
+</div>
+
+</body>
+</html>
