@@ -19,13 +19,39 @@
 </head>
 <body class="flex min-h-screen bg-[#f5f6f8] font-sans antialiased">
 
-    <!-- Sidebar -->
-    <aside class="w-60 shrink-0 bg-[#2d5a27] text-white flex flex-col justify-between fixed inset-y-0 left-0 z-30">
+    <!-- Topbar mobile -->
+    <header class="md:hidden fixed top-0 inset-x-0 z-40 bg-[#2d5a27] text-white flex items-center justify-between px-4 h-14">
+        <h1 class="font-bold text-base tracking-wide leading-tight">
+            Riz <span class="text-[#7ec86e] text-base font-bold">Local</span>
+        </h1>
+        <button onclick="openMobileMenu()" aria-label="Menu" class="text-white">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Overlay + drawer mobile -->
+    <div id="menu-overlay" onclick="closeMobileMenu()"
+         class="hidden md:hidden fixed inset-0 bg-black/50 z-50"></div>
+
+    <!-- Sidebar (desktop fixe / drawer mobile) -->
+    <aside id="mobile-menu"
+           class="w-60 shrink-0 bg-[#2d5a27] text-white flex flex-col justify-between fixed inset-y-0 left-0 z-50
+                  transform -translate-x-full transition-transform duration-300 ease-in-out
+                  md:translate-x-0 md:flex">
         <div class="pt-8 px-5">
-            <h1 class="font-bold text-base tracking-wide leading-tight mb-10">
-                Riz
-                <span class="text-[#7ec86e] text-base font-bold">Local</span>
-            </h1>
+            <div class="flex items-center justify-between mb-10 md:mb-10">
+                <h1 class="font-bold text-base tracking-wide leading-tight">
+                    Riz
+                    <span class="text-[#7ec86e] text-base font-bold">Local</span>
+                </h1>
+                <button onclick="closeMobileMenu()" aria-label="Fermer" class="md:hidden text-white/70">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
 
             <nav class="space-y-1 -mx-5">
 
@@ -104,10 +130,10 @@
     </aside>
 
     <!-- Contenu principal -->
-    <main class="ml-60 flex-1 min-h-screen">
+    <main class="md:ml-60 flex-1 min-h-screen pt-14 md:pt-0">
 
         {% if messages %}
-        <div class="px-10 pt-6 flex flex-col gap-2">
+        <div class="px-4 md:px-10 pt-6 flex flex-col gap-2">
             {% for message in messages %}
             <div class="px-4 py-3 rounded-xl text-sm font-medium
                 {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
@@ -143,6 +169,19 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function openMobileMenu() {
+            document.getElementById('mobile-menu').classList.remove('-translate-x-full');
+            document.getElementById('menu-overlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMobileMenu() {
+            document.getElementById('mobile-menu').classList.add('-translate-x-full');
+            document.getElementById('menu-overlay').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    </script>
 
     <script>
     (function () {

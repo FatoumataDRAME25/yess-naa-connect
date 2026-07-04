@@ -12,12 +12,12 @@ Riz Local
 
 {% block content %}
 
-  <main class="pt-20">
-    <div class="max-w-7xl mx-auto px-8 py-12">
+  <main class="pt-16 md:pt-20">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
 
-      <div class="mb-10">
-        <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">Finaliser ma commande</h1>
-        <p class="text-lg text-gray-500">Quelques informations pour vous livrer votre riz</p>
+      <div class="mb-6 md:mb-10">
+        <h1 class="text-2xl md:text-4xl font-bold text-lime-950 leading-tight mb-2">Finaliser ma commande</h1>
+        <p class="text-base md:text-lg text-gray-500">Quelques informations pour vous livrer votre riz</p>
       </div>
 
       <!-- Erreur globale -->
@@ -31,11 +31,11 @@ Riz Local
       <form method="POST" action="{% url 'finaliser_commande' %}">
         {% csrf_token %}
 
-        <div class="flex items-start gap-10">
+        <div class="flex flex-col lg:flex-row items-start gap-8 lg:gap-10">
 
           <!-- COLONNE GAUCHE : FORMULAIRE -->
-          <div class="flex-1 flex flex-col gap-8">
-            <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-10">
+          <div class="flex-1 w-full flex flex-col gap-8">
+            <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-5 md:p-8 flex flex-col gap-8 md:gap-10">
 
               <!-- Vos informations -->
               <section class="flex flex-col gap-6">
@@ -97,17 +97,26 @@ Riz Local
                     <label for="ville" class="text-sm font-medium text-gray-700">Ville</label>
                     <select id="ville" name="ville"
                             class="w-full px-4 py-4 bg-gray-50 rounded-xl outline outline-1 outline-gray-200 text-base text-lime-950 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-lime-700 transition">
-                      <option value="dakar"       {% if form_ville == 'dakar' %}selected{% endif %}>Dakar</option>
-                      <option value="thies"       {% if form_ville == 'thies' %}selected{% endif %}>Thiès</option>
-                      <option value="saint-louis" {% if form_ville == 'saint-louis' %}selected{% endif %}>Saint-Louis</option>
-                      <option value="ziguinchor"  {% if form_ville == 'ziguinchor' %}selected{% endif %}>Ziguinchor</option>
-                      <option value="kaolack"     {% if form_ville == 'kaolack' %}selected{% endif %}>Kaolack</option>
+                      <option value="dakar"        {% if form_ville == 'dakar' %}selected{% endif %}>Dakar</option>
+                      <option value="thies"        {% if form_ville == 'thies' %}selected{% endif %}>Thiès</option>
+                      <option value="diourbel"     {% if form_ville == 'diourbel' %}selected{% endif %}>Diourbel</option>
+                      <option value="fatick"       {% if form_ville == 'fatick' %}selected{% endif %}>Fatick</option>
+                      <option value="kaffrine"     {% if form_ville == 'kaffrine' %}selected{% endif %}>Kaffrine</option>
+                      <option value="kaolack"      {% if form_ville == 'kaolack' %}selected{% endif %}>Kaolack</option>
+                      <option value="kedougou"     {% if form_ville == 'kedougou' %}selected{% endif %}>Kédougou</option>
+                      <option value="kolda"        {% if form_ville == 'kolda' %}selected{% endif %}>Kolda</option>
+                      <option value="louga"        {% if form_ville == 'louga' %}selected{% endif %}>Louga</option>
+                      <option value="matam"        {% if form_ville == 'matam' %}selected{% endif %}>Matam</option>
+                      <option value="saint-louis"  {% if form_ville == 'saint-louis' %}selected{% endif %}>Saint-Louis</option>
+                      <option value="sedhiou"      {% if form_ville == 'sedhiou' %}selected{% endif %}>Sédhiou</option>
+                      <option value="tambacounda"  {% if form_ville == 'tambacounda' %}selected{% endif %}>Tambacounda</option>
+                      <option value="ziguinchor"   {% if form_ville == 'ziguinchor' %}selected{% endif %}>Ziguinchor</option>
                     </select>
                   </div>
 
                   <!-- Position précise sur la carte (facilite le travail du livreur) -->
                   <div class="flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <label class="text-sm font-medium text-gray-700">Position précise (optionnel)</label>
                       <button type="button" id="btn-geoloc"
                               class="flex items-center gap-1.5 text-xs font-bold text-lime-900 hover:text-lime-700 transition-colors">
@@ -137,7 +146,7 @@ Riz Local
                   <h2 class="text-xl font-bold text-lime-950">Mode de paiement</h2>
                 </div>
 
-                <div class="flex gap-4">
+                <div class="flex flex-col sm:flex-row gap-4">
                   <!-- Paiement à la livraison -->
                   <label for="paiement-livraison"
                          class="flex-1 p-6 rounded-2xl outline outline-2 cursor-pointer transition-colors
@@ -186,8 +195,8 @@ Riz Local
           </div>
 
           <!-- COLONNE DROITE : RÉSUMÉ -->
-          <aside class="w-96 shrink-0">
-            <div class="bg-white rounded-3xl outline outline-1 outline-gray-100 p-8 flex flex-col gap-6 sticky top-28">
+          <aside class="w-full lg:w-96 lg:shrink-0">
+            <div class="bg-white rounded-3xl outline outline-1 outline-gray-100 p-5 md:p-8 flex flex-col gap-6 lg:sticky lg:top-28">
 
               <h2 class="text-xl font-bold text-lime-950">Résumé de la commande</h2>
 

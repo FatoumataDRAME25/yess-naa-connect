@@ -7,9 +7,9 @@ Riz Local
 
 {% block content %}
 
-  <main class="pt-20 min-h-screen bg-white">
+  <main class="pt-16 md:pt-20 min-h-screen bg-white">
 
-    <div class="flex items-end gap-2 pt-12 pb-6 px-6 max-w-7xl mx-auto">
+    <div class="flex items-end gap-2 pt-8 md:pt-12 pb-6 px-4 md:px-6 max-w-7xl mx-auto">
       <h1 class="text-2xl lg:text-3xl font-bold text-lime-950">Votre Panier</h1>
       {% if not panier_vide %}
       <span class="text-gray-400 text-lg">({{ articles|length }} article{{ articles|length|pluralize }})</span>
@@ -24,7 +24,7 @@ Riz Local
     ============================================================ -->
     {% if panier_vide %}
 
-    <div class="max-w-7xl mx-auto px-6 pb-32 flex flex-col items-center justify-center py-24 gap-8">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 pb-32 flex flex-col items-center justify-center py-16 md:py-24 gap-8">
       <!-- Icône panier vide -->
       <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center">
         <svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -44,7 +44,7 @@ Riz Local
     {% else %}
 
     <!-- PANIER AVEC ARTICLES -->
-    <div class="max-w-7xl mx-auto px-6 pb-20 flex flex-col lg:flex-row gap-12">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 pb-20 flex flex-col lg:flex-row gap-8 lg:gap-12">
 
       <!-- COLONNE GAUCHE : liste des articles -->
       <div class="flex-1 space-y-4">
@@ -57,12 +57,12 @@ Riz Local
         {% for article in articles %}
         <!-- data-prix stocke le prix unitaire pour que le JS puisse
              recalculer le total de ligne sans redemander au serveur -->
-        <div class="flex items-center gap-6 p-5 bg-white border border-gray-100 rounded-2xl"
+        <div class="flex items-start sm:items-center gap-3 sm:gap-6 p-4 sm:p-5 bg-white border border-gray-100 rounded-2xl"
              id="article-{{ article.id }}"
              data-prix="{{ article.prix }}">
 
           <!-- Image produit -->
-          <div class="w-24 h-24 bg-gray-50 rounded-xl overflow-hidden shrink-0">
+          <div class="w-16 h-16 sm:w-24 sm:h-24 bg-gray-50 rounded-xl overflow-hidden shrink-0">
             {% if article.image %}
               <img src="{{ article.image }}" class="w-full h-full object-cover" alt="{{ article.nom }}"/>
             {% else %}
@@ -70,20 +70,20 @@ Riz Local
             {% endif %}
           </div>
 
-          <div class="flex-1">
-            <h3 class="text-lg font-semibold text-lime-950">{{ article.nom }}</h3>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-base sm:text-lg font-semibold text-lime-950 truncate">{{ article.nom }}</h3>
             {% if article.poids %}
             <p class="text-sm text-gray-500">Format : {{ article.poids }}</p>
             {% endif %}
 
-            <div class="mt-4 flex items-center justify-between">
+            <div class="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 
               <!-- CONTRÔLE QUANTITÉ
                    Les boutons - et + envoient une requête POST via JS
                    data-url pointe vers modifier_quantite en Django
                    data-action indique si c'est "increment" ou "decrement"
               -->
-              <div class="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
+              <div class="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-full px-3 py-1 self-start">
                 <button
                   class="btn-quantite text-gray-500 hover:text-lime-900 font-bold w-6 text-center"
                   data-action="decrement"
@@ -104,7 +104,7 @@ Riz Local
               </div>
 
               <!-- Prix ligne -->
-              <div class="text-right">
+              <div class="text-left sm:text-right">
                 <p class="text-sm text-gray-400">{{ article.prix }} FCFA / unité</p>
                 <p class="text-lg font-bold text-lime-950" id="total-{{ article.id }}">
                   {{ article.ligne_total }} FCFA
@@ -117,7 +117,7 @@ Riz Local
                data-url pointe vers supprimer_du_panier en Django
           -->
           <button
-            class="btn-supprimer text-gray-300 hover:text-red-500 transition-colors text-xl"
+            class="btn-supprimer text-gray-300 hover:text-red-500 transition-colors text-xl shrink-0"
             data-url="{% url 'supprimer_du_panier' article.id %}"
             data-article-id="{{ article.id }}"
             aria-label="Supprimer {{ article.nom }}">
@@ -133,7 +133,7 @@ Riz Local
 
       <!-- COLONNE DROITE : récapitulatif -->
       <div class="w-full lg:w-96">
-        <div class="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm" id="recapitulatif">
+        <div class="bg-white border border-gray-100 rounded-2xl p-5 sm:p-8 shadow-sm" id="recapitulatif">
           <h2 class="text-2xl font-bold text-lime-950 mb-6">Récapitulatif</h2>
 
           <div class="space-y-4 border-b pb-6">

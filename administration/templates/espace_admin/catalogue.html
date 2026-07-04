@@ -32,18 +32,6 @@
     </button>
   </div>
 
-  <!-- Alertes stock faible desktop -->
-  {% for p in produits_stock_faible %}
-  <div class="flex items-center justify-between bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-5 py-3 mb-3">
-    <span class="flex items-center gap-2 font-semibold text-sm">
-      <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.516 11.59c.75 1.334-.213 2.985-1.743 2.985H3.483c-1.53 0-2.493-1.65-1.743-2.985L8.257 3.1zM11 14a1 1 0 11-2 0 1 1 0 012 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v4a1 1 0 01-1 1z" clip-rule="evenodd"/>
-      </svg>
-      ⚠ {{ p.nom }} {{ p.poids_kg }} kg — stock faible ({{ p.stock_sacs }} sacs restants)
-    </span>
-  </div>
-  {% endfor %}
-
   <!-- Onglets filtres desktop -->
   <div class="flex gap-1 mb-6 border-b border-gray-200">
     <a href="?filtre=tous"
@@ -167,18 +155,6 @@
       </svg>
       + Ajouter un produit
     </button>
-
-    <!-- Alertes stock faible mobile -->
-    {% for p in produits_stock_faible %}
-    <div class="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-2">
-      <svg class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.516 11.59c.75 1.334-.213 2.985-1.743 2.985H3.483c-1.53 0-2.493-1.65-1.743-2.985L8.257 3.1zM11 14a1 1 0 11-2 0 1 1 0 012 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v4a1 1 0 01-1 1z" clip-rule="evenodd"/>
-      </svg>
-      <p class="text-xs font-semibold text-amber-700">
-        ⚠ {{ p.nom }} {{ p.poids_kg }} kg — stock faible ({{ p.stock_sacs }} sacs restants)
-      </p>
-    </div>
-    {% endfor %}
   </div>
 
   <!-- Onglets filtres mobile -->

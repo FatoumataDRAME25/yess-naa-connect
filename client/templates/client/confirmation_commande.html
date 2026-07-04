@@ -8,29 +8,29 @@ Riz Local
 {% block content %}
 
   <main class="pt-16">
-    <div class="max-w-7xl mx-auto px-8 pt-16 pb-24 flex flex-col items-center">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 pt-10 md:pt-16 pb-24 flex flex-col items-center">
 
       <!-- EN-TÊTE -->
-      <div class="flex flex-col items-center text-center mb-12">
-        <div class="w-20 h-20 bg-lime-200 rounded-full flex items-center justify-center mb-6">
-          <svg class="w-8 h-8 fill-lime-900" viewBox="0 0 24 24">
+      <div class="flex flex-col items-center text-center mb-8 md:mb-12">
+        <div class="w-16 h-16 md:w-20 md:h-20 bg-lime-200 rounded-full flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 md:w-8 md:h-8 fill-lime-900" viewBox="0 0 24 24">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
           </svg>
         </div>
-        <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">Commande confirmée !</h1>
-        <p class="text-lg text-gray-500">Merci de soutenir le riz local sénégalais </p>
+        <h1 class="text-2xl md:text-4xl font-bold text-lime-950 leading-tight mb-2">Commande confirmée !</h1>
+        <p class="text-base md:text-lg text-gray-500">Merci de soutenir le riz local sénégalais </p>
       </div>
 
       <!-- GRILLE DÉTAILS + QR -->
-      <div class="w-full max-w-5xl flex items-start gap-10">
+      <div class="w-full max-w-5xl flex flex-col lg:flex-row items-start gap-8 lg:gap-10">
 
         <!-- COLONNE GAUCHE -->
-        <div class="flex-1 flex flex-col gap-8">
+        <div class="flex-1 w-full flex flex-col gap-8">
 
-          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-8">
+          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-5 md:p-8 flex flex-col gap-8">
 
             <!-- Numéro + statut -->
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div class="flex items-center gap-3">
                 <h2 class="text-xl font-bold text-lime-950">#{{ commande.numero }}</h2>
                 <!-- Bouton copier -->
@@ -50,27 +50,27 @@ Riz Local
             <!-- Articles commandés -->
             <div class="flex flex-col gap-5 pb-8 border-b border-gray-100">
               {% for ligne in lignes %}
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                  <div class="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden shrink-0">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 md:gap-4 min-w-0">
+                  <div class="w-14 h-14 md:w-16 md:h-16 bg-gray-50 rounded-xl overflow-hidden shrink-0">
                     {% if ligne.image %}
                       <img src="{{ ligne.image }}" class="w-full h-full object-cover" alt="{{ ligne.nom }}"/>
                     {% else %}
                       <img src="{% static 'images/1sac5kg.jpg' %}" class="w-full h-full object-cover" alt="{{ ligne.nom }}"/>
                     {% endif %}
                   </div>
-                  <div>
-                    <p class="text-base font-semibold text-lime-950">{{ ligne.nom }} — {{ ligne.poids }} kg</p>
+                  <div class="min-w-0">
+                    <p class="text-sm md:text-base font-semibold text-lime-950 truncate">{{ ligne.nom }} — {{ ligne.poids }} kg</p>
                     <p class="text-sm text-gray-500">Quantité : {{ ligne.quantite }}</p>
                   </div>
                 </div>
-                <p class="text-base font-bold text-lime-950">{{ ligne.ligne_total }} FCFA</p>
+                <p class="text-sm md:text-base font-bold text-lime-950 shrink-0">{{ ligne.ligne_total }} FCFA</p>
               </div>
               {% endfor %}
             </div>
 
             <!-- Adresse + Paiement -->
-            <div class="flex items-start gap-8">
+            <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-8">
               <div class="flex-1 flex flex-col gap-1">
                 <p class="text-sm font-medium text-gray-500">Adresse de livraison</p>
                 <p class="text-base text-lime-950">{{ commande.adresse_livraison }}</p>
@@ -111,7 +111,7 @@ Riz Local
           </div>
 
           <!-- Boutons -->
-          <div class="flex items-center gap-4">
+          <div class="flex flex-col sm:flex-row items-stretch gap-4">
             <a href="{% url 'suivre_commande' %}"
                class="flex-1 py-5 bg-lime-900 text-white text-lg font-bold text-center rounded-xl hover:bg-lime-800 transition-colors">
               Suivre ma commande
@@ -130,8 +130,8 @@ Riz Local
         </div>
 
         <!-- COLONNE DROITE : Récap client -->
-        <aside class="w-96 shrink-0 flex flex-col gap-5">
-          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-6">
+        <aside class="w-full lg:w-96 lg:shrink-0 flex flex-col gap-5">
+          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-5 md:p-8 flex flex-col gap-6">
 
             <h2 class="text-xl font-bold text-lime-950 text-center mt-2">Récapitulatif client</h2>
 

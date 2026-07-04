@@ -5,18 +5,18 @@
 
 {% block content %}
 
-<div class="w-full px-10 py-8 flex flex-col gap-8 items-center">
+<div class="w-full px-4 md:px-10 py-6 md:py-8 flex flex-col gap-6 md:gap-8 items-center">
 
   <!-- Page title -->
-  <div class="w-full max-w-3xl flex items-center justify-between">
-    <h1 class="text-3xl font-bold text-green-brand">Déclaration Stocks Paddy</h1>
+  <div class="w-full max-w-3xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <h1 class="text-xl md:text-3xl font-bold text-green-brand">Déclaration Stocks Paddy</h1>
     <a href="{% url 'dashbord' %}" class="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
       ← Retour au tableau de bord
     </a>
   </div>
 
   <!-- Form card -->
-  <form method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col gap-7 w-full max-w-3xl">
+  <form method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-8 flex flex-col gap-6 md:gap-7 w-full max-w-3xl">
     {% csrf_token %}
 
     <div class="flex flex-col gap-3">
@@ -49,7 +49,7 @@
     </div>
 
     <!-- Variété + Quantité -->
-    <div class="grid grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
       <!-- Variété de riz -->
       <div class="flex flex-col gap-2">
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Date + Région -->
-    <div class="grid grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
       <!-- Date de récolte -->
       <div class="flex flex-col gap-2">

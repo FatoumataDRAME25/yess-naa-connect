@@ -5,11 +5,11 @@
 
 {% block content %}
 
-<div class="w-full p-7 flex flex-col gap-7">
+<div class="w-full p-4 md:p-7 flex flex-col gap-5 md:gap-7">
 
   <!-- Profile Header Card -->
-  <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm p-8 flex items-center justify-between">
-    <div class="flex items-center gap-6">
+  <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm p-5 md:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center gap-4 md:gap-6">
       <!-- Avatar -->
       <div class="w-16 h-16 rounded-full outline outline-4 outline-[#D4EDB8] flex-shrink-0 bg-[#2d5a27] flex items-center justify-center">
         {% if user.photo %}
@@ -35,7 +35,7 @@
     <!-- Bouton Modifier -->
     <button id="btn-edit"
             onclick="toggleEdit(true)"
-            class="flex items-center gap-2 bg-sidebar text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-900 transition-colors shadow-sm">
+            class="flex items-center justify-center gap-2 bg-sidebar text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-900 transition-colors shadow-sm">
       <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -65,7 +65,7 @@
       </button>
     </div>
 
-    <div class="p-6 grid grid-cols-2 gap-5">
+    <div class="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
       <!-- Prénom -->
       <div class="flex flex-col gap-2">
         <label class="text-xs font-semibold text-gray-500">{{ form.prenom.label }}</label>
@@ -91,7 +91,7 @@
         {% if form.telephone.errors %}<p class="text-xs text-red-500">{{ form.telephone.errors.0 }}</p>{% endif %}
       </div>
       <!-- Région (colonne entière) -->
-      <div class="flex flex-col gap-2 col-span-2">
+      <div class="flex flex-col gap-2 sm:col-span-2">
         <label class="text-xs font-semibold text-gray-500">{{ form.region.label }}</label>
         {{ form.region }}
         {% if form.region.errors %}<p class="text-xs text-red-500">{{ form.region.errors.0 }}</p>{% endif %}
@@ -119,7 +119,7 @@
       </div>
       <h2 class="text-base font-bold text-sidebar">Informations Personnelles</h2>
     </div>
-    <div class="p-6 grid grid-cols-2 gap-5">
+    <div class="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
       <div class="flex flex-col gap-2">
         <label class="text-xs font-semibold text-gray-500">Prénom</label>
         <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">
@@ -157,7 +157,7 @@
       </div>
       <h2 class="text-base font-bold text-sidebar">Informations Professionnelles</h2>
     </div>
-    <div class="p-6 grid grid-cols-2 gap-5">
+    <div class="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
       <div class="flex flex-col gap-2">
         <label class="text-xs font-semibold text-gray-500">Type de producteur</label>
         <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base font-medium text-gray-900">
@@ -195,7 +195,7 @@
       </div>
       <h2 class="text-base font-bold text-sidebar">Sécurité</h2>
     </div>
-    <div class="px-6 py-5 flex items-center justify-between">
+    <div class="px-4 md:px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <p class="text-base font-medium text-gray-900">Mot de passe</p>
         <p class="text-sm text-gray-500 mt-0.5">

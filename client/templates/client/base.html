@@ -29,17 +29,17 @@
        NAVBAR
   ============================ -->
   <header class="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center justify-between">
 
       <!-- Logo -->
       <a href="{% url 'accueil' %}" class="flex items-center gap-1">
-        <span class="text-2xl font-extrabold text-lime-900">Riz </span>
-        <span class="text-2xl font-bold text-lime-500">Local</span>
+        <span class="text-xl md:text-2xl font-extrabold text-lime-900">Riz </span>
+        <span class="text-xl md:text-2xl font-bold text-lime-500">Local</span>
       </a>
 
-      <!-- Navigation -->
-      <nav class="flex items-center gap-8">
-        <a href="{% url 'accueil' %}" 
+      <!-- Navigation desktop -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="{% url 'accueil' %}"
           class="text-sm font-medium pb-1 transition-colors
             {% if request.resolver_match.url_name == 'accueil' %}
               text-lime-900 border-b-2 border-lime-900
@@ -48,7 +48,7 @@
             {% endif %}">
           Accueil
         </a>
-        <a href="{% url 'catalogue' %}" 
+        <a href="{% url 'catalogue' %}"
         class="text-sm font-medium pb-1 transition-colors
             {% if request.resolver_match.url_name == 'catalogue' %}
               text-lime-900 border-b-2 border-lime-900
@@ -80,8 +80,8 @@
         </a>
       </nav>
 
-      <!-- Actions -->
-      <div class="flex items-center gap-5">
+      <!-- Actions desktop -->
+      <div class="hidden md:flex items-center gap-5">
         <button aria-label="Rechercher" class="text-gray-600 hover:text-lime-900 transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -112,8 +112,60 @@
         </a>
       </div>
 
+      <!-- Actions mobile : panier + burger -->
+      <div class="flex md:hidden items-center gap-4">
+        <a href="{% url 'panier' %}" aria-label="Panier" class="relative text-gray-700">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+          </svg>
+          {% if nb_panier > 0 %}
+          <span class="absolute -top-2 -right-2 w-5 h-5 bg-lime-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {{ nb_panier }}
+          </span>
+          {% endif %}
+        </a>
+        <button onclick="openMobileMenu()" aria-label="Menu" class="text-gray-700">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+
     </div>
   </header>
+
+  <!-- ===========================
+       DRAWER MENU MOBILE
+  ============================ -->
+  <div id="menu-overlay" onclick="closeMobileMenu()"
+       class="hidden fixed inset-0 bg-black/50 z-[60] md:hidden"></div>
+
+  <div id="mobile-menu"
+       class="fixed top-0 right-0 h-full w-72 max-w-[80%] bg-white z-[70] transform translate-x-full
+              transition-transform duration-300 ease-in-out md:hidden flex flex-col">
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+      <span class="text-xl font-extrabold text-lime-900">Riz <span class="text-lime-500 font-bold">Local</span></span>
+      <button onclick="closeMobileMenu()" aria-label="Fermer" class="text-gray-500">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="flex flex-col px-2 py-4">
+      <a href="{% url 'accueil' %}" class="px-4 py-3 rounded-xl text-base font-semibold {% if request.resolver_match.url_name == 'accueil' %}text-lime-900 bg-lime-50{% else %}text-gray-700{% endif %}">Accueil</a>
+      <a href="{% url 'catalogue' %}" class="px-4 py-3 rounded-xl text-base font-semibold {% if request.resolver_match.url_name == 'catalogue' %}text-lime-900 bg-lime-50{% else %}text-gray-700{% endif %}">Catalogue</a>
+      <a href="{% url 'suivre_commande' %}" class="px-4 py-3 rounded-xl text-base font-semibold {% if request.resolver_match.url_name == 'suivre_commande' %}text-lime-900 bg-lime-50{% else %}text-gray-700{% endif %}">Suivre ma commande</a>
+      <a href="{% url 'inscription' %}" class="px-4 py-3 rounded-xl text-base font-semibold text-gray-700">Devenir partenaire</a>
+      <a href="{% url 'a_propos' %}" class="px-4 py-3 rounded-xl text-base font-semibold {% if request.resolver_match.url_name == 'a_propos' %}text-lime-900 bg-lime-50{% else %}text-gray-700{% endif %}">À Propos</a>
+    </nav>
+    <div class="mt-auto p-4">
+      <a href="{% url 'catalogue' %}"
+         class="flex items-center justify-center w-full px-5 py-3.5 bg-lime-900 text-white text-sm font-bold rounded-xl">
+        Commander
+      </a>
+    </div>
+  </div>
 
     {% block content%}
     {% endblock %}
@@ -207,6 +259,20 @@
 
     </div>
   </footer>
+
+  <!-- JS menu mobile -->
+  <script>
+    function openMobileMenu() {
+      document.getElementById('mobile-menu').classList.remove('translate-x-full');
+      document.getElementById('menu-overlay').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobile-menu').classList.add('translate-x-full');
+      document.getElementById('menu-overlay').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  </script>
 
   <!-- JS global -->
 {% block extra_js %}{% endblock %}

@@ -4,16 +4,16 @@
 {% block title %}Vérification — Riz Local{% endblock %}
 
 {% block content %}
-<main class="pt-20">
+<main class="pt-16 md:pt-20">
 
   <!-- ===========================
        EN-TÊTE DE PAGE
   ============================ -->
-  <section class="max-w-3xl mx-auto px-6 pt-16 pb-12 flex flex-col items-center gap-4 text-center">
-    <h1 class="text-5xl font-normal text-lime-950 leading-tight">
+  <section class="max-w-3xl mx-auto px-4 md:px-6 pt-10 md:pt-16 pb-8 md:pb-12 flex flex-col items-center gap-4 text-center">
+    <h1 class="text-3xl md:text-5xl font-normal text-lime-950 leading-tight">
       Vérifiez l'authenticité de votre riz
     </h1>
-    <p class="max-w-xl text-lg text-gray-500 leading-7">
+    <p class="max-w-xl text-base md:text-lg text-gray-500 leading-7">
       Entrez le code de lot inscrit sur le sceau de votre emballage pour garantir
       l'origine et la qualité Riz Local.
     </p>
@@ -23,7 +23,7 @@
   <!-- ===========================
        CONTENU PRINCIPAL
   ============================ -->
-  <main class="max-w-3xl mx-auto px-6 pb-24 flex flex-col gap-8">
+  <div class="max-w-3xl mx-auto px-4 md:px-6 pb-24 flex flex-col gap-8">
 
     {% if erreur %}
     <div class="bg-red-50 rounded-2xl outline outline-1 outline-red-200 p-6 flex items-center gap-4">
@@ -38,7 +38,7 @@
          BLOC : SAISIE CODE
     ============================ -->
     <div class="bg-white rounded-[32px] outline outline-1 outline-slate-100
-                shadow-[0px_32px_64px_-12px_rgba(0,0,0,0.08)] p-12">
+                shadow-[0px_32px_64px_-12px_rgba(0,0,0,0.08)] p-6 md:p-12">
 
       <form method="get" action="{% url 'verification_qrcode' %}" class="flex flex-col gap-6">
 
@@ -78,6 +78,6 @@
       </form>
     </div>
 
-  </main>
+  </div>
 </main>
 {% endblock %}

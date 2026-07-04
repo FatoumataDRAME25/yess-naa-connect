@@ -4,24 +4,24 @@
 {% block title %}Suivre ma commande — Riz Local{% endblock %}
 
 {% block content %}
-<main class="pt-20">
-  <div class="max-w-5xl mx-auto px-6 pt-12 pb-32 flex flex-col items-center gap-16">
+<main class="pt-16 md:pt-20">
+  <div class="max-w-5xl mx-auto px-4 md:px-6 pt-8 md:pt-12 pb-32 flex flex-col items-center gap-10 md:gap-16">
 
     <!-- ===========================
          FORMULAIRE DE RECHERCHE
     ============================ -->
-    <section class="w-full max-w-2xl bg-white rounded-3xl shadow-[0px_8px_30px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-10 flex flex-col gap-8">
+    <section class="w-full max-w-2xl bg-white rounded-3xl shadow-[0px_8px_30px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-5 md:p-10 flex flex-col gap-6 md:gap-8">
 
       <div class="text-center flex flex-col gap-2">
-        <h1 class="text-4xl font-bold text-lime-950 tracking-tight">Suivre ma commande</h1>
-        <p class="text-base text-gray-500">
+        <h1 class="text-2xl md:text-4xl font-bold text-lime-950 tracking-tight">Suivre ma commande</h1>
+        <p class="text-sm md:text-base text-gray-500">
           Entrez votre numéro de commande et votre téléphone pour obtenir les détails en temps réel.
         </p>
       </div>
 
-      <form method="get" action="{% url 'suivre_commande' %}" class="flex items-end gap-4 flex-wrap">
+      <form method="get" action="{% url 'suivre_commande' %}" class="flex flex-col sm:flex-row sm:items-end gap-4 sm:flex-wrap">
 
-        <div class="flex-1 min-w-[220px] flex flex-col gap-2">
+        <div class="flex-1 sm:min-w-[220px] flex flex-col gap-2">
           <label for="num-commande" class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
             Numéro de commande
           </label>
@@ -38,7 +38,7 @@
           />
         </div>
 
-        <div class="flex-1 min-w-[220px] flex flex-col gap-2">
+        <div class="flex-1 sm:min-w-[220px] flex flex-col gap-2">
           <label for="num-telephone" class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
             Numéro de téléphone
           </label>
@@ -56,7 +56,7 @@
         </div>
 
         <button type="submit"
-          class="flex items-center gap-2 px-8 py-4 rounded-xl outline outline-1 outline-lime-900
+          class="flex items-center justify-center gap-2 px-8 py-4 rounded-xl outline outline-1 outline-lime-900
                  text-lime-900 text-base font-bold shadow-[0px_10px_15px_-3px_rgba(45,90,22,0.20)]
                  hover:bg-lime-50 active:scale-[.98] transition-all
                  focus:outline-none focus:ring-2 focus:ring-lime-700 whitespace-nowrap">
@@ -116,7 +116,7 @@
 
       {% if commande.statut == 'annulee' %}
       <!-- ---- Bloc commande annulée ---- -->
-      <div class="bg-red-50 rounded-3xl outline outline-1 outline-red-200 p-8 flex flex-col gap-2">
+      <div class="bg-red-50 rounded-3xl outline outline-1 outline-red-200 p-5 md:p-8 flex flex-col gap-2">
         <h3 class="text-lg font-bold text-red-700">Cette commande a été annulée</h3>
         <p class="text-sm text-red-600">
           Si vous pensez qu'il s'agit d'une erreur, contactez notre support en indiquant votre numéro de commande.
@@ -165,7 +165,7 @@
 
 
       <!-- ---- Résumé commande ---- -->
-      <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-6">
+      <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-5 md:p-8 flex flex-col gap-6">
 
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-bold text-lime-950">Résumé de la commande</h3>
@@ -174,16 +174,16 @@
 
         <div class="flex flex-col gap-4">
           {% for ligne in commande.lignes.all %}
-          <div class="flex items-center gap-4">
-            <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden">
+          <div class="flex items-center gap-3 md:gap-4">
+            <div class="w-14 h-14 md:w-16 md:h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden">
               {% if ligne.produit.photo %}
                 <img src="{{ ligne.produit.photo.url }}" alt="{{ ligne.produit.nom }}" class="w-full h-full object-cover" loading="lazy"/>
               {% else %}
                 <img src="{% static 'images/1sac5kg.jpg' %}" alt="{{ ligne.produit.nom }}" class="w-full h-full object-cover" loading="lazy"/>
               {% endif %}
             </div>
-            <div class="flex-1">
-              <p class="text-base font-semibold text-lime-950">{{ ligne.produit.nom }}</p>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm md:text-base font-semibold text-lime-950 truncate">{{ ligne.produit.nom }}</p>
               <p class="text-xs text-gray-500">{{ ligne.produit.poids_kg }} Kg • Quantité : {{ ligne.quantite }}</p>
             </div>
             <p class="text-sm font-bold text-lime-950 shrink-0">{{ ligne.ligne_total }} FCFA</p>
@@ -210,7 +210,7 @@
 
 
       <!-- ---- Adresse de livraison ---- -->
-      <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-4">
+      <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-5 md:p-8 flex flex-col gap-4">
         <h3 class="text-lg font-bold text-lime-950">Adresse de livraison</h3>
         <div class="flex items-start gap-3">
           <svg class="w-3 h-4 fill-lime-900 mt-1 shrink-0" viewBox="0 0 24 24">
@@ -230,7 +230,7 @@
       {% with codes_lots=commande.lignes.all %}
       {% if codes_lots %}
       <!-- ---- Bloc traçabilité (liens réels vers l'origine des produits) ---- -->
-      <div class="bg-lime-900/5 rounded-3xl outline outline-1 outline-lime-900/10 p-8 flex flex-col gap-4">
+      <div class="bg-lime-900/5 rounded-3xl outline outline-1 outline-lime-900/10 p-5 md:p-8 flex flex-col gap-4">
         <p class="text-base font-bold text-lime-950">Transparence totale</p>
         <p class="text-sm text-gray-500">Suivez le parcours fermier de chacun de vos produits.</p>
         <div class="flex flex-col gap-2">

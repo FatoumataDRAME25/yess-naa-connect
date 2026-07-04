@@ -10,15 +10,15 @@ Catalogue | Riz Local
   <!-- ===========================
        CONTENU PRINCIPAL
   ============================ -->
-  <main class="pt-20">
+  <main class="pt-16 md:pt-20">
 
     <!-- ===========================
          EN-TÊTE + FILTRES
     ============================ -->
-    <section class="max-w-7xl mx-auto px-8 pt-12 pb-8">
+    <section class="max-w-7xl mx-auto px-4 md:px-8 pt-8 md:pt-12 pb-8">
 
       <!-- Fil d'Ariane -->
-      <nav aria-label="Fil d'Ariane" class="flex items-center gap-2 mb-6 text-xs font-medium uppercase tracking-wide">
+      <nav aria-label="Fil d'Ariane" class="flex items-center gap-2 mb-4 md:mb-6 text-xs font-medium uppercase tracking-wide">
         <a href="{% url 'accueil' %}" class="text-gray-500 hover:text-lime-900 transition-colors">Accueil</a>
         <svg class="w-2.5 h-2.5 text-gray-300" fill="none" viewBox="0 0 6 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <path d="M1 1l4 4-4 4"/>
@@ -27,10 +27,10 @@ Catalogue | Riz Local
       </nav>
 
       <!-- Titre -->
-      <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">
+      <h1 class="text-2xl md:text-4xl font-bold text-lime-950 leading-tight mb-2">
         Notre Catalogue de Riz Local
       </h1>
-      <p class="text-xl text-gray-500 mb-6">
+      <p class="text-base md:text-xl text-gray-500 mb-6">
         Riz transformé, conditionné et prêt à cuisiner
       </p>
 
@@ -40,13 +40,13 @@ Catalogue | Riz Local
            La view Django lit ?q=, ?type_riz=, ?poids= et filtre en base.
            Le filtre actif a le style "bg-lime-900 text-white".
       ============================ -->
-      <div class="bg-stone-100 rounded-2xl p-6 flex flex-col gap-5">
+      <div class="bg-stone-100 rounded-2xl p-4 md:p-6 flex flex-col gap-5">
 
         <!-- Ligne 1 : Recherche + Tri -->
         <form method="GET" action="{% url 'catalogue' %}">
           {% if type_riz_actif %}<input type="hidden" name="type_riz" value="{{ type_riz_actif }}">{% endif %}
           {% if poids_actif %}<input type="hidden" name="poids" value="{{ poids_actif }}">{% endif %}
-          <div class="flex items-center gap-4">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
 
             <!-- Recherche -->
             <div class="relative flex-1">
@@ -66,7 +66,7 @@ Catalogue | Riz Local
             </div>
 
             <!-- Tri -->
-            <div class="relative w-52 shrink-0">
+            <div class="relative w-full sm:w-52 shrink-0">
               <select class="w-full appearance-none px-4 py-3 bg-white rounded-xl shadow-sm
                              text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-lime-700
                              transition cursor-pointer">
@@ -83,7 +83,7 @@ Catalogue | Riz Local
 
             <!-- Bouton effacer si filtre actif -->
             {% if q or type_riz_actif or poids_actif %}
-            <a href="{% url 'catalogue' %}" class="text-sm text-gray-400 hover:text-red-500 transition-colors whitespace-nowrap">
+            <a href="{% url 'catalogue' %}" class="text-sm text-gray-400 hover:text-red-500 transition-colors whitespace-nowrap self-start sm:self-auto">
               ✕ Effacer
             </a>
             {% endif %}
@@ -92,20 +92,20 @@ Catalogue | Riz Local
         </form>
 
         <!-- Ligne 2 : Types de riz + Conditionnement -->
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
           <!-- Types de riz dynamiques -->
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 overflow-x-auto pb-1 -mx-1 px-1" style="-ms-overflow-style:none;scrollbar-width:none;">
 
             <a href="{% url 'catalogue' %}{% if q %}?q={{ q }}{% endif %}{% if poids_actif %}{% if q %}&{% else %}?{% endif %}poids={{ poids_actif }}{% endif %}"
-               class="px-6 py-2 rounded-full text-sm font-semibold transition-colors
+               class="flex-shrink-0 px-6 py-2 rounded-full text-sm font-semibold transition-colors
                       {% if not type_riz_actif %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
               Tous
             </a>
 
             {% for val, label in types_riz %}
             <a href="?{% if q %}q={{ q }}&{% endif %}type_riz={{ val }}{% if poids_actif %}&poids={{ poids_actif }}{% endif %}"
-               class="px-6 py-2 rounded-full text-sm font-semibold transition-colors
+               class="flex-shrink-0 px-6 py-2 rounded-full text-sm font-semibold transition-colors
                       {% if type_riz_actif == val %}bg-lime-900 text-white shadow-md{% else %}bg-white text-gray-500 outline outline-1 outline-gray-100 hover:outline-lime-300{% endif %}">
               {{ label }}
             </a>
@@ -114,7 +114,7 @@ Catalogue | Riz Local
           </div>
 
           <!-- Conditionnement dynamique -->
-          <div class="flex items-center bg-white rounded-xl shadow-sm outline outline-1 outline-gray-50 p-1">
+          <div class="flex items-center bg-white rounded-xl shadow-sm outline outline-1 outline-gray-50 p-1 self-start md:self-auto">
 
             <a href="?{% if q %}q={{ q }}&{% endif %}{% if type_riz_actif %}type_riz={{ type_riz_actif }}&{% endif %}poids=5"
                class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors
@@ -143,8 +143,8 @@ Catalogue | Riz Local
     <!-- ===========================
          GRILLE PRODUITS DYNAMIQUE
     ============================ -->
-    <section class="max-w-7xl mx-auto px-8 pb-20">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    <section class="max-w-7xl mx-auto px-4 md:px-8 pb-20">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
            id="grille-produits">
         {% include 'client/partials/cards_produits.html' with produits=produits %}
       </div>

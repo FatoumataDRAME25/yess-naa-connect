@@ -10,11 +10,19 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-heading { font-family: 'Poppins', sans-serif; }
+
+        @media print {
+            body { background: #fff !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            #certificat { box-shadow: none !important; max-width: 100% !important; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
 
-<div class="w-full max-w-sm bg-white rounded-3xl shadow-xl overflow-hidden">
+<div class="w-full max-w-sm flex flex-col gap-4">
+
+<div id="certificat" class="w-full bg-white rounded-3xl shadow-xl overflow-hidden">
 
     <!-- Header vert -->
     <div class="bg-yn-green-dark px-6 pt-8 pb-6 text-center">
@@ -130,6 +138,16 @@
         </div>
 
     </div>
+</div>
+
+<button onclick="window.print()"
+        class="no-print w-full flex items-center justify-center gap-2 bg-yn-green-dark hover:bg-yn-green text-white font-bold py-3.5 rounded-xl transition">
+    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+    </svg>
+    Télécharger le certificat (PDF)
+</button>
+
 </div>
 
 </body>
