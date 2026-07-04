@@ -1,7 +1,11 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 # ── Clé secrète ─────────────────────────────────────────────────────────────
 # En production : définir la variable d'env DJANGO_SECRET_KEY
@@ -78,13 +82,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'yessnaaconnect.wsgi.application'
 
 # ── Base de données ──────────────────────────────────────────────────────────
-# SQLite pour dev/VPS léger — pour un trafic plus fort, passer à PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Par défaut : SQLite. Pour PostgreSQL, définir DB_ENGINE=postgresql dans .env
+if os.environ.get('DB_ENGINE') == 'postgresql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ['DB_NAME'],
+            'USER': os.environ['DB_USER'],
+            'PASSWORD': os.environ['DB_PASSWORD'],
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ── Validation des mots de passe ─────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
