@@ -64,7 +64,7 @@ def dashboard(request):
 
     a_livrer = [l for l in livraisons if not l.confirme_le]
     total_a_encaisser = sum(
-        (l.commande.total for l in a_livrer if l.commande.mode_paiement == 'especes'),
+        (l.commande.total for l in a_livrer if l.commande.mode_paiement == 'livraison'),
         0,
     )
 
