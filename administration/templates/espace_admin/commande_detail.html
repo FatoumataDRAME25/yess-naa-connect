@@ -94,6 +94,61 @@
 
 </div>
 
+<!-- Livreur assigné -->
+<div class="mb-6">
+    <h2 class="text-sm font-bold text-yn-green-dark mb-3">Livreur assigné</h2>
+    <div class="bg-white rounded-2xl shadow-sm shadow-black/5 p-5">
+        {% if livraison %}
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-yn-green-pale flex items-center justify-center">
+                    <svg class="w-5 h-5 text-yn-green" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-800">{{ livraison.livreur.prenom }} {{ livraison.livreur.nom }}</p>
+                    <p class="text-xs text-yn-gray">{{ livraison.livreur.telephone }}</p>
+                </div>
+            </div>
+            {% if livraison.confirme_le %}
+            <span class="bg-green-50 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">Livraison confirmée</span>
+            {% else %}
+            <span class="bg-yn-gold/20 text-yn-green-dark text-xs font-bold px-3 py-1.5 rounded-full">En attente de livraison</span>
+            {% endif %}
+        </div>
+        {% else %}
+        <p class="text-sm text-yn-gray mb-4">Aucun livreur assigné pour l'instant.</p>
+        {% endif %}
+
+        {% if not livraison.confirme_le %}
+        <form method="post" class="flex items-center gap-3">
+            {% csrf_token %}
+            <select name="livreur_id" required
+                    class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
+                <option value="">
+                    {% if livraison %}Réassigner à un autre livreur…{% else %}Choisir un livreur…{% endif %}
+                </option>
+                {% for livreur in livreurs_disponibles %}
+                <option value="{{ livreur.pk }}" {% if livraison.livreur_id == livreur.pk %}selected{% endif %}>
+                    {{ livreur.prenom }} {{ livreur.nom }} — {{ livreur.telephone }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit"
+                    class="bg-yn-green hover:bg-yn-green-dark text-white font-bold px-6 py-3 rounded-xl transition whitespace-nowrap">
+                {% if livraison %}Réassigner{% else %}Assigner{% endif %}
+            </button>
+        </form>
+        {% if not livreurs_disponibles %}
+        <p class="text-xs text-red-500 mt-2">
+            Aucun livreur enregistré. <a href="{% url 'admin_transformatrice:admin_livreurs' %}" class="underline font-semibold">Créez un compte livreur</a> d'abord.
+        </p>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>
+
 <!-- Articles commandés -->
 <div class="mb-6">
     <h2 class="text-sm font-bold text-yn-green-dark mb-3">Articles commandés</h2>
@@ -263,6 +318,45 @@
           </svg>
         </a>
       </div>
+    </div>
+
+    <!-- Livreur assigné -->
+    <div class="bg-white rounded-2xl p-4">
+      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Livreur assigné</p>
+      {% if livraison %}
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p class="font-bold text-gray-900 text-sm">{{ livraison.livreur.prenom }} {{ livraison.livreur.nom }}</p>
+          <p class="text-xs text-gray-500">{{ livraison.livreur.telephone }}</p>
+        </div>
+        {% if livraison.confirme_le %}
+        <span class="bg-green-50 text-green-700 text-[10px] font-bold px-2.5 py-1 rounded-full">Confirmée</span>
+        {% else %}
+        <span class="bg-yn-gold/20 text-yn-green-dark text-[10px] font-bold px-2.5 py-1 rounded-full">En attente</span>
+        {% endif %}
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-500 mb-3">Aucun livreur assigné.</p>
+      {% endif %}
+
+      {% if not livraison.confirme_le %}
+      <form method="post" class="space-y-2">
+        {% csrf_token %}
+        <select name="livreur_id" required
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
+          <option value="">{% if livraison %}Réassigner…{% else %}Choisir un livreur…{% endif %}</option>
+          {% for livreur in livreurs_disponibles %}
+          <option value="{{ livreur.pk }}" {% if livraison.livreur_id == livreur.pk %}selected{% endif %}>
+            {{ livreur.prenom }} {{ livreur.nom }} — {{ livreur.telephone }}
+          </option>
+          {% endfor %}
+        </select>
+        <button type="submit"
+                class="w-full bg-yn-green-dark text-white font-bold py-2.5 rounded-xl text-sm">
+          {% if livraison %}Réassigner{% else %}Assigner le livreur{% endif %}
+        </button>
+      </form>
+      {% endif %}
     </div>
 
     <!-- Articles -->

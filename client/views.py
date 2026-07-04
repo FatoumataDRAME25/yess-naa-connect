@@ -1,5 +1,7 @@
+import re
+
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_POST
 from administration.models import Produit
 from .models import Client, CommandeClient, LigneCommande
@@ -39,9 +41,22 @@ def total_panier(request):
     return sum(item['prix'] * item['quantite'] for item in panier.values())
 
 
+def _normaliser_telephone(numero):
+    """Garde uniquement les chiffres et compare sur les 9 derniers (format sénégalais)."""
+    chiffres = re.sub(r'\D', '', numero or '')
+    return chiffres[-9:] if len(chiffres) >= 9 else chiffres
+
+
 # ---------------------------------------------------------------------------
 # Pages principales
 # ---------------------------------------------------------------------------
+
+def a_propos(request):
+    context = {
+        'nb_panier': nb_articles_panier(request),
+    }
+    return render(request, "client/a_propos.html", context)
+
 
 def accueil(request):
     produits = Produit.objects.filter(est_actif=True)[:4]
@@ -124,13 +139,13 @@ def panier(request):
             'ligne_total': ligne_total,
         })
 
-    frais_livraison = 2000 if articles else 0
-    total = sous_total + frais_livraison
+    # Les frais de livraison dépendent de la distance et sont déterminés par
+    # le livreur au moment de la remise, pas à la commande.
+    total = sous_total
 
     context = {
         'articles': articles,
         'sous_total': sous_total,
-        'frais_livraison': frais_livraison,
         'total': total,
         'nb_panier': nb_articles_panier(request),
         'panier_vide': len(articles) == 0,
@@ -228,8 +243,9 @@ def finaliser_commande(request):
             'ligne_total': ligne_total,
         })
 
-    frais_livraison = 2000
-    total = sous_total + frais_livraison
+    # Les frais de livraison dépendent de la distance et sont déterminés par
+    # le livreur au moment de la remise, pas à la commande.
+    total = sous_total
 
     if request.method == 'POST':
         nom            = request.POST.get('nom', '').strip()
@@ -254,7 +270,6 @@ def finaliser_commande(request):
                 'nb_panier': nb_articles_panier(request),
                 'articles': articles,
                 'sous_total': sous_total,
-                'frais_livraison': frais_livraison,
                 'total': total,
                 'form_nom': nom,
                 'form_telephone': telephone,
@@ -281,7 +296,6 @@ def finaliser_commande(request):
             client=client,
             mode_paiement=mode_paiement,
             adresse_livraison=f"{adresse}, {ville}",
-            frais_livraison=frais_livraison,
         )
 
         for produit_id, item in panier_session.items():
@@ -299,14 +313,15 @@ def finaliser_commande(request):
                 produit.stock = max(0, produit.stock - item['quantite'])
                 produit.save(update_fields=['stock'])
 
-        # Commande enregistrée : on vide le panier
+        # Commande enregistrée : on vide le panier et on garde une trace en
+        # session pour autoriser le téléchargement du reçu sans re-saisie.
         save_panier(request, {})
+        request.session['derniere_commande_numero'] = commande.numero
 
         context = {
             'commande': commande,
             'articles': articles,
             'sous_total': sous_total,
-            'frais_livraison': frais_livraison,
             'total': total,
             'nb_panier': 0,
         }
@@ -335,14 +350,14 @@ def confirmer_commande(request):
             'ligne_total': ligne_total,
         })
 
-    frais_livraison = 2000 if articles else 0
-    total = sous_total + frais_livraison
+    # Les frais de livraison dépendent de la distance et sont déterminés par
+    # le livreur au moment de la remise, pas à la commande.
+    total = sous_total
 
     context = {
         'nb_panier': nb_articles_panier(request),
         'articles': articles,
         'sous_total': sous_total,
-        'frais_livraison': frais_livraison,
         'total': total,
         'form_nom': '',
         'form_telephone': '',
@@ -355,7 +370,105 @@ def confirmer_commande(request):
 
 
 def suivre_commande(request):
+    numero = request.GET.get('numero', '').strip()
+    telephone = request.GET.get('telephone', '').strip()
+
+    commande = None
+    erreur = None
+    a_recherche = bool(numero or telephone)
+
+    if a_recherche:
+        if not numero or not telephone:
+            erreur = "Veuillez renseigner le numéro de commande et le numéro de téléphone."
+        else:
+            candidate = (
+                CommandeClient.objects
+                .select_related('client')
+                .prefetch_related('lignes__produit')
+                .filter(numero__iexact=numero)
+                .first()
+            )
+            if candidate and _normaliser_telephone(candidate.client.telephone) == _normaliser_telephone(telephone):
+                commande = candidate
+            else:
+                erreur = "Aucune commande trouvée avec ces informations. Vérifiez le numéro de commande et le téléphone."
+
+    etapes = None
+    if commande and commande.statut != CommandeClient.Statut.ANNULEE:
+        ordre = [
+            CommandeClient.Statut.ATTENTE,
+            CommandeClient.Statut.PREPARATION,
+            CommandeClient.Statut.EN_LIVRAISON,
+            CommandeClient.Statut.LIVREE,
+        ]
+        index_actuel = ordre.index(commande.statut)
+        definitions = [
+            ("Commande confirmée", "Votre commande a été validée et enregistrée avec succès."),
+            ("En préparation", "Notre équipe sélectionne les meilleurs produits de nos producteurs locaux pour votre colis."),
+            ("En livraison", "Votre colis a été confié à notre livreur pour la remise en main propre."),
+            ("Livrée", "Le colis est arrivé à destination. Bon appétit !"),
+        ]
+        etapes = []
+        for i, (titre, description) in enumerate(definitions):
+            if i < index_actuel:
+                statut_etape = 'complete'
+            elif i == index_actuel:
+                statut_etape = 'en_cours'
+            else:
+                statut_etape = 'attente'
+            etapes.append({'titre': titre, 'description': description, 'statut': statut_etape})
+
     context = {
         'nb_panier': nb_articles_panier(request),
+        'a_recherche': a_recherche,
+        'numero_recherche': numero,
+        'telephone_recherche': telephone,
+        'commande': commande,
+        'erreur': erreur,
+        'etapes': etapes,
     }
     return render(request, "client/suivre_commande.html", context)
+
+
+def recu_commande(request, numero):
+    """Reçu / bon de commande imprimable — accessible sans compte.
+
+    Autorisé si la session est celle qui vient de créer la commande, ou si
+    le téléphone du client est fourni en paramètre (retour depuis le suivi).
+    """
+    commande = get_object_or_404(
+        CommandeClient.objects.select_related('client').prefetch_related('lignes__produit'),
+        numero__iexact=numero,
+    )
+
+    telephone = request.GET.get('telephone', '').strip()
+    autorise = request.session.get('derniere_commande_numero') == commande.numero or (
+        telephone and _normaliser_telephone(telephone) == _normaliser_telephone(commande.client.telephone)
+    )
+    if not autorise:
+        raise Http404("Reçu introuvable.")
+
+    context = {
+        'commande': commande,
+        'lignes': commande.lignes.select_related('produit').all(),
+    }
+    return render(request, "client/recu_commande.html", context)
+
+
+def verification_qrcode(request):
+    """Vérification de l'authenticité d'un produit via son code de lot réel."""
+    code = request.GET.get('code', '').strip().upper()
+    erreur = None
+
+    if code:
+        produit = Produit.objects.filter(code_lot__iexact=code).first()
+        if produit:
+            return redirect('admin_transformatrice:tracabilite_produit', lot_code=produit.code_lot)
+        erreur = "Aucun produit trouvé avec ce code. Vérifiez le code inscrit sur le sceau de votre emballage."
+
+    context = {
+        'nb_panier': nb_articles_panier(request),
+        'code_recherche': code,
+        'erreur': erreur,
+    }
+    return render(request, "client/verification_qrcode.html", context)

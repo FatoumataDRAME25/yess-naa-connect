@@ -1,385 +1,289 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Suivre ma commande — YEES NAA CONNECT</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-white font-sans antialiased">
+{% extends 'client/base.html' %}
+{% load static %}
 
-  <!-- ===========================
-       NAVBAR
-  ============================ -->
-  <header class="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+{% block title %}Suivre ma commande — Riz Local{% endblock %}
 
-      <!-- Logo -->
-      <a href="/" class="flex items-center gap-1">
-        <span class="text-2xl font-extrabold text-lime-900">YEES NAA </span>
-        <span class="text-2xl font-bold text-lime-500">CONNECT</span>
-      </a>
+{% block content %}
+<main class="pt-20">
+  <div class="max-w-5xl mx-auto px-6 pt-12 pb-32 flex flex-col items-center gap-16">
 
-      <!-- Navigation -->
-      <nav class="flex items-center gap-8">
-        <a href="#" class="text-base font-medium text-gray-500 hover:text-lime-900 transition-colors">Accueil</a>
-        <a href="#" class="text-base font-medium text-gray-500 hover:text-lime-900 transition-colors">Catalogue</a>
-        <a href="#" class="text-base font-medium text-gray-500 hover:text-lime-900 transition-colors">Devenir producteurs</a>
-        <a href="#" class="text-base font-medium text-gray-500 hover:text-lime-900 transition-colors">À Propos</a>
-      </nav>
+    <!-- ===========================
+         FORMULAIRE DE RECHERCHE
+    ============================ -->
+    <section class="w-full max-w-2xl bg-white rounded-3xl shadow-[0px_8px_30px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-10 flex flex-col gap-8">
 
-      <!-- Actions -->
-      <div class="flex items-center gap-6">
+      <div class="text-center flex flex-col gap-2">
+        <h1 class="text-4xl font-bold text-lime-950 tracking-tight">Suivre ma commande</h1>
+        <p class="text-base text-gray-500">
+          Entrez votre numéro de commande et votre téléphone pour obtenir les détails en temps réel.
+        </p>
+      </div>
 
-        <!-- Icône recherche -->
-        <button aria-label="Rechercher" class="text-lime-950 hover:text-lime-700 transition-colors">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+      <form method="get" action="{% url 'suivre_commande' %}" class="flex items-end gap-4 flex-wrap">
+
+        <div class="flex-1 min-w-[220px] flex flex-col gap-2">
+          <label for="num-commande" class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Numéro de commande
+          </label>
+          <input
+            id="num-commande"
+            name="numero"
+            type="text"
+            value="{{ numero_recherche }}"
+            required
+            placeholder="Ex: YEES-2026-A3F7"
+            class="w-full px-5 py-4 bg-gray-50 rounded-2xl outline outline-1 outline-gray-100
+                   text-base text-gray-700 placeholder-gray-400
+                   focus:outline-none focus:ring-2 focus:ring-lime-700 transition"
+          />
+        </div>
+
+        <div class="flex-1 min-w-[220px] flex flex-col gap-2">
+          <label for="num-telephone" class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Numéro de téléphone
+          </label>
+          <input
+            id="num-telephone"
+            name="telephone"
+            type="tel"
+            value="{{ telephone_recherche }}"
+            required
+            placeholder="+221 77 000 00 00"
+            class="w-full px-5 py-4 bg-gray-50 rounded-2xl outline outline-1 outline-gray-100
+                   text-base text-gray-700 placeholder-gray-400
+                   focus:outline-none focus:ring-2 focus:ring-lime-700 transition"
+          />
+        </div>
+
+        <button type="submit"
+          class="flex items-center gap-2 px-8 py-4 rounded-xl outline outline-1 outline-lime-900
+                 text-lime-900 text-base font-bold shadow-[0px_10px_15px_-3px_rgba(45,90,22,0.20)]
+                 hover:bg-lime-50 active:scale-[.98] transition-all
+                 focus:outline-none focus:ring-2 focus:ring-lime-700 whitespace-nowrap">
+          <svg class="w-4 h-4 fill-lime-900 shrink-0" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.47 6.47 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
           </svg>
+          Rechercher
         </button>
 
-        <!-- Icône panier -->
-        <a href="#" aria-label="Panier" class="text-lime-950 hover:text-lime-700 transition-colors">
-          <svg class="w-6 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-          </svg>
-        </a>
+      </form>
+    </section>
 
-        <!-- Bouton Commander -->
-        <a href="#"
-           class="px-6 py-2.5 bg-lime-900 text-white text-base font-semibold rounded-xl
-                  hover:bg-lime-800 transition-colors">
-          Commander
-        </a>
+
+    {% if erreur %}
+    <!-- ===========================
+         MESSAGE D'ERREUR
+    ============================ -->
+    <section class="w-full max-w-2xl bg-red-50 rounded-2xl outline outline-1 outline-red-200 p-6 flex items-center gap-4">
+      <svg class="w-6 h-6 fill-red-600 shrink-0" viewBox="0 0 24 24">
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      <p class="text-sm font-medium text-red-700">{{ erreur }}</p>
+    </section>
+    {% endif %}
+
+
+    {% if commande %}
+    <!-- ===========================
+         RÉSULTATS : STATUT + DÉTAILS
+    ============================ -->
+    <section class="w-full flex flex-col gap-8">
+
+      <!-- ---- En-tête statut commande ---- -->
+      <div class="flex flex-col gap-1">
+
+        {% if commande.statut == 'annulee' %}
+        <div class="flex items-center gap-2 px-3 py-1 bg-red-100 rounded-full w-fit">
+          <span class="w-2 h-2 bg-red-600 rounded-full inline-block"></span>
+          <span class="text-xs font-bold text-red-700 uppercase tracking-wider">Commande annulée</span>
+        </div>
+        {% elif commande.statut == 'livree' %}
+        <div class="flex items-center gap-2 px-3 py-1 bg-lime-900/10 rounded-full w-fit">
+          <span class="w-2 h-2 bg-lime-900 rounded-full inline-block"></span>
+          <span class="text-xs font-bold text-lime-900 uppercase tracking-wider">Commande livrée</span>
+        </div>
+        {% else %}
+        <div class="flex items-center gap-2 px-3 py-1 bg-yellow-100 rounded-full w-fit">
+          <span class="w-2 h-2 bg-yellow-600 rounded-full inline-block"></span>
+          <span class="text-xs font-bold text-yellow-700 uppercase tracking-wider">{{ commande.get_statut_display }}</span>
+        </div>
+        {% endif %}
+
+        <h2 class="text-2xl font-bold text-lime-950 mt-3">Commande #{{ commande.numero }}</h2>
+        <p class="text-base text-gray-500">Passée le {{ commande.date|date:"d F Y à H:i" }}</p>
+      </div>
+
+
+      {% if commande.statut == 'annulee' %}
+      <!-- ---- Bloc commande annulée ---- -->
+      <div class="bg-red-50 rounded-3xl outline outline-1 outline-red-200 p-8 flex flex-col gap-2">
+        <h3 class="text-lg font-bold text-red-700">Cette commande a été annulée</h3>
+        <p class="text-sm text-red-600">
+          Si vous pensez qu'il s'agit d'une erreur, contactez notre support en indiquant votre numéro de commande.
+        </p>
+      </div>
+      {% else %}
+      <!-- ---- Timeline de suivi ---- -->
+      <div class="relative pl-10 pt-4 pb-4 flex flex-col gap-12">
+        <div class="absolute left-[15px] top-4 bottom-4 w-0.5 bg-gray-200"></div>
+
+        {% for etape in etapes %}
+        <div class="relative flex flex-col gap-1 {% if etape.statut == 'attente' %}opacity-50{% endif %}">
+          {% if etape.statut == 'complete' %}
+          <div class="absolute -left-[35px] top-1 w-8 h-8 bg-lime-900 rounded-full flex items-center justify-center ring-4 ring-white">
+            <svg class="w-3 h-3 fill-white" viewBox="0 0 24 24">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </div>
+          {% elif etape.statut == 'en_cours' %}
+          <div class="absolute -left-[35px] top-1 w-8 h-8 bg-white rounded-full flex items-center justify-center outline outline-2 outline-yellow-600 ring-4 ring-white">
+            <span class="w-2.5 h-2.5 bg-yellow-600 rounded-full inline-block"></span>
+          </div>
+          {% else %}
+          <div class="absolute -left-[35px] top-1 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center ring-4 ring-white">
+            <svg class="w-3.5 h-3 fill-gray-400" viewBox="0 0 24 24">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </div>
+          {% endif %}
+
+          <h3 class="text-lg font-bold text-lime-950">{{ etape.titre }}</h3>
+          <p class="text-sm text-gray-500">{{ etape.description }}</p>
+
+          {% if etape.statut == 'en_cours' %}
+          <div class="flex items-center gap-2 mt-3">
+            <svg class="w-3 h-3 fill-yellow-600 shrink-0" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/>
+            </svg>
+            <span class="text-xs font-bold text-yellow-600 uppercase tracking-wide">Étape actuelle</span>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+
+      <!-- ---- Résumé commande ---- -->
+      <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-6">
+
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-lime-950">Résumé de la commande</h3>
+          <span class="text-sm text-gray-500">{{ commande.lignes.count }} article{{ commande.lignes.count|pluralize }}</span>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          {% for ligne in commande.lignes.all %}
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden">
+              {% if ligne.produit.photo %}
+                <img src="{{ ligne.produit.photo.url }}" alt="{{ ligne.produit.nom }}" class="w-full h-full object-cover" loading="lazy"/>
+              {% else %}
+                <img src="{% static 'images/1sac5kg.jpg' %}" alt="{{ ligne.produit.nom }}" class="w-full h-full object-cover" loading="lazy"/>
+              {% endif %}
+            </div>
+            <div class="flex-1">
+              <p class="text-base font-semibold text-lime-950">{{ ligne.produit.nom }}</p>
+              <p class="text-xs text-gray-500">{{ ligne.produit.poids_kg }} Kg • Quantité : {{ ligne.quantite }}</p>
+            </div>
+            <p class="text-sm font-bold text-lime-950 shrink-0">{{ ligne.ligne_total }} FCFA</p>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="pt-8 border-t border-gray-200 flex flex-col gap-3">
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-500">Sous-total</span>
+            <span class="text-sm text-gray-500">{{ commande.sous_total }} FCFA</span>
+          </div>
+          <div class="flex justify-between pt-2">
+            <span class="text-lg font-bold text-lime-950">Total</span>
+            <span class="text-lg font-bold text-lime-900">{{ commande.total }} FCFA</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-500 leading-5">
+          Les frais de livraison dépendent de la distance et seront communiqués par le livreur, à régler directement à la remise de votre commande.
+        </p>
 
       </div>
-    </div>
-  </header>
 
 
-  <!-- ===========================
-       CONTENU PRINCIPAL
-  ============================ -->
-  <main class="pt-20">
-    <div class="max-w-5xl mx-auto px-6 pt-12 pb-32 flex flex-col items-center gap-16">
-
-
-      <!-- ===========================
-           FORMULAIRE DE RECHERCHE
-      ============================ -->
-      <section class="w-full max-w-2xl bg-white rounded-3xl shadow-[0px_8px_30px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-10 flex flex-col gap-8">
-
-        <!-- Titre -->
-        <div class="text-center flex flex-col gap-2">
-          <h1 class="text-4xl font-bold text-lime-950 tracking-tight">Suivre ma commande</h1>
-          <p class="text-base text-gray-500">
-            Entrez votre numéro de commande et votre téléphone pour obtenir les détails en temps réel.
-          </p>
-        </div>
-
-        <!-- Champs + Bouton -->
-        <div class="flex items-end gap-4">
-
-          <!-- Numéro de commande -->
-          <div class="flex-1 flex flex-col gap-2">
-            <label for="num-commande"
-                   class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              Numéro de commande
-            </label>
-            <input
-              id="num-commande"
-              type="text"
-              placeholder="Ex: YNC-2024-001"
-              class="w-full px-5 py-4 bg-gray-50 rounded-2xl outline outline-1 outline-gray-100
-                     text-base text-gray-700 placeholder-gray-400
-                     focus:outline-none focus:ring-2 focus:ring-lime-700 transition"
-            />
-          </div>
-
-          <!-- Numéro de téléphone -->
-          <div class="flex-1 flex flex-col gap-2">
-            <label for="num-telephone"
-                   class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              Numéro de téléphone
-            </label>
-            <input
-              id="num-telephone"
-              type="tel"
-              placeholder="+221 77 000 00 00"
-              class="w-full px-5 py-4 bg-gray-50 rounded-2xl outline outline-1 outline-gray-100
-                     text-base text-gray-700 placeholder-gray-400
-                     focus:outline-none focus:ring-2 focus:ring-lime-700 transition"
-            />
-          </div>
-
-          <!-- Bouton rechercher -->
-          <button
-            class="flex items-center gap-2 px-8 py-4 rounded-xl outline outline-1 outline-lime-900
-                   text-lime-900 text-base font-bold shadow-[0px_10px_15px_-3px_rgba(45,90,22,0.20)]
-                   hover:bg-lime-50 active:scale-[.98] transition-all
-                   focus:outline-none focus:ring-2 focus:ring-lime-700 whitespace-nowrap">
-            <svg class="w-4 h-4 fill-lime-900 shrink-0" viewBox="0 0 24 24">
-              <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.47 6.47 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
-            Rechercher
-          </button>
-
-        </div>
-      </section>
-
-
-      <!-- ===========================
-           RÉSULTATS : STATUT + DÉTAILS
-      ============================ -->
-      <section class="w-full flex flex-col gap-8">
-
-
-        <!-- ---- En-tête statut commande ---- -->
-        <div class="flex flex-col gap-1">
-
-          <!-- Badge statut -->
-          <div class="flex items-center gap-2 px-3 py-1 bg-lime-900/10 rounded-full w-fit">
-            <span class="w-2 h-2 bg-lime-900 rounded-full inline-block"></span>
-            <span class="text-xs font-bold text-lime-900 uppercase tracking-wider">Commande en cours</span>
-          </div>
-
-          <!-- Numéro + date -->
-          <h2 class="text-2xl font-bold text-lime-950 mt-3">Commande #YNC-284901</h2>
-          <p class="text-base text-gray-500">Passée le 24 Mai 2024 • Estimée entre le 26 et 28 Mai</p>
-
-        </div>
-
-
-        <!-- ---- Timeline de suivi ---- -->
-        <div class="relative pl-10 pt-16 pb-4 flex flex-col gap-12">
-
-          <!-- Ligne verticale de progression -->
-          <div class="absolute left-[15px] top-0 w-0.5 h-[522px] bg-gray-200">
-            <div class="w-full h-44 bg-lime-900"></div>
-          </div>
-
-          <!-- Étape 1 : Commande confirmée (complétée) -->
-          <div class="relative flex flex-col gap-1">
-            <!-- Puce -->
-            <div class="absolute -left-[35px] top-1 w-8 h-8 bg-lime-900 rounded-full flex items-center justify-center
-                        ring-4 ring-white">
-              <svg class="w-3 h-3 fill-white" viewBox="0 0 24 24">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-              </svg>
-            </div>
-            <!-- Contenu -->
-            <h3 class="text-lg font-bold text-lime-950">Commande confirmée</h3>
-            <p class="text-sm text-gray-500">Votre commande a été validée et enregistrée avec succès.</p>
-            <span class="mt-1 px-2 py-1 bg-lime-900/5 rounded text-xs font-medium text-lime-900 w-fit">
-              24 Mai, 14:32
-            </span>
-          </div>
-
-          <!-- Étape 2 : En préparation (étape actuelle) -->
-          <div class="relative flex flex-col gap-1">
-            <!-- Puce -->
-            <div class="absolute -left-[35px] top-1 w-8 h-8 bg-white rounded-full flex items-center justify-center
-                        outline outline-2 outline-yellow-600 ring-4 ring-white">
-              <span class="w-2.5 h-2.5 bg-yellow-600 rounded-full inline-block"></span>
-            </div>
-            <!-- Contenu -->
-            <h3 class="text-lg font-bold text-lime-950">En préparation</h3>
-            <p class="text-sm text-gray-500">
-              Notre équipe sélectionne les meilleurs produits de nos producteurs locaux pour votre colis.
+      <!-- ---- Adresse de livraison ---- -->
+      <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-4">
+        <h3 class="text-lg font-bold text-lime-950">Adresse de livraison</h3>
+        <div class="flex items-start gap-3">
+          <svg class="w-3 h-4 fill-lime-900 mt-1 shrink-0" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          <div>
+            <p class="text-base font-semibold text-lime-950">{{ commande.client_nom }}</p>
+            <p class="text-sm text-gray-500 leading-6">
+              {{ commande.adresse_livraison }}<br/>
+              {{ commande.client_telephone }}
             </p>
-            <div class="flex items-center gap-2 mt-3">
-              <svg class="w-3 h-3 fill-yellow-600 shrink-0" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/>
-              </svg>
-              <span class="text-xs font-bold text-yellow-600 uppercase tracking-wide">Étape actuelle</span>
-            </div>
           </div>
-
-          <!-- Étape 3 : En livraison (en attente) -->
-          <div class="relative flex flex-col gap-1 opacity-50">
-            <!-- Puce -->
-            <div class="absolute -left-[35px] top-1 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center ring-4 ring-white">
-              <svg class="w-3.5 h-3 fill-gray-400" viewBox="0 0 24 24">
-                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2a3 3 0 0 0 6 0h6a3 3 0 0 0 6 0h2v-5l-3-4zm-4 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3-4l-1.5-4H17l1.88 4H13zM5 17a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-              </svg>
-            </div>
-            <!-- Contenu -->
-            <h3 class="text-lg font-bold text-lime-950">En livraison</h3>
-            <p class="text-sm text-gray-500">Votre colis sera confié à notre partenaire logistique pour la remise en main propre.</p>
-            <span class="text-xs font-medium text-gray-400 mt-1">Prévu pour le 26 Mai</span>
-          </div>
-
-          <!-- Étape 4 : Livrée (en attente) -->
-          <div class="relative flex flex-col gap-1 opacity-50">
-            <!-- Puce -->
-            <div class="absolute -left-[35px] top-1 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center ring-4 ring-white">
-              <svg class="w-3.5 h-3 fill-gray-400" viewBox="0 0 24 24">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-              </svg>
-            </div>
-            <!-- Contenu -->
-            <h3 class="text-lg font-bold text-lime-950">Livrée</h3>
-            <p class="text-sm text-gray-500">Le colis est arrivé à destination. Bon appétit !</p>
-          </div>
-
         </div>
+      </div>
 
 
-        <!-- ---- Résumé commande ---- -->
-        <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-6">
-
-          <!-- Titre + nb articles -->
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold text-lime-950">Résumé de la commande</h3>
-            <span class="text-sm text-gray-500">3 articles</span>
-          </div>
-
-          <!-- Articles -->
-          <div class="flex flex-col gap-4">
-
-            <!-- Article 1 -->
-            <div class="flex items-center gap-4">
-              <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden">
-                <img src="https://placehold.co/64x64" alt="Riz Parfumé Royal 10kg"
-                     class="w-full h-full object-contain" loading="lazy"/>
-              </div>
-              <div class="flex-1">
-                <p class="text-base font-semibold text-lime-950">Riz Parfumé Royal 10kg</p>
-                <p class="text-xs text-gray-500">10 Kg • Quantité : 1</p>
-              </div>
-              <p class="text-sm font-bold text-lime-950 shrink-0">4 500 FCFA</p>
-            </div>
-
-            <!-- Article 2 -->
-            <div class="flex items-center gap-4">
-              <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden">
-                <img src="https://placehold.co/64x64" alt="Riz Brisé 5kg"
-                     class="w-full h-full object-contain" loading="lazy"/>
-              </div>
-              <div class="flex-1">
-                <p class="text-base font-semibold text-lime-950">Riz Brisé 5kg</p>
-                <p class="text-xs text-gray-500">5 Kg • Quantité : 2</p>
-              </div>
-              <p class="text-sm font-bold text-lime-950 shrink-0">3 000 FCFA</p>
-            </div>
-
-          </div>
-
-          <!-- Totaux -->
-          <div class="pt-8 border-t border-gray-200 flex flex-col gap-3">
-            <div class="flex justify-between">
-              <span class="text-sm text-gray-500">Sous-total</span>
-              <span class="text-sm text-gray-500">7 500 FCFA</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-sm text-gray-500">Frais de livraison</span>
-              <span class="text-sm text-gray-500">2 000 FCFA</span>
-            </div>
-            <div class="flex justify-between pt-2">
-              <span class="text-lg font-bold text-lime-950">Total</span>
-              <span class="text-lg font-bold text-lime-900">9 500 FCFA</span>
-            </div>
-          </div>
-
-        </div>
-
-
-        <!-- ---- Adresse de livraison ---- -->
-        <div class="bg-white rounded-3xl shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-4">
-
-          <h3 class="text-lg font-bold text-lime-950">Adresse de livraison</h3>
-
-          <div class="flex items-start gap-3">
-            <svg class="w-3 h-4 fill-lime-900 mt-1 shrink-0" viewBox="0 0 24 24">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+      {% with codes_lots=commande.lignes.all %}
+      {% if codes_lots %}
+      <!-- ---- Bloc traçabilité (liens réels vers l'origine des produits) ---- -->
+      <div class="bg-lime-900/5 rounded-3xl outline outline-1 outline-lime-900/10 p-8 flex flex-col gap-4">
+        <p class="text-base font-bold text-lime-950">Transparence totale</p>
+        <p class="text-sm text-gray-500">Suivez le parcours fermier de chacun de vos produits.</p>
+        <div class="flex flex-col gap-2">
+          {% for ligne in codes_lots %}
+          {% if ligne.produit.code_lot %}
+          <a href="{% url 'admin_transformatrice:tracabilite_produit' ligne.produit.code_lot %}"
+             class="flex items-center gap-1 text-sm font-bold text-lime-900 hover:underline">
+            Voir l'origine de « {{ ligne.produit.nom }} » (lot {{ ligne.produit.code_lot }})
+            <svg class="w-3 h-3 fill-lime-900" viewBox="0 0 24 24">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
             </svg>
-            <div>
-              <p class="text-base font-semibold text-lime-950">Moussa Diop</p>
-              <p class="text-sm text-gray-500 leading-6">
-                Villa 402, Rue de l'Aéroport<br/>
-                Ngor, Dakar, Sénégal<br/>
-                +221 77 123 45 67
-              </p>
-            </div>
-          </div>
-
-        </div>
-
-
-        <!-- ---- Bloc traçabilité ---- -->
-        <div class="bg-lime-900/5 rounded-3xl outline outline-1 outline-lime-900/10 p-8 flex items-center gap-6">
-
-          <!-- QR code miniature -->
-          <div class="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center shrink-0 p-2">
-            <img src="https://placehold.co/61x64" alt="QR code traçabilité"
-                 class="w-full h-full object-contain" loading="lazy"/>
-          </div>
-
-          <!-- Texte -->
-          <div class="flex flex-col gap-1">
-            <p class="text-base font-bold text-lime-950">Transparence Totale</p>
-            <p class="text-sm text-gray-500">Suivez le parcours fermier de vos produits.</p>
-            <a href="#" class="flex items-center gap-1 text-sm font-bold text-lime-900 hover:underline mt-2">
-              Voir mon QR code de traçabilité
-              <svg class="w-3 h-3 fill-lime-900" viewBox="0 0 24 24">
-                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-              </svg>
-            </a>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ===========================
-           AIDE / SUPPORT
-      ============================ -->
-      <section class="w-full pt-12 border-t border-gray-100 flex flex-col items-center gap-4">
-
-        <h3 class="text-lg font-bold text-lime-950">Un problème avec votre livraison ?</h3>
-
-        <div class="flex items-center gap-4">
-
-          <a href="#"
-             class="flex items-center gap-2 px-6 py-3 rounded-2xl outline outline-1 outline-gray-200
-                    text-sm font-bold text-lime-950 hover:bg-gray-50 transition-colors">
-            <svg class="w-3.5 h-3.5 fill-lime-900 shrink-0" viewBox="0 0 24 24">
-              <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
-            </svg>
-            Contacter le support
           </a>
-
-          <a href="#"
-             class="flex items-center gap-2 px-6 py-3 rounded-2xl outline outline-1 outline-gray-200
-                    text-sm font-bold text-lime-950 hover:bg-gray-50 transition-colors">
-            <svg class="w-3.5 h-3.5 fill-lime-900 shrink-0" viewBox="0 0 24 24">
-              <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/>
-            </svg>
-            Foire aux questions
-          </a>
-
+          {% endif %}
+          {% endfor %}
         </div>
-
-      </section>
-
-
-    </div>
-  </main>
+      </div>
+      {% endif %}
+      {% endwith %}
 
 
-  <!-- ===========================
-       FOOTER (simplifié)
-  ============================ -->
-  <footer class="border-t border-gray-50 py-12 flex flex-col items-center gap-4">
-    <p class="text-sm text-gray-500">© 2024 YEES NAA CONNECT. Tous droits réservés.</p>
-    <div class="flex items-center gap-6">
-      <a href="#" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Mentions légales</a>
-      <a href="#" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Conditions de livraison</a>
-      <a href="#" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Politique de confidentialité</a>
-    </div>
-  </footer>
-</body>
-</html>
+      <!-- ---- Reçu / bon de commande ---- -->
+      <div class="flex justify-center">
+        <a href="{% url 'recu_commande' numero=commande.numero %}?telephone={{ telephone_recherche|urlencode }}"
+           target="_blank"
+           class="flex items-center gap-2 px-8 py-4 bg-lime-900 text-white text-base font-bold rounded-xl hover:bg-lime-800 transition-colors">
+          <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+            <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+          </svg>
+          Télécharger le reçu
+        </a>
+      </div>
+
+    </section>
+    {% endif %}
+
+
+    <!-- ===========================
+         AIDE / SUPPORT
+    ============================ -->
+    <section class="w-full pt-12 border-t border-gray-100 flex flex-col items-center gap-4">
+      <h3 class="text-lg font-bold text-lime-950">Un problème avec votre livraison ?</h3>
+      <div class="flex items-center gap-4">
+        <a href="mailto:contact@rizlocal.sn"
+           class="flex items-center gap-2 px-6 py-3 rounded-2xl outline outline-1 outline-gray-200
+                  text-sm font-bold text-lime-950 hover:bg-gray-50 transition-colors">
+          <svg class="w-3.5 h-3.5 fill-lime-900 shrink-0" viewBox="0 0 24 24">
+            <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
+          </svg>
+          Contacter le support
+        </a>
+      </div>
+    </section>
+
+  </div>
+</main>
+{% endblock %}

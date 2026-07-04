@@ -32,8 +32,8 @@ urlpatterns = [
     path('commandes/', views.admin_commandes, name='admin_commandes'),
     path('commandes/<int:pk>/', views.admin_commande_detail, name='admin_commande_detail'),
 
-    # Démo & À propos
-    path('a-propos/', views.admin_about, name='admin_about'),
+    # Gestion des livreurs
+    path('livreurs/', views.admin_livreurs, name='admin_livreurs'),
 
     # QR code téléchargement (admin connecté)
     path('catalogue/<str:lot_code>/qr/', views.admin_qr_download, name='admin_qr_download'),

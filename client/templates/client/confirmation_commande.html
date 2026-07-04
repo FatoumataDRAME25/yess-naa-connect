@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-YEES NAA CONNECT
+Riz Local
 {% endblock %}
 
 {% block content %}
@@ -18,7 +18,7 @@ YEES NAA CONNECT
           </svg>
         </div>
         <h1 class="text-4xl font-bold text-lime-950 leading-tight mb-2">Commande confirmée !</h1>
-        <p class="text-lg text-gray-500">Merci de soutenir le riz local sénégalais 🌾</p>
+        <p class="text-lg text-gray-500">Merci de soutenir le riz local sénégalais </p>
       </div>
 
       <!-- GRILLE DÉTAILS + QR -->
@@ -93,11 +93,11 @@ YEES NAA CONNECT
                 <span>Sous-total</span>
                 <span>{{ commande.sous_total }} FCFA</span>
               </div>
-              <div class="flex justify-between text-sm text-gray-500">
-                <span>Livraison</span>
-                <span>{{ commande.frais_livraison }} FCFA</span>
-              </div>
             </div>
+
+            <p class="text-xs text-gray-500 leading-5">
+              Les frais de livraison dépendent de la distance et seront communiqués par le livreur, à régler directement à la remise de votre commande.
+            </p>
 
             <!-- Total payé -->
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -116,19 +116,22 @@ YEES NAA CONNECT
                class="flex-1 py-5 bg-lime-900 text-white text-lg font-bold text-center rounded-xl hover:bg-lime-800 transition-colors">
               Suivre ma commande
             </a>
-            <a href="{% url 'catalogue' %}"
+            <a href="{% url 'recu_commande' numero=commande.numero %}"
+               target="_blank"
                class="flex-1 py-4 text-lime-900 text-lg font-bold text-center rounded-xl outline outline-2 outline-lime-900 hover:bg-lime-50 transition-colors">
-              Continuer mes achats
+              Télécharger le reçu
             </a>
           </div>
+          <a href="{% url 'catalogue' %}"
+             class="block text-center py-3 text-sm font-semibold text-gray-500 hover:text-lime-900 transition-colors">
+            Continuer mes achats
+          </a>
 
         </div>
 
         <!-- COLONNE DROITE : Récap client -->
         <aside class="w-96 shrink-0 flex flex-col gap-5">
-          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-6 relative overflow-hidden">
-
-            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-700 to-yellow-600 rounded-t-3xl"></div>
+          <div class="bg-white rounded-3xl shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8 flex flex-col gap-6">
 
             <h2 class="text-xl font-bold text-lime-950 text-center mt-2">Récapitulatif client</h2>
 

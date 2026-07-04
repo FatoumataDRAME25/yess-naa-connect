@@ -1,0 +1,324 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}À propos — Riz Local{% endblock %}
+
+{% block content %}
+<main class="pt-20 overflow-hidden">
+
+  <!-- ===========================
+       HERO
+  ============================ -->
+  <section class="relative bg-lime-950 py-24">
+    <div class="absolute inset-0 opacity-10">
+      <img src="{% static 'images/PADDY3.jpg' %}" class="w-full h-full object-cover" alt="" />
+    </div>
+    <div class="relative max-w-4xl mx-auto px-6 text-center flex flex-col items-center gap-6">
+      <span data-reveal class="reveal px-4 py-1.5 bg-yellow-600/15 border border-yellow-600/30 rounded-full text-yellow-500 text-xs font-bold uppercase tracking-widest">
+        Notre histoire
+      </span>
+      <h1 data-reveal data-reveal-delay="80" class="reveal text-4xl md:text-5xl font-bold text-white leading-tight">
+        Du champ sénégalais<br class="hidden md:block" /> à votre table
+      </h1>
+      <p data-reveal data-reveal-delay="160" class="reveal max-w-2xl text-lg text-lime-100/70 leading-7">
+        Riz Local connecte directement les producteurs de riz du Sénégal aux consommateurs,
+        avec la traçabilité comme valeur centrale.
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div data-reveal data-reveal-delay="240" class="reveal relative max-w-4xl mx-auto px-6 mt-14 grid grid-cols-3 gap-4 md:gap-8">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm">
+        <p class="text-3xl md:text-4xl font-bold text-white"><span class="counter" data-target="3">0</span></p>
+        <p class="text-white/50 text-xs md:text-sm mt-1">Espaces utilisateurs</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm">
+        <p class="text-3xl md:text-4xl font-bold text-yellow-500"><span class="counter" data-target="100">0</span>%</p>
+        <p class="text-white/50 text-xs md:text-sm mt-1">Riz local sénégalais</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm">
+        <p class="text-3xl md:text-4xl font-bold text-lime-400">QR</p>
+        <p class="text-white/50 text-xs md:text-sm mt-1">Traçabilité garantie</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===========================
+       CONTEXTE + MISSION
+  ============================ -->
+  <section class="max-w-6xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-8">
+
+    <!-- Contexte -->
+    <div data-reveal class="reveal bg-white rounded-3xl shadow-[0px_8px_30px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 overflow-hidden flex flex-col">
+      <div class="relative h-48 shrink-0">
+        <img src="{% static 'images/paddy2.jpeg' %}" class="w-full h-full object-cover" alt="Paddy sénégalais" />
+        <div class="absolute inset-0 bg-gradient-to-t from-lime-950/85 to-transparent"></div>
+        <div class="absolute bottom-5 left-6">
+          <span class="text-xs font-bold text-lime-300 uppercase tracking-widest">Le constat</span>
+          <p class="font-bold text-white text-xl leading-tight">Contexte &amp; Problématique</p>
+        </div>
+      </div>
+      <div class="p-8 flex flex-col flex-1 gap-4">
+        <p class="text-gray-600 text-sm leading-relaxed">
+          Le Sénégal dépend fortement des <strong class="text-lime-950">importations de riz</strong>,
+          ce qui représente un défi majeur pour la souveraineté alimentaire nationale.
+          Pourtant, les producteurs locaux existent, travaillent et récoltent — mais leurs produits
+          peinent à atteindre les consommateurs faute de circuits de distribution fiables.
+        </p>
+        <div class="mt-auto bg-white rounded-xl px-5 py-4">
+          <p class="text-sm font-semibold text-lime-950 leading-relaxed">
+            <span class="text-lime-700">Riz Local</span> apporte une réponse structurelle : une
+            plateforme numérique qui crée un pont direct entre la production locale et les
+            consommateurs finaux — avec la traçabilité comme valeur centrale.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mission -->
+    <div data-reveal data-reveal-delay="120" class="reveal bg-white rounded-3xl shadow-[0px_8px_30px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-gray-100 p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="w-1 h-7 bg-lime-900 rounded-full"></span>
+        <h2 class="font-bold text-lg text-lime-950">Notre Mission</h2>
+      </div>
+      <div class="flex flex-col gap-1">
+
+        <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-lime-900/5 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-lime-900/10 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 fill-lime-900" viewBox="0 0 20 20"><path d="M10 2L3 6v8l7 4 7-4V6l-7-4z"/></svg>
+          </div>
+          <p class="text-sm text-gray-700 leading-relaxed">Augmenter la <strong class="text-lime-950">consommation de riz local</strong> sénégalais</p>
+        </div>
+
+        <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-lime-900/5 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-yellow-600/10 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 fill-yellow-600" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+          </div>
+          <p class="text-sm text-gray-700 leading-relaxed">Valoriser <strong class="text-lime-950">dignement le travail</strong> des producteurs</p>
+        </div>
+
+        <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-lime-900/5 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 fill-blue-500" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clip-rule="evenodd"/></svg>
+          </div>
+          <p class="text-sm text-gray-700 leading-relaxed">Garantir la <strong class="text-lime-950">traçabilité et l'authenticité</strong> de chaque sac via QR Code</p>
+        </div>
+
+        <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-lime-900/5 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 fill-orange-500" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/></svg>
+          </div>
+          <p class="text-sm text-gray-700 leading-relaxed">Faciliter les <strong class="text-lime-950">commandes en ligne</strong> pour tous types d'acheteurs</p>
+        </div>
+
+        <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-lime-900/5 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 fill-purple-500" viewBox="0 0 20 20"><path d="M3 3h6v6H3V3zm8 0h6v6h-6V3zM3 11h6v6H3v-6zm8 0h6v6h-6v-6z"/></svg>
+          </div>
+          <p class="text-sm text-gray-700 leading-relaxed">Centraliser la <strong class="text-lime-950">gestion des produits, stocks et commandes</strong></p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===========================
+       VIDÉO DE PRÉSENTATION
+  ============================ -->
+  <section class="max-w-6xl mx-auto px-6 pb-24">
+    <div data-reveal class="reveal bg-lime-950 rounded-[32px] overflow-hidden shadow-xl">
+      <div class="px-7 pt-7 pb-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-white/40 uppercase tracking-widest mb-1">Présentation</p>
+          <h2 class="font-bold text-xl text-white">Découvrez Riz Local en action</h2>
+        </div>
+        <span class="flex items-center gap-2 bg-lime-400/10 border border-lime-400/30 text-lime-300 text-xs font-bold px-3 py-1.5 rounded-full">
+          <span class="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse"></span>
+          VIDÉO
+        </span>
+      </div>
+      <div class="mx-6 mb-6 rounded-2xl overflow-hidden bg-black">
+        <video controls class="w-full max-h-[500px]" poster="{% static 'images/paddy1.jpeg' %}" preload="metadata">
+          <source src="{% static 'images/DEMO YESS.mp4' %}" type="video/mp4">
+          <p class="text-white/60 p-6 text-sm text-center">Votre navigateur ne supporte pas la lecture vidéo HTML5.</p>
+        </video>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===========================
+       VISION
+  ============================ -->
+  <section class="max-w-6xl mx-auto px-6 pb-24">
+    <div data-reveal class="reveal relative bg-lime-950 rounded-[32px] overflow-hidden">
+      <div class="absolute inset-0">
+        <img src="{% static 'images/PADDY3.jpg' %}" class="w-full h-full object-cover opacity-10" alt="" />
+      </div>
+      <div class="relative px-8 md:px-12 py-14 grid md:grid-cols-3 gap-10 items-center">
+        <div class="md:col-span-2">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-xs font-bold text-lime-300 uppercase tracking-widest">Notre Vision</span>
+          </div>
+          <h2 class="font-bold text-2xl md:text-3xl text-white mb-4 leading-snug">
+            Transformer un sac de riz anonyme en un produit
+            <span class="text-lime-400"> authentifié, tracé et sécurisé.</span>
+          </h2>
+          <p class="text-white/60 text-base leading-relaxed">
+            Prouver que la digitalisation des circuits courts est le levier indispensable pour
+            garantir la qualité, stabiliser les prix et valoriser le producteur sénégalais.
+          </p>
+        </div>
+        <div class="flex flex-col gap-3">
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-3">
+            <svg class="w-5 h-5 fill-lime-400 shrink-0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span class="text-white/80 text-sm font-semibold">Qualité garantie</span>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-3">
+            <svg class="w-5 h-5 fill-lime-400 shrink-0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span class="text-white/80 text-sm font-semibold">Prix stables</span>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-3">
+            <svg class="w-5 h-5 fill-lime-400 shrink-0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span class="text-white/80 text-sm font-semibold">Producteur valorisé</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===========================
+       SLOGANS
+  ============================ -->
+  <section class="max-w-6xl mx-auto px-6 pb-24 grid md:grid-cols-2 gap-8">
+    <div data-reveal class="reveal bg-yellow-600/10 outline outline-1 outline-yellow-600/25 rounded-3xl p-10 flex flex-col items-center text-center">
+      <div class="w-14 h-14 rounded-full bg-yellow-600/15 flex items-center justify-center mb-5">
+        <svg class="w-7 h-7 fill-yellow-600" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18s6-5.686 6-10A6 6 0 004 8c0 4.314 6 10 6 10zm0-7a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+      </div>
+      <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Notre slogan</p>
+      <p class="font-bold text-2xl text-lime-950 leading-tight">"Du Champ<br>à Votre Table"</p>
+    </div>
+    <div data-reveal data-reveal-delay="120" class="reveal bg-lime-900/5 outline outline-1 outline-lime-900/15 rounded-3xl p-10 flex flex-col items-center text-center">
+      <div class="w-14 h-14 rounded-full bg-lime-900/10 flex items-center justify-center mb-5">
+        <svg class="w-7 h-7 fill-lime-900" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+      </div>
+      <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Notre engagement</p>
+      <p class="font-bold text-2xl text-lime-950 leading-tight">"Consommer local,<br>c'est soutenir le Sénégal"</p>
+    </div>
+  </section>
+
+
+  <!-- ===========================
+       PRODUCTEURS PARTENAIRES
+  ============================ -->
+  <section class="max-w-6xl mx-auto px-6 pb-24">
+    <div data-reveal class="reveal">
+      <h2 class="font-bold text-2xl text-lime-950 mb-8 text-center">Nos Producteurs Partenaires</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="relative rounded-2xl overflow-hidden h-56 group">
+          <img src="{% static 'images/agri1.jpg' %}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Moussa Diop" />
+          <div class="absolute inset-0 bg-gradient-to-t from-lime-950/85 via-transparent to-transparent"></div>
+          <div class="absolute bottom-5 left-5">
+            <p class="text-white font-bold text-base">Moussa Diop</p>
+            <p class="text-white/60 text-xs">Ross Béthio, Saint-Louis</p>
+          </div>
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-56 group">
+          <img src="{% static 'images/qgri2.jpg' %}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Amadou Ly" />
+          <div class="absolute inset-0 bg-gradient-to-t from-lime-950/85 via-transparent to-transparent"></div>
+          <div class="absolute bottom-5 left-5">
+            <p class="text-white font-bold text-base">Amadou Ly</p>
+            <p class="text-white/60 text-xs">Sédhiou, Casamance</p>
+          </div>
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-56 group">
+          <img src="{% static 'images/agri3.jpg' %}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Ibrahima Sow" />
+          <div class="absolute inset-0 bg-gradient-to-t from-lime-950/85 via-transparent to-transparent"></div>
+          <div class="absolute bottom-5 left-5">
+            <p class="text-white font-bold text-base">Ibrahima Sow</p>
+            <p class="text-white/60 text-xs">Podor, Saint-Louis</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===========================
+       CTA FINAL
+  ============================ -->
+  <section class="max-w-6xl mx-auto px-6 pb-24">
+    <div data-reveal class="reveal bg-gradient-to-r from-lime-900 to-lime-700 rounded-[32px] p-12 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-bold text-white leading-tight">Envie de nous rejoindre ?</h2>
+        <p class="text-lime-100/80 mt-2">Découvrez notre catalogue ou devenez partenaire producteur.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4 shrink-0">
+        <a href="{% url 'catalogue' %}" class="px-8 py-4 bg-white text-lime-950 rounded-xl font-bold hover:scale-105 transition-transform">
+          Voir le catalogue
+        </a>
+        <a href="{% url 'inscription' %}" class="px-8 py-4 outline outline-2 outline-white text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
+          Devenir partenaire
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<style>
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // ---- Scroll-reveal des sections ----
+    const revealEls = document.querySelectorAll('[data-reveal]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const delay = parseInt(el.dataset.revealDelay || '0', 10);
+          setTimeout(() => el.classList.add('is-visible'), delay);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach((el) => observer.observe(el));
+
+    // ---- Compteurs animés ----
+    const counters = document.querySelectorAll('.counter');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = parseInt(el.dataset.target, 10);
+        const duration = 1000;
+        const start = performance.now();
+
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          el.textContent = Math.round(progress * target);
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        counterObserver.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach((el) => counterObserver.observe(el));
+  });
+</script>
+{% endblock %}

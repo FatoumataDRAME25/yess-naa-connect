@@ -6,12 +6,15 @@ from . import views
 urlpatterns = [
     # Pages
     path("", views.accueil, name="accueil"),
+    path("a-propos/", views.a_propos, name="a_propos"),
     path("cat/", views.catalogue, name="catalogue"),
     path('produit/<int:produit_id>/', views.produit_detail, name='produit_detail'),
     path("panier/", views.panier, name="panier"),
     path("commande/", views.finaliser_commande, name="finaliser_commande"),
     path("confirmationCommande/", views.confirmer_commande, name="confirmationCommande"),
     path("suivreCommande/", views.suivre_commande, name="suivre_commande"),
+    path("commande/<str:numero>/recu/", views.recu_commande, name="recu_commande"),
+    path("verification/", views.verification_qrcode, name="verification_qrcode"),
 
     # Actions panier (AJAX POST)
     path("panier/ajouter/<int:produit_id>/", views.ajouter_au_panier, name="ajouter_au_panier"),

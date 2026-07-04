@@ -61,7 +61,7 @@ def dashboard(request):
 
     a_livrer = [l for l in livraisons if not l.confirme_le]
     total_a_encaisser = sum(
-        (l.commande.montant_total for l in a_livrer if l.commande.mode_paiement == 'especes'),
+        (l.commande.total for l in a_livrer if l.commande.mode_paiement == 'especes'),
         0,
     )
 
@@ -91,7 +91,7 @@ def confirmer_livraison(request, pk):
     livraison = get_object_or_404(Livraison, pk=pk, livreur=request.user)
 
     if request.method == 'POST' and not livraison.confirme_le:
-        montant = livraison.commande.montant_total if livraison.commande.mode_paiement == 'especes' else 0
+        montant = livraison.commande.total if livraison.commande.mode_paiement == 'especes' else 0
         livraison.confirmer(montant=montant)
 
     return redirect('livreur:confirmation', pk=livraison.pk)

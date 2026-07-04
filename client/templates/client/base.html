@@ -11,9 +11,9 @@
     <title>{% block title %}{% endblock %}</title>
 
     <!-- SEO -->
-    <meta name="description" content="Achetez du riz local directement auprès des producteurs sénégalais avec YEES NAA CONNECT.">
-    <meta name="keywords" content="riz, Sénégal, agriculture, producteurs, vente en ligne, Yees Naa">
-    <meta name="author" content="YEES NAA CONNECT">
+    <meta name="description" content="Achetez du riz local directement auprès des producteurs sénégalais avec Riz Local.">
+    <meta name="keywords" content="riz, Sénégal, agriculture, producteurs, vente en ligne, Riz Local">
+    <meta name="author" content="Riz Local">
 
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
@@ -31,8 +31,8 @@
 
       <!-- Logo -->
       <a href="{% url 'accueil' %}" class="flex items-center gap-1">
-        <span class="text-2xl font-extrabold text-lime-900">YEES NAA </span>
-        <span class="text-2xl font-bold text-lime-500">CONNECT</span>
+        <span class="text-2xl font-extrabold text-lime-900">Riz </span>
+        <span class="text-2xl font-bold text-lime-500">Local</span>
       </a>
 
       <!-- Navigation -->
@@ -55,10 +55,16 @@
             {% endif %}">
           Catalogue
         </a>
-        <a href="#" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
-          Devenir producteurs
+        <a href="{% url 'inscription' %}" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+          Devenir partenaire
         </a>
-        <a href="#" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+        <a href="{% url 'a_propos' %}"
+          class="text-sm font-medium pb-1 transition-colors
+            {% if request.resolver_match.url_name == 'a_propos' %}
+              text-lime-900 border-b-2 border-lime-900
+            {% else %}
+              text-gray-500 hover:text-lime-900
+            {% endif %}">
           À Propos
         </a>
       </nav>
@@ -111,7 +117,7 @@
 
         <!-- Colonne 1 : Présentation -->
         <div>
-          <p class="text-white text-2xl font-extrabold uppercase mb-6">Yees Naa</p>
+          <p class="text-white text-2xl font-extrabold uppercase mb-6">Riz Local</p>
           <p class="text-white/70 text-sm leading-6 mb-6">
             Connecter les producteurs locaux de riz du Sénégal directement aux consommateurs.
             Pour une agriculture durable et une économie circulaire forte.
@@ -143,8 +149,8 @@
             <li><a href="{% url 'accueil' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Accueil</a></li>
             <li><a href="{% url 'catalogue' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Notre Catalogue</a></li>
             <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Nos Producteurs</a></li>
-            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> La Traçabilité</a></li>
-            <li><a href="#" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Devenir Partenaire</a></li>
+            <li><a href="{% url 'verification_qrcode' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> La Traçabilité</a></li>
+            <li><a href="{% url 'inscription' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Devenir Partenaire</a></li>
           </ul>
         </div>
 
@@ -153,16 +159,19 @@
           <h3 class="text-white text-lg font-bold mb-6 pb-2 border-b border-white/20">Contactez-nous</h3>
           <ul class="space-y-4 mb-6">
             <li class="flex items-start gap-3">
-              <svg class="w-4 h-4 fill-yellow-600 mt-0.5 shrink-0" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-              <span class="text-white/70 text-sm leading-5">Dakar, Sénégal<br/>Point E, Rue 10</span>
+              <a href="https://maps.google.com/?q=14.442598,-16.949387" target="_blank" rel="noopener"
+                 class="flex items-start gap-3 hover:text-white transition-colors">
+                <svg class="w-4 h-4 fill-yellow-600 mt-0.5 shrink-0" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span class="text-white/70 text-sm leading-5">Mbour, Sénégal</span>
+              </a>
             </li>
             <li class="flex items-center gap-3">
               <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C9.61 21 3 14.39 3 6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2z"/></svg>
-              <span class="text-white/70 text-sm">+221 77 123 45 67</span>
+              <a href="tel:+221775451599" class="text-white/70 text-sm hover:text-white transition-colors">+221 77 545 15 99</a>
             </li>
             <li class="flex items-center gap-3">
               <svg class="w-4 h-4 fill-yellow-600 shrink-0" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
-              <span class="text-white/70 text-sm">contact@yeesnaa.sn</span>
+              <span class="text-white/70 text-sm">contact@rizlocal.sn</span>
             </li>
           </ul>
           <a href="#"
@@ -177,7 +186,7 @@
 
       <!-- Bas de footer -->
       <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p class="text-white/50 text-xs">© 2024 YEES NAA CONNECT. Tous droits réservés.</p>
+        <p class="text-white/50 text-xs">© 2024 Riz Local. Tous droits réservés.</p>
         <div class="flex gap-6">
           <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Mentions Légales</a>
           <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Politique de Confidentialité</a>

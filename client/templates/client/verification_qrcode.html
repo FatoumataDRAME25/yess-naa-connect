@@ -1,322 +1,83 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vérification — YEES NAA CONNECT</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-white font-sans antialiased">
+{% extends 'client/base.html' %}
+{% load static %}
 
+{% block title %}Vérification — Riz Local{% endblock %}
+
+{% block content %}
+<main class="pt-20">
 
   <!-- ===========================
        EN-TÊTE DE PAGE
   ============================ -->
   <section class="max-w-3xl mx-auto px-6 pt-16 pb-12 flex flex-col items-center gap-4 text-center">
-
     <h1 class="text-5xl font-normal text-lime-950 leading-tight">
       Vérifiez l'authenticité de votre riz
     </h1>
     <p class="max-w-xl text-lg text-gray-500 leading-7">
-      Scannez le QR code sur votre sac ou entrez le code manuellement pour garantir
-      l'origine et la qualité YEES NAA CONNECT.
+      Entrez le code de lot inscrit sur le sceau de votre emballage pour garantir
+      l'origine et la qualité Riz Local.
     </p>
-
   </section>
 
 
   <!-- ===========================
        CONTENU PRINCIPAL
   ============================ -->
-  <main class="max-w-4xl mx-auto px-6 pb-24 flex flex-col gap-12">
+  <main class="max-w-3xl mx-auto px-6 pb-24 flex flex-col gap-8">
 
+    {% if erreur %}
+    <div class="bg-red-50 rounded-2xl outline outline-1 outline-red-200 p-6 flex items-center gap-4">
+      <svg class="w-6 h-6 fill-red-600 shrink-0" viewBox="0 0 24 24">
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      <p class="text-sm font-medium text-red-700">{{ erreur }}</p>
+    </div>
+    {% endif %}
 
     <!-- ===========================
-         BLOC : SCANNER / SAISIE CODE
+         BLOC : SAISIE CODE
     ============================ -->
     <div class="bg-white rounded-[32px] outline outline-1 outline-slate-100
                 shadow-[0px_32px_64px_-12px_rgba(0,0,0,0.08)] p-12">
 
-      <div class="flex items-center gap-12">
+      <form method="get" action="{% url 'verification_qrcode' %}" class="flex flex-col gap-6">
 
-        <!-- ---- Zone scanner QR ---- -->
-        <div class="flex-1">
-          <div class="relative bg-slate-50 rounded-3xl h-80 flex flex-col items-center justify-center overflow-hidden">
-
-            <!-- Coins de cadrage -->
-            <span class="absolute top-8 left-8 w-12 h-12 rounded-tl-xl border-l-4 border-t-4 border-slate-900"></span>
-            <span class="absolute top-8 right-8 w-12 h-12 rounded-tr-xl border-r-4 border-t-4 border-slate-900"></span>
-            <span class="absolute bottom-8 left-8 w-12 h-12 rounded-bl-xl border-l-4 border-b-4 border-slate-900"></span>
-            <span class="absolute bottom-8 right-8 w-12 h-12 rounded-br-xl border-r-4 border-b-4 border-slate-900"></span>
-
-            <!-- Ligne de scan animée -->
-            <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 opacity-50
-                        bg-gradient-to-r from-amber-700/0 via-amber-700 to-amber-700/0
-                        shadow-[0px_0px_15px_0px_rgba(200,90,22,1)]">
-            </div>
-
-            <!-- Icône + bouton -->
-            <div class="flex flex-col items-center gap-6 z-10">
-
-              <div class="p-6 bg-white rounded-2xl shadow-xl">
-                <svg class="w-10 h-12 fill-lime-950" viewBox="0 0 24 24">
-                  <path d="M3 5h2V3a2 2 0 0 0-2 2zm0 8H1v3a3 3 0 0 0 3 3v-2a1 1 0 0 1-1-1v-3zm18-8a2 2 0 0 0-2-2v2h2zm0 8v3a1 1 0 0 1-1 1v2a3 3 0 0 0 3-3v-3h-2zM5 3H3v2a2 2 0 0 0 2-2zM3 11H1V8h2v3zm18-3h2v3h-2V8zm-2-5v2a2 2 0 0 0 2-2h-2zM1 16v3a2 2 0 0 0 2 2v-2H1v-3zM11 3H8v2h3V3zM8 19h3v2H8v-2zm8 0v2h3v-2h-3zm3-16h-3v2h3V3zM8 8h8v8H8V8zm2 2v4h4v-4h-4z"/>
-                </svg>
-              </div>
-
-              <button
-                class="flex items-center gap-3 px-8 py-4 bg-lime-900 text-white text-base font-bold
-                       rounded-xl shadow-[0px_10px_15px_-3px_rgba(200,90,22,0.20)]
-                       hover:bg-lime-800 active:scale-[.98] transition-all
-                       focus:outline-none focus:ring-2 focus:ring-lime-700">
-                <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
-                  <path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5z"/>
-                </svg>
-                Scanner le QR code
-              </button>
-
-            </div>
-          </div>
+        <div class="flex flex-col gap-3">
+          <label for="code-verification"
+                 class="text-sm font-bold text-lime-950 uppercase tracking-wide">
+            Code de vérification
+          </label>
+          <input
+            id="code-verification"
+            name="code"
+            type="text"
+            required
+            value="{{ code_recherche }}"
+            placeholder="Ex: RIZ-A56806E2"
+            class="w-full px-6 py-5 bg-slate-50 rounded-2xl outline outline-2 outline-slate-100
+                   text-xl text-slate-700 placeholder-slate-300
+                   focus:outline-none focus:ring-2 focus:ring-lime-700 transition"
+          />
         </div>
 
-        <!-- ---- Séparateur ---- -->
-        <div class="flex flex-col items-center gap-4 shrink-0">
-          <div class="w-px h-24 bg-slate-200"></div>
-          <span class="text-base font-medium text-gray-500">ou</span>
-          <div class="w-px h-24 bg-slate-200"></div>
-        </div>
-
-        <!-- ---- Saisie manuelle ---- -->
-        <div class="flex-1 flex flex-col gap-6">
-
-          <div class="flex flex-col gap-3">
-            <label for="code-verification"
-                   class="text-sm font-bold text-lime-950 uppercase tracking-wide">
-              Code de vérification
-            </label>
-            <input
-              id="code-verification"
-              type="text"
-              placeholder="Ex: YNC-882-X92-2024"
-              class="w-full px-6 py-5 bg-slate-50 rounded-2xl outline outline-2 outline-slate-100
-                     text-xl text-slate-700 placeholder-slate-300
-                     focus:outline-none focus:ring-2 focus:ring-lime-700 transition"
-            />
-          </div>
-
-          <button
-            class="w-full flex items-center justify-center gap-3 py-5 rounded-2xl
-                   outline outline-1 outline-lime-900 text-lime-900 text-lg font-bold
-                   shadow-[0px_20px_25px_-5px_rgba(45,90,22,0.10)]
-                   hover:bg-lime-50 active:scale-[.98] transition-all
-                   focus:outline-none focus:ring-2 focus:ring-lime-700">
-            Vérifier
-            <svg class="w-4 h-4 fill-lime-900 shrink-0" viewBox="0 0 24 24">
-              <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.47 6.47 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
-          </button>
-
-          <p class="text-sm text-gray-500 text-center">
-            Le code est situé sur le sceau de sécurité de votre emballage.
-          </p>
-
-        </div>
-      </div>
-    </div>
-
-
-    <!-- ===========================
-         RÉSULTATS DE VÉRIFICATION
-    ============================ -->
-    <div class="flex flex-col gap-8">
-
-      <!-- ---- Badge : Produit authentique ---- -->
-      <div class="flex flex-col items-center gap-2 py-8">
-        <div class="w-20 h-20 bg-lime-500/10 rounded-full outline outline-1 outline-lime-500/20
-                    flex items-center justify-center mb-4">
-          <svg class="w-8 h-9 fill-lime-500" viewBox="0 0 24 24">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        <button type="submit"
+          class="w-full flex items-center justify-center gap-3 py-5 rounded-2xl
+                 outline outline-1 outline-lime-900 text-lime-900 text-lg font-bold
+                 shadow-[0px_20px_25px_-5px_rgba(45,90,22,0.10)]
+                 hover:bg-lime-50 active:scale-[.98] transition-all
+                 focus:outline-none focus:ring-2 focus:ring-lime-700">
+          Vérifier
+          <svg class="w-4 h-4 fill-lime-900 shrink-0" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.47 6.47 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
           </svg>
-        </div>
-        <h2 class="text-3xl font-bold text-lime-950">Produit authentique ✅</h2>
-        <p class="text-base text-gray-500">Ce produit a été certifié par le protocole YEES NAA CONNECT</p>
-      </div>
+        </button>
 
-
-      <!-- ---- Fiche produit ---- -->
-      <div class="bg-white rounded-[32px] shadow-[0px_20px_50px_0px_rgba(0,0,0,0.05)]
-                  outline outline-1 outline-slate-100 flex overflow-hidden">
-
-        <!-- Image produit -->
-        <div class="w-80 shrink-0 bg-slate-50 flex items-center justify-center overflow-hidden">
-          <img src="https://placehold.co/325x384" alt="Riz Parfumé Sahel 108"
-               class="w-full h-full object-cover" loading="lazy"/>
-        </div>
-
-        <!-- Infos produit -->
-        <div class="flex-1 p-10 flex flex-col justify-between">
-
-          <div class="flex flex-col gap-6 pb-8">
-
-            <!-- Nom + lot + expiration -->
-            <div class="flex items-start justify-between">
-              <div class="flex flex-col gap-1">
-                <h3 class="text-3xl font-normal text-lime-950 leading-tight">
-                  Riz Parfumé — Variété Sahel 108
-                </h3>
-                <span class="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-                  Lot #YNC-882-X92-2024
-                </span>
-              </div>
-              <div class="text-right flex flex-col gap-1 shrink-0">
-                <span class="text-xs font-bold text-gray-500 uppercase tracking-tight">Date d'expiration</span>
-                <span class="text-base font-bold text-slate-800">12 Déc 2026</span>
-              </div>
-            </div>
-
-            <!-- Détails : 2 colonnes -->
-            <div class="flex gap-8">
-
-              <!-- Colonne 1 -->
-              <div class="flex-1 flex flex-col gap-4">
-
-                <!-- Producteur -->
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-full outline outline-2 outline-lime-900/20 overflow-hidden shrink-0">
-                    <img src="https://placehold.co/48x48" alt="Moussa Diop"
-                         class="w-full h-full object-cover"/>
-                  </div>
-                  <div>
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-tight">Producteur</p>
-                    <p class="text-base font-semibold text-lime-950">Moussa Diop, GIE Walu</p>
-                  </div>
-                </div>
-
-                <!-- Origine -->
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-5 fill-lime-900" viewBox="0 0 24 24">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-tight">Origine</p>
-                    <p class="text-base font-semibold text-lime-950">Mbour, Sénégal</p>
-                  </div>
-                </div>
-
-              </div>
-
-              <!-- Colonne 2 -->
-              <div class="flex-1 flex flex-col gap-4">
-
-                <!-- Transformation -->
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-5 fill-lime-900" viewBox="0 0 24 24">
-                      <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-tight">Transformation</p>
-                    <p class="text-base font-semibold text-lime-950">14 Jan 2024</p>
-                  </div>
-                </div>
-
-                <!-- Qualité -->
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 fill-lime-900" viewBox="0 0 24 24">
-                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-tight">Qualité</p>
-                    <p class="text-base font-semibold text-lime-950">Grade A Premium</p>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
-          <!-- Pied de fiche : badges + certificat -->
-          <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
-
-            <div class="flex gap-2">
-              <span class="px-3 py-1 bg-lime-900/5 rounded-full text-[10px] font-bold text-lime-900 uppercase tracking-tight">
-                Sans OGM
-              </span>
-              <span class="px-3 py-1 bg-lime-900/5 rounded-full text-[10px] font-bold text-lime-900 uppercase tracking-tight">
-                Soutien Local
-              </span>
-            </div>
-
-            <a href="#"
-               class="flex items-center gap-2 text-sm font-bold text-lime-950 hover:text-lime-700 transition-colors">
-              <svg class="w-3.5 h-3.5 fill-lime-950" viewBox="0 0 24 24">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/>
-              </svg>
-              Télécharger le certificat complet
-            </a>
-
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ---- Bloc bonus culinaire ---- -->
-      <div class="bg-lime-950 rounded-[32px] flex overflow-hidden">
-
-        <!-- Texte -->
-        <div class="flex-1 p-10 flex flex-col gap-3">
-          <p class="text-xs font-bold text-amber-700 uppercase tracking-wider">Bonus Culinaire</p>
-          <h3 class="text-3xl font-normal text-white leading-tight">
-            Découvrez la recette authentique du Jolof Rice
-          </h3>
-          <p class="max-w-sm text-base text-slate-300 leading-6 pb-5">
-            Sublimez votre riz Sahel 108 avec les secrets de préparation traditionnels du Sénégal.
-          </p>
-          <a href="#"
-             class="flex items-center gap-3 px-8 py-4 bg-amber-700 text-white text-base font-bold
-                    rounded-xl hover:bg-amber-600 transition-colors w-fit">
-            Voir la recette
-            <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-            </svg>
-          </a>
-        </div>
-
-        <!-- Image plat -->
-        <div class="w-96 p-4 shrink-0">
-          <div class="h-64 rounded-2xl overflow-hidden shadow-2xl">
-            <img src="https://placehold.co/355x256" alt="Jolof Rice"
-                 class="w-full h-full object-cover" loading="lazy"/>
-          </div>
-        </div>
-
-      </div>
-
+        <p class="text-sm text-gray-500 text-center">
+          Le code est situé sur le sceau de sécurité de votre emballage.
+        </p>
+      </form>
     </div>
+
   </main>
-
-
-  <!-- ===========================
-       FOOTER
-  ============================ -->
-  <footer class="border-t border-slate-100 py-12 flex flex-col items-center gap-4">
-    <p class="text-sm text-gray-500">© 2024 YEES NAA CONNECT. Tous droits réservés.</p>
-    <div class="flex items-center gap-8">
-      <a href="#" class="text-xs font-bold text-lime-950 uppercase tracking-wider hover:text-lime-700 transition-colors">
-        Confidentialité
-      </a>
-      <a href="#" class="text-xs font-bold text-lime-950 uppercase tracking-wider hover:text-lime-700 transition-colors">
-        Mentions Légales
-      </a>
-      <a href="#" class="text-xs font-bold text-lime-950 uppercase tracking-wider hover:text-lime-700 transition-colors">
-        Contact Support
-      </a>
-    </div>
-  </footer>
-</body>
-</html>
+</main>
+{% endblock %}

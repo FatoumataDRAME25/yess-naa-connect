@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-YEES NAA CONNECT
+Riz Local
 {% endblock %}
 
 {% block content %}
@@ -191,10 +191,6 @@ YEES NAA CONNECT
                   <span class="text-base text-gray-600">Sous-total</span>
                   <span class="text-base font-semibold text-lime-950">{{ sous_total }} FCFA</span>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-base text-gray-600">Livraison</span>
-                  <span class="text-base font-semibold text-lime-950">{{ frais_livraison }} FCFA</span>
-                </div>
               </div>
 
               <!-- Total final -->
@@ -205,6 +201,10 @@ YEES NAA CONNECT
                   <p class="text-[10px] uppercase tracking-wide text-gray-400">TVA incluse</p>
                 </div>
               </div>
+
+              <p class="text-xs text-gray-500 leading-5 pb-2">
+                Les frais de livraison dépendent de la distance et seront communiqués par le livreur, à régler directement à la remise de votre commande.
+              </p>
 
               <!-- Bouton soumettre le formulaire -->
               <button type="submit"

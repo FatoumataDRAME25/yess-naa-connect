@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Accueil | YEES NAA CONNECT
+Accueil | Riz Local
 {% endblock %}
 
 {% block content %}
@@ -47,25 +47,78 @@ Accueil | YEES NAA CONNECT
     <section class="py-24 bg-white">
       <div class="max-w-6xl mx-auto text-center">
         <h2 class="text-3xl font-bold text-lime-900">De la rizière à votre table</h2>
-        <div class="mt-12 grid md:grid-cols-3 gap-10">
-          <div>
-            <div style="background-image: url('{% static 'images/producteur.jpg' %}')" class="w-32 h-32 mx-auto rounded-full bg-cover bg-center"></div>
-            <h3 class="mt-4 font-bold">Producteur</h3>
-            <p class="text-gray-500">Déclaration de la récolte</p>
+        <div class="mt-16 flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-4">
+
+          <div data-process-step class="process-step flex flex-col items-center w-40">
+            <div style="background-image: url('{% static 'images/producteur.jpg' %}')" class="process-circle w-32 h-32 mx-auto rounded-full bg-cover bg-center shadow-lg transition-transform duration-500 hover:scale-110"></div>
+            <h3 class="mt-4 font-bold text-lime-950">Producteur</h3>
+            <p class="text-gray-500 text-sm">Déclaration de la récolte</p>
           </div>
-          <div>
-            <div style="background-image: url('{% static 'images/1sac5kg.jpg' %}')" class="w-32 h-32 mx-auto rounded-full bg-cover bg-center"></div>
-            <h3 class="mt-4 font-bold">Transformation</h3>
-            <p class="text-gray-500">Traitement et emballage</p>
+
+          <div data-process-step data-process-delay="250" class="process-step process-arrow shrink-0 mt-10 rotate-90 md:rotate-0 text-lime-600">
+            <svg class="w-10 h-10 md:w-14 md:h-14" viewBox="0 0 100 24" fill="none">
+              <line x1="2" y1="12" x2="82" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="arrow-dash"/>
+              <path d="M74 4 L90 12 L74 20" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </div>
-          <div>
-            <div style="background-image: url('{% static 'images/livreur.png' %}')" class="w-32 h-32 mx-auto rounded-full bg-cover bg-center"></div>
-            <h3 class="mt-4 font-bold">Livraison</h3>
-            <p class="text-gray-500">Traçabilité complète</p>
+
+          <div data-process-step data-process-delay="500" class="process-step flex flex-col items-center w-40">
+            <div style="background-image: url('{% static 'images/1sac5kg.jpg' %}')" class="process-circle w-32 h-32 mx-auto rounded-full bg-cover bg-center shadow-lg transition-transform duration-500 hover:scale-110"></div>
+            <h3 class="mt-4 font-bold text-lime-950">Transformation</h3>
+            <p class="text-gray-500 text-sm">Traitement et emballage</p>
           </div>
+
+          <div data-process-step data-process-delay="750" class="process-step process-arrow shrink-0 mt-10 rotate-90 md:rotate-0 text-lime-600">
+            <svg class="w-10 h-10 md:w-14 md:h-14" viewBox="0 0 100 24" fill="none">
+              <line x1="2" y1="12" x2="82" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="arrow-dash"/>
+              <path d="M74 4 L90 12 L74 20" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div data-process-step data-process-delay="1000" class="process-step flex flex-col items-center w-40">
+            <div style="background-image: url('{% static 'images/livreur.png' %}')" class="process-circle w-32 h-32 mx-auto rounded-full bg-cover bg-center shadow-lg transition-transform duration-500 hover:scale-110"></div>
+            <h3 class="mt-4 font-bold text-lime-950">Livraison</h3>
+            <p class="text-gray-500 text-sm">Traçabilité complète</p>
+          </div>
+
         </div>
       </div>
     </section>
+
+    <style>
+      .process-step {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+      }
+      .process-step.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .process-step.is-visible .process-circle {
+        animation: process-pop 0.6s ease-out;
+      }
+      @keyframes process-pop {
+        0%   { box-shadow: 0 0 0 0 rgba(45, 90, 22, 0.35); }
+        70%  { box-shadow: 0 0 0 14px rgba(45, 90, 22, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(45, 90, 22, 0); }
+      }
+
+      /* Flèches du timeline : apparaissent en "poussée" plutôt qu'en fondu classique */
+      .process-arrow {
+        transform: scale(0.6);
+      }
+      .process-arrow.is-visible {
+        transform: scale(1);
+      }
+      .arrow-dash {
+        stroke-dasharray: 6 6;
+        animation: arrow-flow 1s linear infinite;
+      }
+      @keyframes arrow-flow {
+        to { stroke-dashoffset: -24; }
+      }
+    </style>
 
     <!-- ============================================================
          SECTION PRODUITS DYNAMIQUE
@@ -199,7 +252,7 @@ Accueil | YEES NAA CONNECT
                   <p class="text-lime-200 text-lg">Recette Jolof Rice incluse</p>
                 </div>
               </div>
-              <a href="#" class="inline-block bg-white text-lime-950 px-10 py-4 rounded-xl font-bold">Vérifier un code</a>
+              <a href="{% url 'verification_qrcode' %}" class="inline-block bg-white text-lime-950 px-10 py-4 rounded-xl font-bold">Vérifier un code</a>
             </div>
           </div>
         </div>
@@ -222,7 +275,7 @@ Accueil | YEES NAA CONNECT
               <svg class="w-3.5 h-3.5 fill-yellow-600" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 0 0 .95.69h4.171c.969 0 1.371 1.24.588 1.81l-3.374 2.451a1 1 0 0 0-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118L10 15.347l-3.955 2.7c-.785.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 0 0-.364-1.118L2.054 9.394c-.783-.57-.38-1.81.588-1.81h4.171a1 1 0 0 0 .95-.69l1.286-3.967z"/></svg>
               <svg class="w-3.5 h-3.5 fill-yellow-600" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 0 0 .95.69h4.171c.969 0 1.371 1.24.588 1.81l-3.374 2.451a1 1 0 0 0-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118L10 15.347l-3.955 2.7c-.785.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 0 0-.364-1.118L2.054 9.394c-.783-.57-.38-1.81.588-1.81h4.171a1 1 0 0 0 .95-.69l1.286-3.967z"/></svg>
             </div>
-            <p class="text-gray-600 text-sm leading-relaxed mb-4">"Grâce à YEES NAA, mes produits atteignent Dakar sans intermédiaires."</p>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">"Grâce à Riz Local, mes produits atteignent Dakar sans intermédiaires."</p>
             <h4 class="font-bold text-lime-900 text-sm">Mamadou Faye</h4>
             <span class="text-gray-400 text-xs">Producteur à Richard-Toll</span>
           </div>
@@ -270,7 +323,7 @@ Accueil | YEES NAA CONNECT
             </div>
           </div>
           <div class="relative">
-            <button class="bg-white text-amber-700 px-8 py-4 rounded-xl font-bold shadow-lg hover:scale-105 transition">Devenir Producteur</button>
+            <a href="{% url 'inscription' %}" class="inline-block bg-white text-amber-700 px-8 py-4 rounded-xl font-bold shadow-lg hover:scale-105 transition">Devenir Partenaire</a>
           </div>
         </div>
       </div>
@@ -406,5 +459,25 @@ Accueil | YEES NAA CONNECT
     });
   });
 </script>
+
+  <!-- Animation de la section "De la rizière à votre table" au scroll -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const steps = document.querySelectorAll('[data-process-step]');
+    if (!steps.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const delay = parseInt(el.dataset.processDelay || '0', 10);
+        setTimeout(() => el.classList.add('is-visible'), delay);
+        observer.unobserve(el);
+      });
+    }, { threshold: 0.2 });
+
+    steps.forEach((el) => observer.observe(el));
+  });
+  </script>
 
  {% endblock %}

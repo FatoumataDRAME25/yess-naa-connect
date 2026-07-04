@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-YEES NAA CONNECT
+Riz Local
 {% endblock %}
 
 {% block content %}
@@ -210,7 +210,7 @@ YEES NAA CONNECT
                 Découvrez le parcours exact de ce sac, de la parcelle de terre à votre table.
                 </p>
             </div>
-            <a href="#" class="text-lime-900 font-semibold text-sm">
+            <a href="{% url 'admin_transformatrice:tracabilite_produit' produit.code_lot %}" class="text-lime-900 font-semibold text-sm">
                 En savoir plus sur notre chaîne de valeur
             </a>
             </div>

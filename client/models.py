@@ -44,7 +44,7 @@ class CommandeClient(models.Model):
     statut          = models.CharField(max_length=20, choices=Statut.choices, default=Statut.ATTENTE)
     mode_paiement   = models.CharField(max_length=50)
     adresse_livraison = models.CharField(max_length=255, blank=True)
-    frais_livraison = models.PositiveIntegerField(default=2000)
+    frais_livraison = models.PositiveIntegerField(default=0)
     date            = models.DateTimeField(auto_now_add=True)
 
     class Meta:

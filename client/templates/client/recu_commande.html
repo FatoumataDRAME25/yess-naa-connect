@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reçu — Commande {{ commande.numero }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { padding: 0 !important; }
+    }
+  </style>
+</head>
+<body class="bg-white font-sans text-gray-800 antialiased">
+
+  <div class="max-w-2xl mx-auto px-8 py-10">
+
+    <!-- Barre d'action (masquée à l'impression) -->
+    <div class="no-print flex justify-end gap-3 mb-8">
+      <button onclick="window.print()"
+              class="flex items-center gap-2 px-6 py-3 bg-lime-900 text-white text-sm font-bold rounded-xl hover:bg-lime-800 transition-colors">
+        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm-1-9H6v4h12V3z"/></svg>
+        Imprimer / Enregistrer en PDF
+      </button>
+    </div>
+
+    <!-- En-tête -->
+    <div class="flex items-center justify-between border-b-2 border-lime-900 pb-6 mb-6">
+      <div>
+        <p class="text-2xl font-extrabold text-lime-900">Riz <span class="text-lime-600">Local</span></p>
+        <p class="text-xs text-gray-500 mt-1">Mbour, Sénégal</p>
+        <p class="text-xs text-gray-500">contact@rizlocal.sn • +221 77 545 15 99</p>
+      </div>
+      <div class="text-right">
+        <p class="text-lg font-bold text-lime-950">Reçu de commande</p>
+        <p class="text-sm text-gray-500">N° {{ commande.numero }}</p>
+        <p class="text-sm text-gray-500">{{ commande.date|date:"d/m/Y à H:i" }}</p>
+      </div>
+    </div>
+
+    <!-- Statut + Client -->
+    <div class="flex justify-between gap-8 mb-8">
+      <div>
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Client</p>
+        <p class="text-base font-semibold text-lime-950">{{ commande.client_nom }}</p>
+        <p class="text-sm text-gray-600">{{ commande.client_telephone }}</p>
+        <p class="text-sm text-gray-600">{{ commande.adresse_livraison }}</p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Statut</p>
+        <p class="text-base font-semibold text-lime-950">{{ commande.get_statut_display }}</p>
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-3 mb-1">Paiement</p>
+        <p class="text-sm text-gray-600">
+          {% if commande.mode_paiement == 'livraison' %}Paiement à la livraison{% else %}Paiement en ligne{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Articles -->
+    <table class="w-full text-sm mb-8">
+      <thead>
+        <tr class="border-b border-gray-200 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          <th class="py-2">Produit</th>
+          <th class="py-2 text-center">Qté</th>
+          <th class="py-2 text-right">Prix unitaire</th>
+          <th class="py-2 text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in lignes %}
+        <tr class="border-b border-gray-100">
+          <td class="py-3">{{ ligne.produit.nom }} — {{ ligne.produit.poids_kg }} kg</td>
+          <td class="py-3 text-center">{{ ligne.quantite }}</td>
+          <td class="py-3 text-right">{{ ligne.prix_unitaire }} FCFA</td>
+          <td class="py-3 text-right font-semibold text-lime-950">{{ ligne.ligne_total }} FCFA</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Totaux -->
+    <div class="flex justify-end mb-10">
+      <div class="w-64 flex flex-col gap-2">
+        <div class="flex justify-between text-sm text-gray-600">
+          <span>Sous-total</span>
+          <span>{{ commande.sous_total }} FCFA</span>
+        </div>
+        <div class="flex justify-between text-lg font-bold text-lime-950 pt-2 border-t border-gray-200">
+          <span>Total</span>
+          <span>{{ commande.total }} FCFA</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-xs text-gray-500 text-center mb-6">
+      Les frais de livraison dépendent de la distance et seront communiqués par le livreur, à régler directement à la remise de votre commande.
+    </p>
+
+    <p class="text-center text-xs text-gray-400 border-t border-gray-100 pt-6">
+      Ce reçu confirme l'enregistrement de votre commande auprès de Riz Local.
+      Conservez le numéro {{ commande.numero }} pour suivre votre livraison.
+    </p>
+
+  </div>
+
+</body>
+</html>

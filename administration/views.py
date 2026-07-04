@@ -13,8 +13,10 @@ from datetime import date, datetime
 import qrcode
 
 from producteur.models import StockPaddy
-from administration.models import Produit, CommandePaddy
+from administration.models import Produit, CommandePaddy, User
+from administration.forms import LivreurCreationForm
 from client.models import CommandeClient
+from livreur.models import Livraison
 
 
 # ── Décorateur utilitaire : réserve l'accès aux admins ──
@@ -488,7 +490,35 @@ def admin_commande_detail(request, pk):
         pk=pk,
     )
 
+    livraison = Livraison.objects.filter(commande=commande).select_related('livreur').first()
+
     if request.method == 'POST':
+
+        # ── Cas 1 : assignation / réassignation d'un livreur ──
+        if 'livreur_id' in request.POST:
+            livreur_id = request.POST.get('livreur_id')
+            if not livreur_id:
+                messages.error(request, "Veuillez choisir un livreur.")
+            else:
+                livreur_user = get_object_or_404(User, pk=livreur_id, role=User.Role.LIVREUR)
+                if livraison:
+                    livraison.livreur = livreur_user
+                    livraison.save(update_fields=['livreur'])
+                else:
+                    livraison = Livraison.objects.create(commande=commande, livreur=livreur_user)
+
+                # Fait passer la commande en livraison si elle était encore en préparation/attente
+                if commande.statut in (CommandeClient.Statut.ATTENTE, CommandeClient.Statut.PREPARATION):
+                    commande.statut = CommandeClient.Statut.EN_LIVRAISON
+                    commande.save(update_fields=['statut'])
+
+                messages.success(
+                    request,
+                    f"{livreur_user.prenom} {livreur_user.nom} a été assigné(e) à la commande #{commande.numero}."
+                )
+            return redirect('admin_transformatrice:admin_commande_detail', pk=pk)
+
+        # ── Cas 2 : changement de statut (stepper) ──
         nouveau_statut = request.POST.get('statut')
         statuts_valides = [s for s, _ in CommandeClient.Statut.choices]
         if nouveau_statut in statuts_valides:
@@ -499,6 +529,8 @@ def admin_commande_detail(request, pk):
 
     statut = commande.statut
     statut_labels = dict(CommandeClient.Statut.choices)
+
+    livreurs_disponibles = User.objects.filter(role=User.Role.LIVREUR).order_by('prenom', 'nom')
 
     etapes = [
         {'label': 'Marquer en préparation', 'value': 'preparation',  'active': statut == 'attente'},
@@ -523,8 +555,66 @@ def admin_commande_detail(request, pk):
         'stepper_steps': stepper_steps,
         'total': total,
         'qr_url': f'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=CMD-{pk:04d}',
+        'livraison': livraison,
+        'livreurs_disponibles': livreurs_disponibles,
     }
     return render(request, 'espace_admin/commande_detail.html', context)
+
+
+# ============================================================
+#  GESTION DES LIVREURS (créés uniquement par l'admin)
+# ============================================================
+
+@admin_required
+def admin_livreurs(request):
+    """
+    Liste des comptes livreurs + formulaire de création.
+    L'admin choisit le téléphone (= identifiant de connexion) et le mot
+    de passe, puis les communique lui-même au livreur.
+    """
+    form = LivreurCreationForm()
+
+    if request.method == 'POST':
+        form = LivreurCreationForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_livreur(
+                username=form.cleaned_data['telephone'],
+                password=form.cleaned_data['mot_de_passe'],
+                prenom=form.cleaned_data['prenom'],
+                nom=form.cleaned_data['nom'],
+                telephone=form.cleaned_data['telephone'],
+                adresse=form.cleaned_data.get('adresse', ''),
+            )
+            from livreur.models import Livreur
+            Livreur.objects.create(user=user)
+
+            messages.success(
+                request,
+                f"Compte livreur créé : {user.prenom} {user.nom} — "
+                f"identifiant {user.telephone}. Communiquez-lui ce numéro et le mot de passe choisi."
+            )
+            return redirect('admin_transformatrice:admin_livreurs')
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+
+    livreurs = User.objects.filter(role=User.Role.LIVREUR).order_by('-date_joined')
+
+    # Nombre de livraisons en cours / terminées par livreur (pour affichage)
+    livreurs_stats = []
+    for livreur in livreurs:
+        livraisons_qs = Livraison.objects.filter(livreur=livreur)
+        livreurs_stats.append({
+            'user': livreur,
+            'total_livraisons': livraisons_qs.count(),
+            'en_cours': livraisons_qs.filter(confirme_le__isnull=True).count(),
+        })
+
+    context = {
+        'active_nav': 'livreurs',
+        'form': form,
+        'livreurs_stats': livreurs_stats,
+    }
+    return render(request, 'espace_admin/livreurs.html', context)
 
 
 # ============================================================
@@ -585,16 +675,6 @@ def admin_commande_paddy_statut(request, pk):
                 messages.success(request, f"Commande #PAD-{pk:04d} mise à jour.")
 
     return redirect('admin_transformatrice:admin_commandes_paddy')
-
-
-# ============================================================
-#  À PROPOS
-# ============================================================
-
-@admin_required
-def admin_about(request):
-    context = {'active_nav': 'about'}
-    return render(request, 'espace_admin/about.html', context)
 
 
 # ============================================================
