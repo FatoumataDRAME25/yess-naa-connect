@@ -1,7 +1,11 @@
+import base64
+import io
 import re
 
+import qrcode
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, Http404
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from administration.models import Produit
 from .models import Client, CommandeClient, LigneCommande
@@ -113,10 +117,23 @@ def produit_detail(request, produit_id):
     produit = get_object_or_404(Produit, id=produit_id, est_actif=True)
     panier = get_panier(request)
     qte_dans_panier = panier.get(str(produit_id), {}).get('quantite', 0)
+
+    tracabilite_url = request.build_absolute_uri(
+        reverse('admin_transformatrice:tracabilite_produit', args=[produit.code_lot])
+    )
+    qr = qrcode.QRCode(version=1, box_size=6, border=2)
+    qr.add_data(tracabilite_url)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color="#1a5c32", back_color="white")
+    buf = io.BytesIO()
+    qr_img.save(buf, format='PNG')
+    qr_code_base64 = base64.b64encode(buf.getvalue()).decode()
+
     context = {
         'produit': produit,
         'nb_panier': nb_articles_panier(request),
         'qte_dans_panier': qte_dans_panier,
+        'qr_code_base64': qr_code_base64,
     }
     return render(request, "client/detailProduit.html", context)
 

@@ -201,8 +201,8 @@ Riz Local
 
             <!-- RIGHT : QR traçabilité -->
             <div class="flex-1 bg-gray-50 rounded-3xl p-8 flex flex-col items-center gap-6">
-            <div class="w-28 h-28 bg-white rounded-2xl shadow-inner flex items-center justify-center">
-                <div class="w-12 h-12 bg-lime-900"></div>
+            <div class="w-28 h-28 bg-white rounded-2xl shadow-inner flex items-center justify-center p-2">
+                <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR code de traçabilité — {{ produit.nom }}" class="w-full h-full object-contain">
             </div>
             <div class="text-center flex flex-col gap-2">
                 <h3 class="text-lime-950 text-base md:text-lg font-black">Scannez pour la transparence</h3>

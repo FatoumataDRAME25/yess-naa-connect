@@ -16,16 +16,22 @@
 
 <!--
   Mobile  : fond blanc, card plein écran, padding latéral px-6
-  Desktop : fond gris clair, card centrée max-w-md avec ombre
+  Desktop : fond gris clair, card centrée avec panneau image collé au formulaire
 -->
 <body class="bg-white md:bg-gray-50 min-h-screen flex items-center justify-center">
 
-    <div class="w-full md:max-w-md
-                bg-white
-                md:rounded-[20px] md:shadow-xl md:shadow-black/5
-                px-6 py-12 md:p-10
-                min-h-screen md:min-h-0
-                flex flex-col justify-center md:block">
+  <div class="w-full md:max-w-4xl bg-white md:rounded-[24px] md:shadow-xl md:shadow-black/5
+              overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-0">
+
+    <!-- Panneau image produit (desktop uniquement, collé au formulaire) -->
+    <div class="hidden md:flex md:w-[42%] bg-yn-ivory items-center justify-center p-10">
+        <img src="{% static 'images/2sac10kg.jpg' %}" alt="Riz Blanc Premium — Riz Local"
+             class="max-h-[520px] w-auto object-contain drop-shadow-xl">
+    </div>
+
+    <div class="w-full md:w-[58%]
+                px-6 py-12 md:p-12
+                flex flex-col justify-center">
 
         <!-- Logo + titre -->
         <div class="text-center mb-8">
@@ -111,7 +117,8 @@
             </a>
         </div>
 
-    </div><!-- fin card -->
+    </div><!-- fin panneau formulaire -->
+  </div><!-- fin card -->
 
     <script>
         function togglePassword() {
