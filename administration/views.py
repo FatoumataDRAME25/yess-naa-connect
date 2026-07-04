@@ -5,8 +5,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Sum, Count, F, Q
 from django.http import HttpResponse
+from django.templatetags.static import static
 from django.urls import reverse
 from datetime import date, datetime
 
@@ -237,6 +239,14 @@ def admin_marquer_paddy_recu(request, pk):
     if request.method == 'POST':
         commande.statut = CommandePaddy.Statut.RECUE
         commande.save(update_fields=['statut'])
+
+        stock = commande.stock
+        stock.quantite_kg = max(stock.quantite_kg - commande.quantite_commande, 0)
+        stock.statut = (
+            StockPaddy.Statut.EPUISE if stock.quantite_kg <= 0 else StockPaddy.Statut.DISPONIBLE
+        )
+        stock.save(update_fields=['quantite_kg', 'statut'])
+
         messages.success(
             request,
             f"Commande #{pk} marquée comme reçue. "
@@ -460,6 +470,9 @@ def admin_commandes(request):
     en_attente_count = counts.get('attente', 0)
     en_livraison_count = counts.get('en_livraison', 0)
 
+    paginator = Paginator(commandes_qs, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
     context = {
         'active_nav': 'commandes',
         'stats': {
@@ -476,7 +489,9 @@ def admin_commandes(request):
             {'label': 'Livrée',         'value': 'livree',       'count': counts.get('livree', 0),      'active': statut_filtre == 'livree'},
             {'label': 'Annulée',        'value': 'annulee',      'count': counts.get('annulee', 0),     'active': statut_filtre == 'annulee'},
         ],
-        'commandes': commandes_qs,
+        'commandes': page_obj,
+        'paginator': paginator,
+        'page_obj': page_obj,
         'statut_filtre': statut_filtre,
         'q': q,
     }
@@ -545,16 +560,33 @@ def admin_commande_detail(request, pk):
         ('Livrée',      statut == 'livree'),
     ]
 
-    total = sum(l.quantite * l.prix_unitaire for l in commande.lignes.all())
+    # Attributs d'affichage calculés, attachés directement à l'instance pour
+    # que le template puisse les lire simplement via `commande.xxx`.
+    commande.date_str = commande.date.strftime('%d/%m/%Y')
+    commande.heure = commande.date.strftime('%H:%M')
+    commande.statut_label = statut_labels.get(statut, statut)
+
+    tracking_url = request.build_absolute_uri(
+        reverse('suivre_commande') + f'?numero={commande.numero}'
+    )
+    commande.qr_url = f'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={quote(tracking_url)}'
+
+    commande.articles = [
+        {
+            'nom': ligne.produit.nom,
+            'photo_url': ligne.produit.photo.url if ligne.produit.photo else static('images/1sac5kg.jpg'),
+            'quantite': ligne.quantite,
+            'prix_unitaire': ligne.prix_unitaire,
+            'sous_total': ligne.ligne_total,
+        }
+        for ligne in commande.lignes.all()
+    ]
 
     context = {
         'active_nav': 'commandes',
         'commande': commande,
-        'statut_label': statut_labels.get(statut, statut),
         'etapes': etapes,
         'stepper_steps': stepper_steps,
-        'total': total,
-        'qr_url': f'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=CMD-{pk:04d}',
         'livraison': livraison,
         'livreurs_disponibles': livreurs_disponibles,
     }

@@ -6,17 +6,6 @@
 
 <div class="w-full p-7 flex flex-col gap-7 max-w-xl">
 
-  <!-- Messages -->
-  {% if messages %}
-    {% for message in messages %}
-      <div class="w-full px-4 py-3 rounded-xl text-sm font-medium
-        {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
-        {% else %}bg-green-50 text-green-700 border border-[#D4EDB8]{% endif %}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
   <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm overflow-hidden">
     <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
       <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0">

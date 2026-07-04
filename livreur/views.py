@@ -1,6 +1,9 @@
+from urllib.parse import quote
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from administration.models import User
@@ -79,11 +82,15 @@ def dashboard(request):
 @livreur_required
 def detail_livraison(request, pk):
     livraison = get_object_or_404(
-        Livraison.objects.select_related('commande', 'commande__client'),
+        Livraison.objects.select_related('commande', 'commande__client').prefetch_related('commande__lignes__produit'),
         pk=pk,
         livreur=request.user,  # empêche un livreur de voir la livraison d'un autre
     )
-    return render(request, 'livreur/detail_livraison.html', {'livraison': livraison})
+    tracking_url = request.build_absolute_uri(
+        reverse('suivre_commande') + f'?numero={livraison.commande.numero}'
+    )
+    qr_url = f'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={quote(tracking_url)}'
+    return render(request, 'livreur/detail_livraison.html', {'livraison': livraison, 'qr_url': qr_url})
 
 
 @livreur_required

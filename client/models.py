@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.db import models
 from django.utils.crypto import get_random_string
 
@@ -44,6 +46,8 @@ class CommandeClient(models.Model):
     statut          = models.CharField(max_length=20, choices=Statut.choices, default=Statut.ATTENTE)
     mode_paiement   = models.CharField(max_length=50)
     adresse_livraison = models.CharField(max_length=255, blank=True)
+    latitude        = models.FloatField(null=True, blank=True)
+    longitude       = models.FloatField(null=True, blank=True)
     frais_livraison = models.PositiveIntegerField(default=0)
     date            = models.DateTimeField(auto_now_add=True)
 
@@ -76,6 +80,16 @@ class CommandeClient(models.Model):
     @property
     def client_telephone(self):
         return self.client.telephone
+
+    @property
+    def maps_url(self):
+        """Lien Google Maps le plus précis possible : position GPS choisie par le
+        client si disponible, sinon recherche par adresse texte."""
+        if self.latitude is not None and self.longitude is not None:
+            return f"https://www.google.com/maps?q={self.latitude},{self.longitude}"
+        if self.adresse_livraison:
+            return f"https://www.google.com/maps/search/?api=1&query={quote(self.adresse_livraison)}"
+        return ""
 
     @property
     def montant(self):

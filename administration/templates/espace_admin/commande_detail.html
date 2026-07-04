@@ -60,15 +60,11 @@
         <div class="bg-white rounded-2xl shadow-sm shadow-black/5 p-5 space-y-4">
             <div>
                 <p class="text-xs font-bold text-yn-gray uppercase tracking-wide mb-1">Nom complet</p>
-                <p class="font-bold text-gray-800">{{ commande.client.nom }}</p>
+                <p class="font-bold text-gray-800">{{ commande.client_nom }}</p>
             </div>
             <div>
                 <p class="text-xs font-bold text-yn-gray uppercase tracking-wide mb-1">Téléphone</p>
-                <p class="font-semibold text-gray-700">{{ commande.client.telephone }}</p>
-            </div>
-            <div>
-                <p class="text-xs font-bold text-yn-gray uppercase tracking-wide mb-1">Email</p>
-                <p class="font-semibold text-gray-700">{{ commande.client.email }}</p>
+                <p class="font-semibold text-gray-700">{{ commande.client_telephone }}</p>
             </div>
         </div>
     </div>
@@ -78,17 +74,17 @@
         <h2 class="text-sm font-bold text-yn-green-dark mb-3">Adresse de livraison</h2>
         <div class="bg-white rounded-2xl shadow-sm shadow-black/5 p-5 h-[calc(100%-2.25rem)] flex flex-col justify-between">
             <p class="text-gray-700 leading-relaxed">
-                {{ commande.adresse.ligne1 }}<br>
-                {{ commande.adresse.ligne2 }}<br>
-                {{ commande.adresse.ville }}
+                {{ commande.adresse_livraison }}
             </p>
-            <a href="{{ commande.adresse.maps_url }}" target="_blank" rel="noopener noreferrer"
+            {% if commande.maps_url %}
+            <a href="{{ commande.maps_url }}" target="_blank" rel="noopener noreferrer"
                class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-yn-green hover:text-yn-green-dark transition">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18s6-5.686 6-10A6 6 0 004 8c0 4.314 6 10 6 10zm0-7a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
                 </svg>
                 Voir sur la carte
             </a>
+            {% endif %}
         </div>
     </div>
 
@@ -285,9 +281,8 @@
             </svg>
           </div>
           <div>
-            <p class="font-bold text-gray-900">{{ commande.client.nom }}</p>
-            <p class="text-sm text-gray-500">{{ commande.client.telephone }}</p>
-            <p class="text-sm text-gray-500">{{ commande.client.email }}</p>
+            <p class="font-bold text-gray-900">{{ commande.client_nom }}</p>
+            <p class="text-sm text-gray-500">{{ commande.client_telephone }}</p>
           </div>
         </div>
         <div class="flex flex-col items-center gap-1 flex-shrink-0">
@@ -306,17 +301,17 @@
           </svg>
           <div>
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Adresse de livraison</p>
-            <p class="font-bold text-gray-900">{{ commande.adresse.ligne1 }}</p>
-            <p class="text-sm text-gray-600">{{ commande.adresse.ligne2 }}</p>
-            <p class="text-sm text-gray-600">{{ commande.adresse.ville }}</p>
+            <p class="font-bold text-gray-900">{{ commande.adresse_livraison }}</p>
           </div>
         </div>
-        <a href="{{ commande.adresse.maps_url }}" target="_blank"
+        {% if commande.maps_url %}
+        <a href="{{ commande.maps_url }}" target="_blank"
            class="w-9 h-9 rounded-xl bg-yn-green-pale flex items-center justify-center flex-shrink-0">
           <svg class="w-4 h-4 text-yn-green" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18s6-5.686 6-10A6 6 0 004 8c0 4.314 6 10 6 10zm0-7a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
           </svg>
         </a>
+        {% endif %}
       </div>
     </div>
 

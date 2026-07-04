@@ -7,17 +7,6 @@
 
 <div class="w-full p-7 flex flex-col gap-7">
 
-  <!-- Messages -->
-  {% if messages %}
-    {% for message in messages %}
-      <div class="w-full px-4 py-3 rounded-xl text-sm font-medium
-        {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
-        {% else %}bg-green-50 text-green-700 border border-[#D4EDB8]{% endif %}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
   <!-- Profile Header Card -->
   <div class="bg-white rounded-2xl border border-[#D4EDB8] shadow-sm p-8 flex items-center justify-between">
     <div class="flex items-center gap-6">

@@ -131,10 +131,19 @@
                     <span class="text-xs font-medium text-status-amber-text">Commandé</span>
                   </span>
                 {% else %}
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100">
-                    <span class="w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0"></span>
-                    <span class="text-xs font-medium text-gray-500">Épuisé</span>
-                  </span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100">
+                      <span class="w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0"></span>
+                      <span class="text-xs font-medium text-gray-500">Épuisé</span>
+                    </span>
+                    <a href="{% url 'declaration' %}"
+                       class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors whitespace-nowrap">
+                      <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                      </svg>
+                      Renouveler
+                    </a>
+                  </div>
                 {% endif %}
               </td>
             </tr>

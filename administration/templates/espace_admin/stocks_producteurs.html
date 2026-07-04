@@ -148,7 +148,7 @@
               {% endif %}
             {% else %}
               <button type="button"
-                      onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.user.prenom }} {{ stock.producteur.user.nom }}', {{ stock.quantite_kg }}, {{ stock.prix_par_kg }})"
+                      onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.user.prenom }} {{ stock.producteur.user.nom }}', '{{ stock.quantite_kg }}', '{{ stock.prix_par_kg }}')"
                       class="mt-auto w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark
                              text-white font-semibold py-3 rounded-xl transition">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3h2l.4 2M7 13h7l3-8H5.4M7 13L5.4 5M7 13l-1.5 3h9"/></svg>
@@ -299,7 +299,7 @@
             </div>
 
             <!-- Bouton CTA -->
-            <a href="{% url 'admin_transformatrice:admin_commandes' %}"
+            <a href="{% url 'admin_transformatrice:admin_commandes_paddy' %}"
                class="flex items-center justify-center gap-2 w-full bg-yn-green-dark hover:bg-yn-green text-white font-bold py-3.5 rounded-xl transition mb-3">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -469,7 +469,7 @@
           {% endif %}
         {% else %}
           <button type="button"
-                  onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.user.prenom }} {{ stock.producteur.user.nom }}', {{ stock.quantite_kg }}, {{ stock.prix_par_kg }})"
+                  onclick="openOrderModal('{{ stock.id }}', '{{ stock.producteur.user.prenom }} {{ stock.producteur.user.nom }}', '{{ stock.quantite_kg }}', '{{ stock.prix_par_kg }}')"
                   class="w-full flex items-center justify-center gap-2 border-2 border-yn-green text-yn-green
                          font-bold py-3 rounded-xl hover:bg-yn-green hover:text-white transition">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -615,7 +615,15 @@
 <script>
 let currentPrixKg = 0;
 
+function toNumber(val) {
+    if (typeof val === 'number') return val;
+    var n = parseFloat(String(val).replace(/\s/g, '').replace(',', '.'));
+    return isNaN(n) ? 0 : n;
+}
+
 function openOrderModal(stockId, producteurNom, stockDispo, prixKg) {
+    stockDispo = toNumber(stockDispo);
+    prixKg = toNumber(prixKg);
     document.getElementById('modal-stock-id').value = stockId;
     document.getElementById('modal-prix-kg').value = prixKg;
     document.getElementById('modal-producteur-nom').value = producteurNom;

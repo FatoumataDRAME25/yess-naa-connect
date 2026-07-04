@@ -148,7 +148,7 @@
 <!-- Toggle mot de passe -->
 <script>
   function togglePassword() {
-    const input = document.querySelector('input[type="password"], input[type="text"]');
+    const input = document.getElementById('id_mot_de_passe');
     const icon = document.getElementById('eye-icon');
     if (input.type === 'password') {
       input.type = 'text';

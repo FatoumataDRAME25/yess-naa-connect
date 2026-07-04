@@ -43,11 +43,13 @@
       <div class="address-row">
         <i class="ti ti-map-pin"></i>
         <div style="flex:1; min-width:0;">
-          <p class="address-text">{{ livraison.commande.client.adresse }}</p>
-          <a class="map-link" href="https://www.google.com/maps/search/?api=1&query={{ livraison.commande.client.adresse|urlencode }}" target="_blank" rel="noopener">
+          <p class="address-text">{{ livraison.commande.adresse_livraison }}</p>
+          {% if livraison.commande.maps_url %}
+          <a class="map-link" href="{{ livraison.commande.maps_url }}" target="_blank" rel="noopener">
             Voir sur la carte
             <i class="ti ti-chevron-right" style="font-size:13px"></i>
           </a>
+          {% endif %}
         </div>
       </div>
     </section>
@@ -75,25 +77,25 @@
 
       <div class="pay-row">
         <span class="pay-label">Montant à encaisser</span>
-        <span class="pay-amount">{{ livraison.commande.montant_total|floatformat:0 }} FCFA</span>
+        <span class="pay-amount">{{ livraison.commande.total|floatformat:0 }} FCFA</span>
       </div>
 
       <div class="pay-method">
-        {% if livraison.commande.mode_paiement == 'especes' %}
+        {% if livraison.commande.mode_paiement == 'livraison' %}
           <i class="ti ti-cash"></i>
           <span>Paiement en espèces à la livraison</span>
         {% else %}
           <i class="ti ti-credit-card"></i>
-          <span>{{ livraison.commande.mode_paiement }}</span>
+          <span>Payé en ligne</span>
         {% endif %}
       </div>
     </section>
 
     <section class="qr-card span-2">
       <div class="qr-box">
-        <i class="ti ti-qrcode"></i>
+        <img src="{{ qr_url }}" alt="QR code de suivi de la commande" style="width:100%;height:100%;object-fit:contain;">
       </div>
-      <p>QR code de traçabilité du lot</p>
+      <p>Scanner pour suivre cette commande</p>
     </section>
 
   </main>

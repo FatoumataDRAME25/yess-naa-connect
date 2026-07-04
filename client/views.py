@@ -269,7 +269,9 @@ def finaliser_commande(request):
         telephone      = request.POST.get('telephone', '').strip()
         adresse        = request.POST.get('adresse', '').strip()
         ville          = request.POST.get('ville', 'dakar').strip()
-        mode_paiement  = request.POST.get('mode_paiement', 'livraison').strip()
+        mode_paiement  = request.POST.get('paiement', 'livraison').strip()
+        latitude       = request.POST.get('latitude', '').strip()
+        longitude      = request.POST.get('longitude', '').strip()
 
         erreurs = {}
         if not nom:
@@ -293,6 +295,8 @@ def finaliser_commande(request):
                 'form_adresse': adresse,
                 'form_ville': ville,
                 'form_paiement': mode_paiement,
+                'form_latitude': latitude,
+                'form_longitude': longitude,
                 'erreurs': erreurs,
             }
             return render(request, "client/finalisercommande.html", context)
@@ -309,10 +313,18 @@ def finaliser_commande(request):
             adresse=f"{adresse}, {ville}",
         )
 
+        try:
+            lat = float(latitude) if latitude else None
+            lng = float(longitude) if longitude else None
+        except ValueError:
+            lat = lng = None
+
         commande = CommandeClient.objects.create(
             client=client,
             mode_paiement=mode_paiement,
             adresse_livraison=f"{adresse}, {ville}",
+            latitude=lat,
+            longitude=lng,
         )
 
         for produit_id, item in panier_session.items():

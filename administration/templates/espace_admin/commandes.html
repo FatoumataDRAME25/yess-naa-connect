@@ -192,19 +192,19 @@
         </p>
         <div class="flex items-center gap-1">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">‹</a>
+            <a href="?statut={{ statut_filtre }}{% if q %}&q={{ q }}{% endif %}&page={{ page_obj.previous_page_number }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">‹</a>
             {% endif %}
             {% for num in paginator.page_range %}
                 {% if num == page_obj.number %}
                 <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-yn-green-dark text-white font-semibold">{{ num }}</span>
                 {% elif num < 4 or num == paginator.num_pages %}
-                <a href="?page={{ num }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">{{ num }}</a>
+                <a href="?statut={{ statut_filtre }}{% if q %}&q={{ q }}{% endif %}&page={{ num }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">{{ num }}</a>
                 {% elif num == 4 %}
                 <span class="px-1 text-gray-400">…</span>
                 {% endif %}
             {% endfor %}
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">›</a>
+            <a href="?statut={{ statut_filtre }}{% if q %}&q={{ q }}{% endif %}&page={{ page_obj.next_page_number }}" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">›</a>
             {% endif %}
         </div>
     </div>
@@ -332,6 +332,25 @@
     <div class="text-center py-12 text-yn-gray text-sm">Aucune commande pour ce filtre.</div>
     {% endfor %}
   </div>
+
+  <!-- Pagination mobile -->
+  {% if paginator.num_pages > 1 %}
+  <div class="flex items-center justify-between px-4 py-4 sm:max-w-2xl sm:mx-auto">
+    {% if page_obj.has_previous %}
+    <a href="?statut={{ statut_filtre }}{% if q %}&q={{ q }}{% endif %}&page={{ page_obj.previous_page_number }}"
+       class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 bg-white">‹ Précédent</a>
+    {% else %}
+    <span></span>
+    {% endif %}
+    <span class="text-xs text-gray-400">Page {{ page_obj.number }} sur {{ paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?statut={{ statut_filtre }}{% if q %}&q={{ q }}{% endif %}&page={{ page_obj.next_page_number }}"
+       class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 bg-white">Suivant ›</a>
+    {% else %}
+    <span></span>
+    {% endif %}
+  </div>
+  {% endif %}
 
   <!-- FAB ajouter -->
   <button class="fixed bottom-20 right-4 w-14 h-14 bg-yn-green rounded-full shadow-lg flex items-center justify-center z-20">

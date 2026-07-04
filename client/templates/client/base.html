@@ -20,6 +20,8 @@
 
     <!-- Tailwind CSS -->
     {% tailwind_css %}
+
+    {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-white font-sans antialiased">
 
@@ -54,6 +56,15 @@
               text-gray-500 hover:text-lime-900
             {% endif %}">
           Catalogue
+        </a>
+        <a href="{% url 'suivre_commande' %}"
+          class="text-sm font-medium pb-1 transition-colors
+            {% if request.resolver_match.url_name == 'suivre_commande' %}
+              text-lime-900 border-b-2 border-lime-900
+            {% else %}
+              text-gray-500 hover:text-lime-900
+            {% endif %}">
+          Suivre ma commande
         </a>
         <a href="{% url 'inscription' %}" class="text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
           Devenir partenaire

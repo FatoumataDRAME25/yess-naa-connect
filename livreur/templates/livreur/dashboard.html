@@ -87,8 +87,8 @@
       <div class="card-footer">
         <div>
           <p class="payment-label">Paiement</p>
-          {% if livraison.commande.mode_paiement == 'especes' %}
-            <p class="payment-value">À encaisser : {{ livraison.commande.montant_total|floatformat:0 }} FCFA</p>
+          {% if livraison.commande.mode_paiement == 'livraison' %}
+            <p class="payment-value">À encaisser : {{ livraison.commande.total|floatformat:0 }} FCFA</p>
           {% elif livraison.confirme_le %}
             <p class="payment-value gray">Payé en ligne</p>
           {% else %}

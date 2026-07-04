@@ -7,6 +7,15 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        @keyframes ynPop {
+            0%   { transform: scale(0.95); opacity: 0; }
+            60%  { transform: scale(1.02); }
+            100% { transform: scale(1);    opacity: 1; }
+        }
+        #yn-confirm-overlay { backdrop-filter: blur(2px); }
+        #yn-confirm-box { animation: ynPop 0.22s ease both; }
+    </style>
 </head>
 <body class="flex min-h-screen bg-[#f5f6f8] font-sans antialiased">
 
@@ -96,9 +105,105 @@
 
     <!-- Contenu principal -->
     <main class="ml-60 flex-1 min-h-screen">
+
+        {% if messages %}
+        <div class="px-10 pt-6 flex flex-col gap-2">
+            {% for message in messages %}
+            <div class="px-4 py-3 rounded-xl text-sm font-medium
+                {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+                {% else %}bg-green-50 text-green-700 border border-[#D4EDB8]{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
     </main>
+
+    <!-- Modal de confirmation (remplace window.confirm) -->
+    <div id="yn-confirm-overlay" class="hidden fixed inset-0 bg-black/50 z-[100] flex items-center justify-center px-4">
+        <div id="yn-confirm-box" class="bg-white rounded-2xl shadow-xl shadow-black/20 max-w-sm w-full p-6 text-center">
+            <div class="w-14 h-14 rounded-full bg-[#7ec86e]/15 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-7 h-7 text-[#2d5a27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                </svg>
+            </div>
+            <p id="yn-confirm-message" class="font-bold text-gray-800 text-base mb-6">Confirmer cette action ?</p>
+            <div class="flex items-center gap-3">
+                <button type="button" id="yn-confirm-cancel"
+                        class="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition">
+                    Annuler
+                </button>
+                <button type="button" id="yn-confirm-ok"
+                        class="flex-1 py-2.5 rounded-xl bg-[#2d5a27] text-white font-semibold hover:bg-green-800 transition">
+                    Confirmer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+        var overlay = document.getElementById('yn-confirm-overlay');
+        var box = document.getElementById('yn-confirm-box');
+        var msgEl = document.getElementById('yn-confirm-message');
+        var btnOk = document.getElementById('yn-confirm-ok');
+        var btnCancel = document.getElementById('yn-confirm-cancel');
+        var pendingForm = null;
+        var pendingHref = null;
+
+        function open(message) {
+            msgEl.textContent = message;
+            overlay.classList.remove('hidden');
+            box.style.animation = 'none';
+            void box.offsetWidth;
+            box.style.animation = '';
+        }
+        function close() {
+            overlay.classList.add('hidden');
+            pendingForm = null;
+            pendingHref = null;
+        }
+
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (form.dataset && form.dataset.confirm && !form.dataset.confirmed) {
+                e.preventDefault();
+                pendingForm = form;
+                open(form.dataset.confirm);
+            }
+        }, true);
+
+        document.addEventListener('click', function (e) {
+            var el = e.target.closest('a[data-confirm]');
+            if (el) {
+                e.preventDefault();
+                pendingHref = el.getAttribute('href');
+                open(el.dataset.confirm);
+            }
+        });
+
+        btnOk.addEventListener('click', function () {
+            if (pendingForm) {
+                pendingForm.dataset.confirmed = '1';
+                pendingForm.submit();
+            } else if (pendingHref) {
+                window.location.href = pendingHref;
+            }
+            close();
+        });
+        btnCancel.addEventListener('click', close);
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) close();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !overlay.classList.contains('hidden')) close();
+        });
+    })();
+    </script>
 
 </body>
 </html>
