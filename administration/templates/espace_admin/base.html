@@ -188,6 +188,12 @@
                     </svg>
                     Livreurs
                 </a>
+                <a href="{% url 'admin_transformatrice:admin_profil' %}"
+                   class="flex items-center gap-3 px-8 py-4 text-white/90 hover:bg-white/5 transition
+                          {% if active_nav == 'profil' %}bg-white/10 border-l-4 border-yn-gold font-semibold{% endif %}">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                    Mon Profil
+                </a>
             </nav>
         </div>
 
@@ -313,7 +319,7 @@
     <!-- CONTENU PRINCIPAL                                       -->
     <!-- ======================================================= -->
     <!-- Desktop : marge gauche sidebar / Mobile : pas de marge -->
-    <main class="flex-1 md:ml-72 md:p-10">
+    <main class="flex-1 md:ml-72 md:px-10 md:pb-10 md:pt-10 pt-14 px-4 pb-8">
 
         {% if messages %}
         <div class="mb-6 space-y-2">
@@ -352,6 +358,125 @@
     Boutique
   </span>
 </a>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER MOBILE — cloche + profil
+════════════════════════════════════════════════════ -->
+<header class="md:hidden fixed top-0 inset-x-0 z-30 bg-white border-b border-gray-100 h-14 flex items-center justify-between px-4">
+  <!-- Burger -->
+  <button onclick="openMobileMenu()" class="text-gray-700">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+  <!-- Logo centré -->
+  <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="font-heading font-extrabold text-base">
+    <span class="text-lime-900">Riz</span><span class="text-lime-500">Local</span>
+  </a>
+  <!-- Cloche + profil -->
+  <div class="flex items-center gap-3">
+    <button id="notif-btn-mobile" onclick="toggleNotifPanel()" class="relative text-gray-600">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+      </svg>
+      <span id="notif-badge-mobile" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">0</span>
+    </button>
+    <a href="{% url 'admin_transformatrice:admin_profil' %}">
+      {% if request.user.photo %}
+        <img src="{{ request.user.photo.url }}" class="w-7 h-7 rounded-full object-cover" alt="profil">
+      {% else %}
+        <div class="w-7 h-7 rounded-full bg-lime-200 flex items-center justify-center text-xs font-bold text-lime-800">
+          {{ request.user.prenom|first }}{{ request.user.nom|first }}
+        </div>
+      {% endif %}
+    </a>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     TOPBAR DESKTOP — gérée page par page (pas fixe)
+════════════════════════════════════════════════════ -->
+
+<!-- Script notifications polling -->
+<script>
+(function() {
+  var panelOpen = false;
+
+  function toggleNotifPanel() {
+    var panel = document.getElementById('notif-panel');
+    if (!panel) return;
+    panelOpen = !panelOpen;
+    panel.classList.toggle('hidden', !panelOpen);
+  }
+  window.toggleNotifPanel = toggleNotifPanel;
+
+  // Ferme si clic en dehors
+  document.addEventListener('click', function(e) {
+    if (!panelOpen) return;
+    var btn   = document.getElementById('notif-btn');
+    var panel = document.getElementById('notif-panel');
+    if (btn && panel && !btn.contains(e.target) && !panel.contains(e.target)) {
+      panelOpen = false;
+      panel.classList.add('hidden');
+    }
+  });
+
+  function updateBadge(count) {
+    ['notif-badge', 'notif-badge-mobile'].forEach(function(id) {
+      var badge = document.getElementById(id);
+      if (!badge) return;
+      if (count > 0) {
+        badge.textContent = count > 9 ? '9+' : count;
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+      }
+    });
+    var lbl = document.getElementById('notif-count-label');
+    if (lbl) lbl.textContent = count + ' en attente';
+  }
+
+  function renderNotifs(notifs) {
+    var list = document.getElementById('notif-list');
+    if (!list) return;
+    if (!notifs.length) {
+      list.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Aucune nouvelle commande</p>';
+      return;
+    }
+    list.innerHTML = notifs.map(function(n) {
+      return '<a href="' + n.url + '" class="flex items-start gap-3 px-4 py-3 hover:bg-lime-50 transition">' +
+        '<div class="w-2 h-2 rounded-full bg-lime-600 mt-2 shrink-0"></div>' +
+        '<div class="flex-1 min-w-0">' +
+          '<p class="text-sm font-semibold text-gray-800 truncate">' + n.client + '</p>' +
+          '<p class="text-xs text-gray-500">' + n.numero + ' · ' + n.montant + ' FCFA</p>' +
+          '<p class="text-xs text-gray-400">' + n.date + '</p>' +
+        '</div>' +
+        '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 shrink-0">' + n.statut + '</span>' +
+      '</a>';
+    }).join('');
+  }
+
+  function fetchNotifs() {
+    fetch('/espace-admin/api/notifications/', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      updateBadge(data.count);
+      renderNotifs(data.notifications);
+    })
+    .catch(function() {});
+  }
+
+  // Premier appel immédiat + polling toutes les 30s
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchNotifs();
+    setInterval(fetchNotifs, 30000);
+  });
+})();
+</script>
 
 <!-- ======================================================= -->
 <!-- MODAL DE CONFIRMATION (remplace window.confirm)         -->

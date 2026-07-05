@@ -4,13 +4,14 @@ import re
 
 import qrcode
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.template.loader import render_to_string
+from weasyprint import HTML as WeasyHTML
 from administration.models import Produit
 from .models import Client, CommandeClient, LigneCommande
 from django.core.paginator import Paginator
-from django.template.loader import render_to_string
 
 
 # ---------------------------------------------------------------------------
@@ -482,6 +483,32 @@ def recu_commande(request, numero):
         'lignes': commande.lignes.select_related('produit').all(),
     }
     return render(request, "client/recu_commande.html", context)
+
+
+def recu_commande_pdf(request, numero):
+    """Génère et télécharge le reçu en PDF via WeasyPrint."""
+    commande = get_object_or_404(
+        CommandeClient.objects.select_related('client').prefetch_related('lignes__produit'),
+        numero__iexact=numero,
+    )
+
+    telephone = request.GET.get('telephone', '').strip()
+    autorise = request.session.get('derniere_commande_numero') == commande.numero or (
+        telephone and _normaliser_telephone(telephone) == _normaliser_telephone(commande.client.telephone)
+    )
+    if not autorise:
+        raise Http404("Reçu introuvable.")
+
+    context = {
+        'commande': commande,
+        'lignes': commande.lignes.select_related('produit').all(),
+    }
+    html_string = render_to_string('client/recu_commande.html', context, request=request)
+    pdf_file = WeasyHTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="recu-{commande.numero}.pdf"'
+    return response
 
 
 def verification_qrcode(request):

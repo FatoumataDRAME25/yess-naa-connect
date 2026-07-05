@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Sum, Count, F, Q
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.templatetags.static import static
 from django.urls import reverse
 from datetime import date, datetime
@@ -38,17 +38,29 @@ def admin_required(view_func):
 # ============================================================
 
 def admin_login(request):
-    """Connexion de la transformatrice/admin."""
+    """Connexion de la transformatrice/admin — accepte téléphone ou username."""
     if request.user.is_authenticated:
         return redirect('admin_transformatrice:admin_dashboard')
 
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
+
+        # Tentative directe (username ou téléphone saisi tel quel)
         user = authenticate(request, username=username, password=password)
+
+        # Si échec, on cherche par téléphone et on réessaie avec le vrai username
+        if user is None:
+            try:
+                found = User.objects.get(telephone=username)
+                user = authenticate(request, username=found.username, password=password)
+            except User.DoesNotExist:
+                pass
+
         if user is not None:
             login(request, user)
             return redirect('admin_transformatrice:admin_dashboard')
+
         messages.error(request, "Identifiant ou mot de passe incorrect.")
         return render(request, 'espace_admin/login.html', {'has_error': True})
     return render(request, 'espace_admin/login.html')
@@ -760,3 +772,98 @@ def tracabilite_produit(request, lot_code):
         'tous_formats': tous_formats,
     }
     return render(request, 'espace_admin/tracabilite.html', context)
+
+
+# ============================================================
+#  PROFIL ADMIN
+# ============================================================
+
+@admin_required
+def admin_profil(request):
+    """Modification du profil (nom, téléphone, photo) + changement de mot de passe."""
+    user = request.user
+    errors = {}
+    success = None
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'profil':
+            prenom = request.POST.get('prenom', '').strip()
+            nom    = request.POST.get('nom', '').strip()
+            tel    = request.POST.get('telephone', '').strip()
+
+            if not prenom:
+                errors['prenom'] = "Le prénom est obligatoire."
+            if not nom:
+                errors['nom'] = "Le nom est obligatoire."
+            if not tel:
+                errors['telephone'] = "Le téléphone est obligatoire."
+
+            if not errors:
+                user.prenom    = prenom
+                user.nom       = nom
+                user.telephone = tel
+                user.username  = tel  # username = téléphone
+                if request.FILES.get('photo'):
+                    user.photo = request.FILES['photo']
+                user.save()
+                success = "Profil mis à jour avec succès."
+
+        elif action == 'password':
+            ancien  = request.POST.get('ancien_mdp', '')
+            nouveau = request.POST.get('nouveau_mdp', '')
+            confirm = request.POST.get('confirm_mdp', '')
+
+            if not user.check_password(ancien):
+                errors['ancien_mdp'] = "Mot de passe actuel incorrect."
+            elif len(nouveau) < 8:
+                errors['nouveau_mdp'] = "Le nouveau mot de passe doit faire au moins 8 caractères."
+            elif nouveau != confirm:
+                errors['confirm_mdp'] = "Les mots de passe ne correspondent pas."
+            else:
+                user.set_password(nouveau)
+                user.save()
+                from django.contrib.auth import update_session_auth_hash
+                update_session_auth_hash(request, user)
+                success = "Mot de passe modifié avec succès."
+
+    context = {
+        'active_nav': 'profil',
+        'user': user,
+        'errors': errors,
+        'success': success,
+    }
+    return render(request, 'espace_admin/profil.html', context)
+
+
+# ============================================================
+#  API NOTIFICATIONS (polling JS)
+# ============================================================
+
+@admin_required
+def api_notifications(request):
+    """Retourne les dernières commandes non lues en JSON pour le polling."""
+    from django.utils import timezone
+    import datetime
+
+    # Commandes des 24 dernières heures en attente ou préparation
+    since = timezone.now() - datetime.timedelta(hours=24)
+    nouvelles = CommandeClient.objects.filter(
+        date__gte=since,
+        statut__in=[CommandeClient.Statut.ATTENTE, CommandeClient.Statut.PREPARATION],
+    ).select_related('client').order_by('-date')[:10]
+
+    data = []
+    for cmd in nouvelles:
+        data.append({
+            'id':       cmd.pk,
+            'numero':   cmd.numero,
+            'client':   f"{cmd.client.prenom} {cmd.client.nom}",
+            'montant':  cmd.montant,
+            'statut':   cmd.get_statut_display(),
+            'date':     cmd.date.strftime('%d/%m à %H:%M'),
+            'url':      f"/espace-admin/commandes/{cmd.pk}/",
+        })
+
+    return JsonResponse({'notifications': data, 'count': len(data)})

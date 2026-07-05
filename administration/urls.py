@@ -40,4 +40,10 @@ urlpatterns = [
 
     # Traçabilité QR (public)
     path('tracabilite/<str:lot_code>/', views.tracabilite_produit, name='tracabilite_produit'),
+
+    # Profil admin
+    path('profil/', views.admin_profil, name='admin_profil'),
+
+    # Notifications (API JSON polling)
+    path('api/notifications/', views.api_notifications, name='api_notifications'),
 ]

@@ -32,15 +32,54 @@
             Ajouter un produit
         </a>
 
-        <!-- Notif + profil -->
-        <div class="flex items-center gap-3 ml-2">
-            <button class="relative w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center">
-                <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z"/></svg>
-                <span class="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+        <!-- Notif + profil sur la même ligne que les boutons -->
+        <div class="relative flex items-center gap-3 ml-2 pl-4 border-l border-gray-200">
+          <!-- Cloche -->
+          <div class="relative">
+            <button id="notif-btn" onclick="toggleNotifPanel()"
+                    class="relative w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100
+                           flex items-center justify-center text-gray-500 hover:text-lime-900 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+              <span id="notif-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
             </button>
-            <img src="{{ user.profile_photo_url|default:'https://i.pravatar.cc/40?img=12' }}"
-                 class="w-10 h-10 rounded-full object-cover" alt="Admin">
-            <span class="text-sm font-semibold text-gray-800">{{ user.get_full_name|default:"Admin Transformatrice" }}</span>
+            <!-- Panneau notifications -->
+            <div id="notif-panel"
+                 class="hidden absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+              <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                <p class="font-bold text-sm text-gray-800">Notifications</p>
+                <span id="notif-count-label" class="text-xs text-gray-400">0 en attente</span>
+              </div>
+              <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                <p class="text-center text-gray-400 text-sm py-8">Aucune nouvelle commande</p>
+              </div>
+              <div class="px-4 py-3 border-t border-gray-100">
+                <a href="{% url 'admin_transformatrice:admin_commandes' %}"
+                   class="block text-center text-xs font-semibold text-lime-700 hover:text-lime-900 transition">
+                  Voir toutes les commandes →
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Profil -->
+          <a href="{% url 'admin_transformatrice:admin_profil' %}"
+             class="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-100 px-3 py-2 hover:bg-gray-50 transition">
+            {% if request.user.photo %}
+              <img src="{{ request.user.photo.url }}" class="w-8 h-8 rounded-full object-cover" alt="profil">
+            {% else %}
+              <div class="w-8 h-8 rounded-full bg-lime-100 flex items-center justify-center text-sm font-bold text-lime-800">
+                {{ request.user.prenom|first }}{{ request.user.nom|first }}
+              </div>
+            {% endif %}
+            <div class="text-left">
+              <p class="text-sm font-semibold text-gray-800 leading-none">{{ request.user.prenom }} {{ request.user.nom }}</p>
+              <p class="text-xs text-gray-400 mt-0.5">{{ request.user.get_role_display }}</p>
+            </div>
+            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
         </div>
     </div>
 </div>
@@ -427,6 +466,82 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+/* ── Notifications polling ─────────────────────────────── */
+(function () {
+  var panelOpen = false;
+
+  window.toggleNotifPanel = function () {
+    var panel = document.getElementById('notif-panel');
+    if (!panel) return;
+    panelOpen = !panelOpen;
+    panel.classList.toggle('hidden', !panelOpen);
+  };
+
+  document.addEventListener('click', function (e) {
+    if (!panelOpen) return;
+    var btn   = document.getElementById('notif-btn');
+    var panel = document.getElementById('notif-panel');
+    if (btn && panel && !btn.contains(e.target) && !panel.contains(e.target)) {
+      panelOpen = false;
+      panel.classList.add('hidden');
+    }
+  });
+
+  function updateBadge(count) {
+    var badge = document.getElementById('notif-badge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.classList.remove('hidden');
+      badge.classList.add('flex');
+    } else {
+      badge.classList.add('hidden');
+      badge.classList.remove('flex');
+    }
+    var lbl = document.getElementById('notif-count-label');
+    if (lbl) lbl.textContent = count + ' en attente';
+  }
+
+  function renderNotifs(notifs) {
+    var list = document.getElementById('notif-list');
+    if (!list) return;
+    if (!notifs.length) {
+      list.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Aucune nouvelle commande</p>';
+      return;
+    }
+    list.innerHTML = notifs.map(function (n) {
+      return '<a href="' + n.url + '" class="flex items-start gap-3 px-4 py-3 hover:bg-lime-50 transition">' +
+        '<div class="w-2 h-2 rounded-full bg-lime-600 mt-2 shrink-0"></div>' +
+        '<div class="flex-1 min-w-0">' +
+          '<p class="text-sm font-semibold text-gray-800 truncate">' + n.client + '</p>' +
+          '<p class="text-xs text-gray-500">' + n.numero + ' · ' + n.montant + ' FCFA</p>' +
+          '<p class="text-xs text-gray-400">' + n.date + '</p>' +
+        '</div>' +
+        '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 shrink-0">' + n.statut + '</span>' +
+      '</a>';
+    }).join('');
+  }
+
+  function fetchNotifs() {
+    fetch('/espace-admin/api/notifications/', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      updateBadge(data.count);
+      renderNotifs(data.notifications);
+    })
+    .catch(function () {});
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    fetchNotifs();
+    setInterval(fetchNotifs, 30000);
+  });
+})();
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const ventesData = {{ ventes_semaine|default:"[45000,52000,38000,64000,47000,69000,58000]"|safe }};

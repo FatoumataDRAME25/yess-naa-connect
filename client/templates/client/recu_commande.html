@@ -18,10 +18,15 @@
 
     <!-- Barre d'action (masquée à l'impression) -->
     <div class="no-print flex justify-end gap-3 mb-8">
+      <a href="{% url 'recu_commande_pdf' commande.numero %}{% if request.GET.telephone %}?telephone={{ request.GET.telephone }}{% endif %}"
+         class="flex items-center gap-2 px-6 py-3 bg-lime-900 text-white text-sm font-bold rounded-xl hover:bg-lime-800 transition-colors">
+        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        Télécharger en PDF
+      </a>
       <button onclick="window.print()"
-              class="flex items-center gap-2 px-6 py-3 bg-lime-900 text-white text-sm font-bold rounded-xl hover:bg-lime-800 transition-colors">
-        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm-1-9H6v4h12V3z"/></svg>
-        Imprimer / Enregistrer en PDF
+              class="flex items-center gap-2 px-6 py-3 bg-white border-2 border-lime-900 text-lime-900 text-sm font-bold rounded-xl hover:bg-lime-50 transition-colors">
+        <svg class="w-4 h-4 fill-lime-900" viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm-1-9H6v4h12V3z"/></svg>
+        Imprimer
       </button>
     </div>
 

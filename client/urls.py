@@ -14,6 +14,7 @@ urlpatterns = [
     path("confirmationCommande/", views.confirmer_commande, name="confirmationCommande"),
     path("suivreCommande/", views.suivre_commande, name="suivre_commande"),
     path("commande/<str:numero>/recu/", views.recu_commande, name="recu_commande"),
+    path("commande/<str:numero>/recu/pdf/", views.recu_commande_pdf, name="recu_commande_pdf"),
     path("verification/", views.verification_qrcode, name="verification_qrcode"),
 
     # Actions panier (AJAX POST)
