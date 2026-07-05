@@ -117,12 +117,64 @@
 
       <!-- Actions desktop -->
       <div class="hidden md:flex items-center gap-5">
-        <button aria-label="Rechercher" class="text-gray-600 hover:text-lime-900 transition-colors">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-          </svg>
-        </button>
+
+        <!-- Recherche expansible (masquée sur la page catalogue qui a sa propre barre) -->
+        {% if request.resolver_match.url_name != 'catalogue' %}
+        <div id="search-wrapper" class="flex items-center">
+          <!-- Champ de saisie (caché par défaut) -->
+          <form id="search-form" action="{% url 'catalogue' %}" method="get"
+                class="flex items-center overflow-hidden transition-all duration-300 ease-in-out"
+                style="max-width:0; opacity:0;">
+            <input id="search-input" type="text" name="q" placeholder="Rechercher un produit…"
+                   autocomplete="off"
+                   class="w-44 text-sm text-gray-700 bg-gray-100 rounded-l-lg px-3 py-1.5
+                          outline-none focus:ring-2 focus:ring-lime-500 border-0"/>
+            <button type="submit"
+                    class="bg-lime-900 text-white px-3 py-1.5 rounded-r-lg hover:bg-lime-800 transition-colors">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+              </svg>
+            </button>
+          </form>
+          <!-- Icône loupe (toggle) -->
+          <button id="search-toggle" aria-label="Rechercher"
+                  class="text-gray-600 hover:text-lime-900 transition-colors ml-1">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+            </svg>
+          </button>
+        </div>
+
+        <script>
+        (function() {
+          var toggle = document.getElementById('search-toggle');
+          var form   = document.getElementById('search-form');
+          var input  = document.getElementById('search-input');
+          var open   = false;
+
+          toggle.addEventListener('click', function() {
+            open = !open;
+            if (open) {
+              form.style.maxWidth = '220px';
+              form.style.opacity  = '1';
+              setTimeout(function() { input.focus(); }, 50);
+            } else {
+              form.style.maxWidth = '0';
+              form.style.opacity  = '0';
+            }
+          });
+
+          /* Ferme la barre si on clique ailleurs */
+          document.addEventListener('click', function(e) {
+            if (open && !document.getElementById('search-wrapper').contains(e.target)) {
+              open = false;
+              form.style.maxWidth = '0';
+              form.style.opacity  = '0';
+            }
+          });
+        })();
+        </script>
+        {% endif %}
 
         <!-- Icône panier avec badge dynamique -->
         <a href="{% url 'panier' %}" aria-label="Panier" class="relative text-gray-700 hover:text-lime-900 transition-colors">

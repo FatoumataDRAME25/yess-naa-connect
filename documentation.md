@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-**Yess Naa Connect** est une plateforme Django de vente de riz local au Sénégal. Elle connecte les producteurs de paddy, la transformatrice (administratrice), les livreurs et les clients finaux. La chaîne de valeur complète — de la récolte jusqu'à la livraison — est tracée via des QR codes.
+**Yess Naa Connect** est une plateforme de vente de riz local au Sénégal. Elle connecte les producteurs de paddy, la transformatrice (administratrice), les livreurs et les clients finaux. La chaîne de valeur complète — de la récolte jusqu'à la livraison — est tracée via des QR codes.
 
 ---
 

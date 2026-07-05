@@ -46,10 +46,10 @@ Catalogue | Riz Local
         <form method="GET" action="{% url 'catalogue' %}">
           {% if type_riz_actif %}<input type="hidden" name="type_riz" value="{{ type_riz_actif }}">{% endif %}
           {% if poids_actif %}<input type="hidden" name="poids" value="{{ poids_actif }}">{% endif %}
-          <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div class="flex flex-wrap items-center gap-3 w-full min-w-0">
 
             <!-- Recherche -->
-            <div class="relative flex-1">
+            <div class="relative flex-1 min-w-0">
               <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -66,7 +66,7 @@ Catalogue | Riz Local
             </div>
 
             <!-- Tri -->
-            <div class="relative w-full sm:w-52 shrink-0">
+            <div class="relative w-48 shrink-0">
               <select class="w-full appearance-none px-4 py-3 bg-white rounded-xl shadow-sm
                              text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-lime-700
                              transition cursor-pointer">
