@@ -78,6 +78,41 @@
             {% endif %}">
           À Propos
         </a>
+
+        <!-- Dropdown Se connecter -->
+        <div class="relative" id="dropdown-connexion">
+          <button onclick="toggleDropdown()"
+                  class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-lime-900 transition-colors">
+            Se connecter
+            <svg class="w-3.5 h-3.5 transition-transform duration-200" id="dropdown-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="dropdown-menu"
+               class="hidden absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl shadow-black/10
+                      border border-gray-100 overflow-hidden z-50">
+            <a href="{% url 'admin_transformatrice:admin_login' %}"
+               class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-lime-50 hover:text-lime-900 transition-colors">
+              <div>
+                <div class="font-semibold text-xs">Espace Transformatrice</div>
+              </div>
+            </a>
+            <div class="border-t border-gray-100"></div>
+            <a href="{% url 'livreur:connexion' %}"
+               class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-lime-50 hover:text-lime-900 transition-colors">
+              <div>
+                <div class="font-semibold text-xs">Espace Livreur</div>
+              </div>
+            </a>
+            <div class="border-t border-gray-100"></div>
+            <a href="{% url 'inscription' %}"
+               class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-lime-50 hover:text-lime-900 transition-colors">
+              <div>
+                <div class="font-semibold text-xs">Espace Producteur</div>
+              </div>
+            </a>
+          </div>
+        </div>
       </nav>
 
       <!-- Actions desktop -->
@@ -158,6 +193,21 @@
       <a href="{% url 'suivre_commande' %}" class="px-4 py-3 rounded-xl text-base font-semibold {% if request.resolver_match.url_name == 'suivre_commande' %}text-lime-900 bg-lime-50{% else %}text-gray-700{% endif %}">Suivre ma commande</a>
       <a href="{% url 'inscription' %}" class="px-4 py-3 rounded-xl text-base font-semibold text-gray-700">Devenir partenaire</a>
       <a href="{% url 'a_propos' %}" class="px-4 py-3 rounded-xl text-base font-semibold {% if request.resolver_match.url_name == 'a_propos' %}text-lime-900 bg-lime-50{% else %}text-gray-700{% endif %}">À Propos</a>
+      <!-- Séparateur connexion -->
+      <div class="mx-4 my-2 border-t border-gray-100"></div>
+      <p class="px-4 py-1 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Espaces connectés</p>
+      <a href="{% url 'admin_transformatrice:admin_login' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-lime-50 hover:text-lime-900">
+        <span class="text-lg">⚙️</span> Espace Transformatrice
+      </a>
+      <a href="{% url 'livreur:connexion' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-lime-50 hover:text-lime-900">
+        <span class="text-lg">🛵</span> Espace Livreur
+      </a>
+      <a href="{% url 'connexion' %}"
+         class="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-lime-50 hover:text-lime-900">
+        <span class="text-lg">🌾</span> Espace Producteur
+      </a>
     </nav>
     <div class="mt-auto p-4">
       <a href="{% url 'catalogue' %}"
@@ -215,6 +265,7 @@
             <li><a href="{% url 'verification_qrcode' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> La Traçabilité</a></li>
             <li><a href="{% url 'inscription' %}" class="text-white/70 text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-yellow-600">›</span> Devenir Partenaire</a></li>
           </ul>
+          <!-- Espaces connectés supprimés -->
         </div>
 
         <!-- Colonne 3 : Contact -->
@@ -272,6 +323,28 @@
       document.getElementById('menu-overlay').classList.add('hidden');
       document.body.style.overflow = '';
     }
+
+    /* Dropdown Se connecter */
+    function toggleDropdown() {
+      var menu    = document.getElementById('dropdown-menu');
+      var chevron = document.getElementById('dropdown-chevron');
+      var isOpen  = !menu.classList.contains('hidden');
+      if (isOpen) {
+        menu.classList.add('hidden');
+        chevron.style.transform = '';
+      } else {
+        menu.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      }
+    }
+    /* Fermer le dropdown en cliquant ailleurs */
+    document.addEventListener('click', function(e) {
+      var container = document.getElementById('dropdown-connexion');
+      if (container && !container.contains(e.target)) {
+        document.getElementById('dropdown-menu').classList.add('hidden');
+        document.getElementById('dropdown-chevron').style.transform = '';
+      }
+    });
   </script>
 
   <!-- JS global -->

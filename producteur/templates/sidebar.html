@@ -183,6 +183,26 @@
         }
     </script>
 
+    <!-- ═══════════════════════════════════════════
+         BOUTON FLOTTANT — Accès rapide à la boutique
+    ═══════════════════════════════════════════ -->
+    <a href="{% url 'accueil' %}"
+       title="Voir la boutique"
+       class="fixed top-5 right-5 z-[80] group flex items-center gap-2
+              bg-[#2d5a27] hover:bg-[#1e3e1b] text-white
+              shadow-lg shadow-black/25 hover:shadow-xl
+              rounded-full px-4 py-3 transition-all duration-300
+              hover:scale-105 active:scale-95"
+       style="text-decoration:none;">
+      <svg class="w-5 h-5 shrink-0" fill="white" viewBox="0 0 24 24">
+        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+      </svg>
+      <span style="max-width:0;overflow:hidden;white-space:nowrap;transition:max-width 0.3s;font-size:0.875rem;font-weight:700;"
+            class="group-hover:max-w-xs">
+        Boutique
+      </span>
+    </a>
+
     <script>
     (function () {
         'use strict';

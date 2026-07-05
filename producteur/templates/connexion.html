@@ -8,7 +8,16 @@
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
 <body>
-  <div class="bg-[#F8FAFC] font-sans min-h-screen flex items-center justify-center px-4 py-10 md:px-8 md:py-36">
+  <div class="bg-[#F8FAFC] font-sans min-h-screen flex items-center justify-center px-4 py-10 md:px-8 md:py-36 relative">
+
+  <!-- Flèche retour vers le catalogue -->
+  <a href="{% url 'catalogue' %}" aria-label="Retour au catalogue"
+     class="absolute top-5 right-5 md:top-8 md:right-8 z-10 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-500 hover:text-[#2D5A16] hover:border-[#2D5A16] transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+    </svg>
+  </a>
+
   <div class="w-full max-w-[1100px] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
 
     <!-- PANNEAU GAUCHE -->

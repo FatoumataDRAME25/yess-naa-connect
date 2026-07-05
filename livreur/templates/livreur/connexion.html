@@ -11,7 +11,20 @@
 </head>
 <body>
 
-<div class="app">
+<div class="app" style="position: relative;">
+
+  <!-- Flèche retour vers le catalogue -->
+  <a href="{% url 'catalogue' %}" aria-label="Retour au catalogue"
+     style="position: fixed; top: 20px; right: 20px; z-index: 10; width: 40px; height: 40px; border-radius: 999px;
+            background: #fff; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex; align-items: center; justify-content: center; color: #64748b; text-decoration: none;
+            transition: color 0.2s, border-color 0.2s;"
+     onmouseover="this.style.color='#c85a1a'; this.style.borderColor='#c85a1a';"
+     onmouseout="this.style.color='#64748b'; this.style.borderColor='rgba(0,0,0,0.08)';">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+    </svg>
+  </a>
 
   <div class="login-side">
     <div class="login-card">

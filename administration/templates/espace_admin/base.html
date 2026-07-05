@@ -332,6 +332,27 @@
 
 </div><!-- fin flex -->
 
+<!-- ═══════════════════════════════════════════════════
+     BOUTON FLOTTANT — Accès rapide à la boutique client
+════════════════════════════════════════════════════ -->
+<a href="{% url 'accueil' %}"
+   title="Voir la boutique"
+   class="fixed top-5 right-5 z-[80] group flex items-center gap-2
+          bg-lime-900 hover:bg-lime-800 text-white
+          shadow-lg shadow-lime-900/40 hover:shadow-xl hover:shadow-lime-900/50
+          rounded-full px-4 py-3 transition-all duration-300
+          hover:scale-105 active:scale-95">
+  <!-- Icône boutique -->
+  <svg class="w-5 h-5 fill-white shrink-0" viewBox="0 0 24 24">
+    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+  </svg>
+  <!-- Label visible au hover -->
+  <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs
+               transition-all duration-300 text-sm font-semibold">
+    Boutique
+  </span>
+</a>
+
 <!-- ======================================================= -->
 <!-- MODAL DE CONFIRMATION (remplace window.confirm)         -->
 <!-- ======================================================= -->
