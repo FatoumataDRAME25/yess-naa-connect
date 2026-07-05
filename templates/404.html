@@ -1,0 +1,58 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Page introuvable — Riz Local{% endblock %}
+
+{% block content %}
+<main class="pt-16 md:pt-20 min-h-screen bg-stone-50 flex items-center justify-center px-4">
+  <div class="max-w-lg w-full text-center py-20">
+
+    <!-- Illustration -->
+    <div class="relative inline-flex items-center justify-center mb-8">
+      <div class="w-36 h-36 rounded-full bg-lime-100 flex items-center justify-center">
+        <span class="text-6xl">🌾</span>
+      </div>
+      <span class="absolute -top-2 -right-2 text-4xl font-extrabold text-lime-900 bg-white rounded-full w-14 h-14 flex items-center justify-center shadow-md border border-lime-100">
+        !
+      </span>
+    </div>
+
+    <!-- Code erreur -->
+    <p class="text-8xl font-extrabold text-lime-900 leading-none mb-2">404</p>
+
+    <!-- Titre -->
+    <h1 class="text-2xl md:text-3xl font-bold text-lime-950 mb-3">
+      Page introuvable
+    </h1>
+
+    <!-- Message -->
+    <p class="text-gray-500 text-base md:text-lg leading-relaxed mb-8">
+      Cette page n'existe pas ou a été déplacée.<br>
+      Retournez à l'accueil pour continuer vos achats.
+    </p>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="{% url 'accueil' %}"
+         class="px-8 py-3 bg-lime-900 text-white font-semibold rounded-xl
+                hover:bg-lime-800 transition-colors shadow-md">
+        Retour à l'accueil
+      </a>
+      <a href="{% url 'catalogue' %}"
+         class="px-8 py-3 bg-white text-lime-900 font-semibold rounded-xl
+                border-2 border-lime-900 hover:bg-lime-50 transition-colors">
+        Voir le catalogue
+      </a>
+    </div>
+
+    <!-- Lien suivi commande -->
+    <p class="mt-8 text-sm text-gray-400">
+      Vous cherchez votre commande ?
+      <a href="{% url 'suivre_commande' %}" class="text-lime-700 hover:underline font-medium">
+        Suivre ma commande →
+      </a>
+    </p>
+
+  </div>
+</main>
+{% endblock %}

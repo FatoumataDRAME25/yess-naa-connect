@@ -8,6 +8,8 @@ admin.site.site_header  = "Yess Naa Connect – Administration"
 admin.site.site_title   = "Yess Naa Connect"
 admin.site.index_title  = "Tableau de bord administrateur"
 
+handler404 = 'client.views.page_404'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('client.urls')),

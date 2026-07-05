@@ -501,3 +501,8 @@ def verification_qrcode(request):
         'erreur': erreur,
     }
     return render(request, "client/verification_qrcode.html", context)
+
+
+def page_404(request, exception=None):
+    context = {'nb_panier': nb_articles_panier(request)}
+    return render(request, '404.html', context, status=404)
