@@ -5,6 +5,8 @@ cssselect2==0.9.0
 Django==6.0.6
 django-tailwind==4.5.0
 fonttools==4.63.0
+gunicorn==26.0.0
+packaging==26.2
 pillow==12.2.0
 psycopg2-binary==2.9.12
 pycparser==3.0
