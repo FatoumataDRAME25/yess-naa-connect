@@ -111,8 +111,13 @@
               {{ form.telephone }}
             </div>
             {% if form.telephone.errors %}
-              <p class="text-xs text-red-500">{{ form.telephone.errors.0 }}</p>
+              <p class="text-xs text-red-500" id="tel-error-server">{{ form.telephone.errors.0 }}</p>
             {% endif %}
+            <p class="text-xs text-red-500 hidden" id="tel-error-client"></p>
+            <p class="text-xs text-green-600 hidden" id="tel-valid">
+              <svg class="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+              Numéro valide
+            </p>
           </div>
 
           <!-- Région -->
@@ -191,4 +196,74 @@
   </div>
 </div>
 </body>
+<script>
+  (function () {
+    const PREFIXES_VALIDES = ['70', '71', '75', '76', '77', '78'];
+    const input = document.getElementById('id_telephone');
+    const errorEl = document.getElementById('tel-error-client');
+    const validEl = document.getElementById('tel-valid');
+
+    if (!input) return;
+
+    function normaliser(val) {
+      // Supprimer espaces, tirets, points
+      let n = val.replace(/[\s\-\.]/g, '');
+      // Retirer +221 ou 00221
+      n = n.replace(/^(\+221|00221)/, '');
+      return n;
+    }
+
+    function valider(val) {
+      const n = normaliser(val);
+      if (val.trim() === '') return null; // pas encore saisi
+
+      if (!/^\d{9}$/.test(n)) {
+        return 'Le numéro doit contenir 9 chiffres (ex: 77 123 45 67).';
+      }
+      if (!PREFIXES_VALIDES.includes(n.slice(0, 2))) {
+        return `Numéro invalide. Doit commencer par : ${PREFIXES_VALIDES.join(', ')}.`;
+      }
+      return null; // valide
+    }
+
+    function afficher(erreur) {
+      if (erreur === null) {
+        // pas encore saisi
+        errorEl.classList.add('hidden');
+        validEl.classList.add('hidden');
+        input.classList.remove('border-red-400', 'border-green-500');
+        return;
+      }
+      if (erreur) {
+        errorEl.textContent = erreur;
+        errorEl.classList.remove('hidden');
+        validEl.classList.add('hidden');
+        input.classList.add('border-red-400');
+        input.classList.remove('border-green-500');
+      } else {
+        errorEl.classList.add('hidden');
+        validEl.classList.remove('hidden');
+        input.classList.remove('border-red-400');
+        input.classList.add('border-green-500');
+      }
+    }
+
+    input.addEventListener('input', function () {
+      afficher(valider(this.value));
+    });
+
+    input.addEventListener('blur', function () {
+      if (this.value.trim() !== '') {
+        afficher(valider(this.value));
+      }
+    });
+
+    // Bloquer les lettres (n'autoriser que chiffres, espaces, +, -)
+    input.addEventListener('keypress', function (e) {
+      if (!/[\d\s\+\-\.]/.test(e.key)) {
+        e.preventDefault();
+      }
+    });
+  })();
+</script>
 </html>

@@ -1,6 +1,37 @@
+import re
 from django import forms
 from administration.models import User
 from producteur.models import StockPaddy
+
+# Préfixes valides des opérateurs sénégalais (Orange, Free, Expresso, Saga)
+PREFIXES_VALIDES_SN = ['70', '71', '75', '76', '77', '78']
+
+def valider_numero_senegalais(telephone):
+    """
+    Valide un numéro de téléphone sénégalais.
+    Accepte les formats : 771234567 / 77 123 45 67 / 77-123-45-67
+    Retourne le numéro normalisé (9 chiffres) ou lève une ValidationError.
+    """
+    # Supprimer espaces, tirets, points
+    numero = re.sub(r'[\s\-\.]', '', telephone)
+    # Retirer le préfixe +221 ou 00221 si présent
+    numero = re.sub(r'^(\+221|00221)', '', numero)
+
+    # Doit avoir exactement 9 chiffres
+    if not re.fullmatch(r'\d{9}', numero):
+        raise forms.ValidationError(
+            "Le numéro doit contenir 9 chiffres (ex: 77 123 45 67)."
+        )
+
+    # Vérifier le préfixe opérateur
+    prefixe = numero[:2]
+    if prefixe not in PREFIXES_VALIDES_SN:
+        raise forms.ValidationError(
+            f"Numéro invalide. Les numéros sénégalais commencent par : "
+            f"{', '.join(PREFIXES_VALIDES_SN)}."
+        )
+
+    return numero
 
 REGIONS_SENEGAL = [
     ('', 'Sélectionnez votre région'),
@@ -67,9 +98,12 @@ class InscriptionProducteurForm(forms.Form):
 
     def clean_telephone(self):
         telephone = self.cleaned_data.get('telephone')
-        if User.objects.filter(telephone=telephone).exists():
+        # Validation format + préfixe sénégalais (lève ValidationError si invalide)
+        numero = valider_numero_senegalais(telephone)
+        # Vérifier l'unicité avec le numéro normalisé
+        if User.objects.filter(telephone=numero).exists():
             raise forms.ValidationError("Ce numéro de téléphone est déjà utilisé.")
-        return telephone
+        return numero
 
     def clean(self):
         cleaned_data = super().clean()
@@ -127,6 +161,17 @@ class ProfilForm(forms.ModelForm):
         # Pré-remplir région depuis le champ adresse de l'utilisateur
         if self.instance and self.instance.adresse:
             self.fields['region'].initial = self.instance.adresse
+
+    def clean_telephone(self):
+        telephone = self.cleaned_data.get('telephone')
+        numero = valider_numero_senegalais(telephone)
+        # Vérifier unicité en excluant l'utilisateur actuel
+        qs = User.objects.filter(telephone=numero)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Ce numéro de téléphone est déjà utilisé.")
+        return numero
 
     def save(self, commit=True):
         user = super().save(commit=False)
