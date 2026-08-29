@@ -11,9 +11,9 @@
     <title>{% block title %}{% endblock %}</title>
 
     <!-- SEO -->
-    <meta name="description" content="Achetez du riz local directement auprès des producteurs sénégalais avec Riz Local.">
-    <meta name="keywords" content="riz, Sénégal, agriculture, producteurs, vente en ligne, Riz Local">
-    <meta name="author" content="Riz Local">
+    <meta name="description" content="Achetez du riz local directement auprès des producteurs sénégalais avec Riz de la Teranga.">
+    <meta name="keywords" content="riz, Sénégal, agriculture, producteurs, vente en ligne, Riz de la Teranga">
+    <meta name="author" content="Riz de la Teranga">
 
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
@@ -33,8 +33,8 @@
 
       <!-- Logo -->
       <a href="{% url 'accueil' %}" class="flex items-center gap-1">
-        <span class="text-xl md:text-2xl font-extrabold text-lime-900">Riz </span>
-        <span class="text-xl md:text-2xl font-bold text-lime-500">Local</span>
+        <span class="text-xl md:text-2xl font-extrabold text-lime-900">Riz de la </span>
+        <span class="text-xl md:text-2xl font-bold text-lime-500">Teranga</span>
       </a>
 
       <!-- Navigation desktop -->
@@ -94,7 +94,7 @@
             <a href="{% url 'admin_transformatrice:admin_login' %}"
                class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-lime-50 hover:text-lime-900 transition-colors">
               <div>
-                <div class="font-semibold text-xs">Espace Transformatrice</div>
+                <div class="font-semibold text-xs">Espace Transformateurs(trices)</div>
               </div>
             </a>
             <div class="border-t border-gray-100"></div>
@@ -108,7 +108,7 @@
             <a href="{% url 'inscription' %}"
                class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-lime-50 hover:text-lime-900 transition-colors">
               <div>
-                <div class="font-semibold text-xs">Espace Producteur</div>
+                <div class="font-semibold text-xs">Espace Producteurs(trices)</div>
               </div>
             </a>
           </div>
@@ -232,7 +232,7 @@
        class="fixed top-0 right-0 h-full w-72 max-w-[80%] bg-white z-[70] transform translate-x-full
               transition-transform duration-300 ease-in-out md:hidden flex flex-col">
     <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
-      <span class="text-xl font-extrabold text-lime-900">Riz <span class="text-lime-500 font-bold">Local</span></span>
+      <span class="text-xl font-extrabold text-lime-900">Riz de la <span class="text-lime-500 font-bold">Teranga</span></span>
       <button onclick="closeMobileMenu()" aria-label="Fermer" class="text-gray-500">
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -250,7 +250,7 @@
       <p class="px-4 py-1 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Espaces connectés</p>
       <a href="{% url 'admin_transformatrice:admin_login' %}"
          class="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-lime-50 hover:text-lime-900">
-        <span class="text-lg">⚙️</span> Espace Transformatrice
+        <span class="text-lg">⚙️</span> Espace Transformateurs(trices)
       </a>
       <a href="{% url 'livreur:connexion' %}"
          class="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-lime-50 hover:text-lime-900">
@@ -258,7 +258,7 @@
       </a>
       <a href="{% url 'connexion' %}"
          class="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-lime-50 hover:text-lime-900">
-        <span class="text-lg">🌾</span> Espace Producteur
+        <span class="text-lg">🌾</span> Espace Producteurs(trices)
       </a>
     </nav>
     <div class="mt-auto p-4">
@@ -282,7 +282,7 @@
 
         <!-- Colonne 1 : Présentation -->
         <div>
-          <p class="text-white text-2xl font-extrabold uppercase mb-6">Riz Local</p>
+          <p class="text-white text-2xl font-extrabold uppercase mb-6">Riz de la Teranga</p>
           <p class="text-white/70 text-sm leading-6 mb-6">
             Connecter les producteurs locaux de riz du Sénégal directement aux consommateurs.
             Pour une agriculture durable et une économie circulaire forte.
@@ -352,7 +352,7 @@
 
       <!-- Bas de footer -->
       <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p class="text-white/50 text-xs">© 2024 Riz Local. Tous droits réservés.</p>
+        <p class="text-white/50 text-xs">© 2024 Riz de la Teranga. Tous droits réservés.</p>
         <div class="flex gap-6">
           <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Mentions Légales</a>
           <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Politique de Confidentialité</a>
