@@ -15,7 +15,7 @@ from datetime import date, datetime
 import qrcode
 
 from producteur.models import StockPaddy
-from administration.models import Produit, CommandePaddy, User
+from administration.models import Produit, CommandePaddy, User, RegleRemise
 from administration.forms import LivreurCreationForm
 from client.models import CommandeClient
 from livreur.models import Livraison
@@ -867,6 +867,65 @@ def api_notifications(request):
         })
 
     return JsonResponse({'notifications': data, 'count': len(data)})
+
+
+# ============================================================
+#  CONFIGURATION REMISE (Prompt 5)
+# ============================================================
+
+@admin_required
+def admin_remise(request):
+    """Affiche et modifie la règle de remise volume."""
+    regle = RegleRemise.objects.filter(est_active=True).order_by('-seuil_kg').first()
+    if not regle:
+        regle = RegleRemise.objects.first()
+
+    success = None
+    errors = {}
+
+    if request.method == 'POST':
+        seuil = request.POST.get('seuil_kg', '').strip()
+        taux = request.POST.get('taux_remise', '').strip()
+        description = request.POST.get('description', '').strip()
+        est_active = request.POST.get('est_active') == 'on'
+
+        try:
+            seuil = int(seuil)
+            if seuil <= 0:
+                errors['seuil_kg'] = "Le seuil doit être supérieur à 0."
+        except (ValueError, TypeError):
+            errors['seuil_kg'] = "Seuil invalide."
+
+        try:
+            taux = float(taux)
+            if not (0 < taux <= 100):
+                errors['taux_remise'] = "Le taux doit être entre 0.01 et 100."
+        except (ValueError, TypeError):
+            errors['taux_remise'] = "Taux invalide."
+
+        if not errors:
+            if regle:
+                regle.seuil_kg = seuil
+                regle.taux_remise = taux
+                regle.description = description
+                regle.est_active = est_active
+                regle.save()
+            else:
+                regle = RegleRemise.objects.create(
+                    seuil_kg=seuil,
+                    taux_remise=taux,
+                    description=description,
+                    est_active=est_active,
+                )
+            success = "Règle de remise mise à jour avec succès."
+
+    context = {
+        'active_nav': 'remise',
+        'regle': regle,
+        'success': success,
+        'errors': errors,
+    }
+    return render(request, 'espace_admin/remise.html', context)
 
 
 # ============================================================

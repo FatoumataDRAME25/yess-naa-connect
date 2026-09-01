@@ -45,6 +45,9 @@ urlpatterns = [
     # Profil admin
     path('profil/', views.admin_profil, name='admin_profil'),
 
+    # Remise volume
+    path('remise/', views.admin_remise, name='admin_remise'),
+
     # Notifications (API JSON polling)
     path('api/notifications/', views.api_notifications, name='api_notifications'),
 ]

@@ -1,0 +1,142 @@
+{% extends "espace_admin/base.html" %}
+{% load static %}
+{% block title %}Règle de remise — Riz de la Teranga{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="font-heading font-bold text-2xl text-yn-green-dark">Règle de remise volume</h1>
+    <p class="text-sm text-yn-gray mt-1">Configurez la remise automatique accordée aux clients commandant en grande quantité.</p>
+  </div>
+
+  {% if success %}
+  <div class="mb-6 px-4 py-3 rounded-xl bg-green-50 text-green-700 border border-green-200 text-sm font-semibold">
+    ✓ {{ success }}
+  </div>
+  {% endif %}
+
+  <!-- Carte état actuel -->
+  <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-gray-800">État actuel</h2>
+      {% if regle %}
+        {% if regle.est_active %}
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span> Active
+          </span>
+        {% else %}
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-gray-400"></span> Inactive
+          </span>
+        {% endif %}
+      {% else %}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
+          Aucune règle configurée
+        </span>
+      {% endif %}
+    </div>
+
+    {% if regle %}
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-yn-green-pale rounded-xl px-4 py-3">
+        <p class="text-xs text-yn-gray font-semibold uppercase mb-1">Seuil déclencheur</p>
+        <p class="text-2xl font-bold text-yn-green-dark">{{ regle.seuil_kg }} kg</p>
+        <p class="text-xs text-yn-gray mt-1">= {{ regle.seuil_kg|floatformat:0 }} kg commandés</p>
+      </div>
+      <div class="bg-amber-50 rounded-xl px-4 py-3">
+        <p class="text-xs text-yn-gray font-semibold uppercase mb-1">Taux de remise</p>
+        <p class="text-2xl font-bold text-yn-gold">{{ regle.taux_remise }}%</p>
+        <p class="text-xs text-yn-gray mt-1">sur le sous-total de la commande</p>
+      </div>
+    </div>
+    {% if regle.description %}
+    <p class="mt-4 text-sm text-yn-gray">Message affiché au client : <span class="font-semibold text-gray-700">« {{ regle.description }} »</span></p>
+    {% endif %}
+    {% else %}
+    <p class="text-yn-gray text-sm">Aucune règle de remise n'est configurée. Remplissez le formulaire ci-dessous pour en créer une.</p>
+    {% endif %}
+  </div>
+
+  <!-- Formulaire -->
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <h2 class="font-semibold text-gray-800 mb-6">{% if regle %}Modifier la règle{% else %}Créer une règle{% endif %}</h2>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Seuil -->
+      <div class="mb-5">
+        <label class="block text-xs font-semibold text-yn-gray uppercase mb-2">
+          Seuil minimum (kg)
+        </label>
+        <input type="number" name="seuil_kg" min="1" step="100"
+               value="{{ regle.seuil_kg|default:'3000' }}"
+               class="w-full px-4 py-3 border {% if errors.seuil_kg %}border-red-400{% else %}border-gray-200{% endif %} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
+        {% if errors.seuil_kg %}
+          <p class="text-xs text-red-500 mt-1">{{ errors.seuil_kg }}</p>
+        {% else %}
+          <p class="text-xs text-yn-gray mt-1">Ex : 3000 pour déclencher la remise à partir de 3 tonnes.</p>
+        {% endif %}
+      </div>
+
+      <!-- Taux -->
+      <div class="mb-5">
+        <label class="block text-xs font-semibold text-yn-gray uppercase mb-2">
+          Taux de remise (%)
+        </label>
+        <input type="number" name="taux_remise" min="0.01" max="100" step="0.5"
+               value="{{ regle.taux_remise|default:'5' }}"
+               class="w-full px-4 py-3 border {% if errors.taux_remise %}border-red-400{% else %}border-gray-200{% endif %} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
+        {% if errors.taux_remise %}
+          <p class="text-xs text-red-500 mt-1">{{ errors.taux_remise }}</p>
+        {% else %}
+          <p class="text-xs text-yn-gray mt-1">Ex : 5 pour une remise de 5% sur le total.</p>
+        {% endif %}
+      </div>
+
+      <!-- Description -->
+      <div class="mb-5">
+        <label class="block text-xs font-semibold text-yn-gray uppercase mb-2">
+          Message affiché au client (optionnel)
+        </label>
+        <input type="text" name="description" maxlength="255"
+               value="{{ regle.description|default:'' }}"
+               placeholder="Ex : Remise fidélité 5% — commande ≥ 3 tonnes"
+               class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
+      </div>
+
+      <!-- Activer/désactiver -->
+      <div class="mb-6 flex items-center gap-3">
+        <input type="checkbox" name="est_active" id="est_active"
+               {% if not regle or regle.est_active %}checked{% endif %}
+               class="w-5 h-5 accent-yn-green rounded">
+        <label for="est_active" class="text-sm font-semibold text-gray-700 cursor-pointer">
+          Règle active (la remise sera appliquée automatiquement)
+        </label>
+      </div>
+
+      <button type="submit"
+              class="w-full flex items-center justify-center gap-2 bg-yn-green hover:bg-yn-green-dark text-white font-bold py-3.5 rounded-xl transition">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+        Enregistrer la règle
+      </button>
+    </form>
+  </div>
+
+  <!-- Info pratique -->
+  <div class="mt-6 bg-blue-50 border border-blue-100 rounded-2xl p-5 text-sm text-blue-800">
+    <p class="font-semibold mb-2">ℹ️ Comment fonctionne la remise ?</p>
+    <ul class="space-y-1 text-blue-700 list-disc list-inside">
+      <li>Le poids total du panier est calculé automatiquement (quantité × poids par sac).</li>
+      <li>Si ce poids atteint ou dépasse le seuil, la remise est appliquée sur le sous-total.</li>
+      <li>La remise est visible par le client dans son panier et lors de la confirmation.</li>
+      <li>Elle est aussi enregistrée dans la commande pour le suivi admin.</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}
