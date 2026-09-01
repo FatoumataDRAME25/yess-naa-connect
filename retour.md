@@ -12,7 +12,6 @@
 |---|---|---|---|
 | R1 | Naming : "Riz de la Teranga" au lieu de "Riz local du Sénégal" | Contenu / UI | Faible |
 | R2 | Système de remise à partir de 3 tonnes | Fonctionnel / DB | Moyenne |
-| R3 | Section Publicité / vidéo n'est plus visible | UI / Bug | Faible |
 | R4 | Renommer espaces : "Espace Producteurs(trices) / Espace Transformateurs(trices)" | UI / Navigation | Faible |
 | R5 | Sécurité des paiements | Technique / Sécurité | Élevée |
 | R6 | Protection des données personnelles (RGPD-like) | Légal / Technique | Élevée |
@@ -35,18 +34,6 @@
 - Remplacer toutes les occurrences de "Riz Local" / "Riz local du Sénégal" par **"Riz de la Teranga"** dans les templates et le code Python
 - Corriger le slogan "du champ à votre table" → **"de la rizière au repas partagé"**
 - Ajouter le nouveau slogan : **"Le riz de la téranga cultivé avec soin, transformé avec amour et livré avec confiance"** dans la page À propos et/ou la landing
-
----
-
-### PROMPT 2 — Visibilité de la section Publicité / Vidéo (R3)
-**Durée estimée : 20–30 min**  
-**Fichiers concernés :** `templates/espace_admin/about.html`, éventuellement `static/`
-
-**Travaux :**
-- Diagnostiquer pourquoi la vidéo n'est plus visible (fichier manquant, chemin cassé, balise `<video>` mal configurée)
-- Corriger le chemin de la vidéo (`/static/images/DEMO%20YESS.mp4`) ou rétablir le fichier manquant
-- S'assurer que la section publicité est bien visible sur mobile et desktop
-- Ajouter un fallback si le fichier vidéo est absent (image statique + message explicite)
 
 ---
 
@@ -134,7 +121,6 @@
 | Prompt | Retours couverts | Durée estimée |
 |--------|-----------------|---------------|
 | 1 | R1, R8, R10 — Naming & slogans | ~15–20 min |
-| 2 | R3 — Vidéo/Publicité | ~20–30 min |
 | 3 | R4 — Renommage espaces | ~20–30 min |
 | 4 | R9 — Variétés de riz | ~30–45 min |
 | 5 | R2 — Système de remise 3 tonnes | ~45–60 min |
@@ -150,7 +136,7 @@
 
 ```
 Priorité haute (visibilité immédiate) :
-  Prompt 1 → Prompt 3 → Prompt 2
+  Prompt 1 → Prompt 3 
 
 Priorité moyenne (fonctionnel métier) :
   Prompt 4 → Prompt 5 → Prompt 6
