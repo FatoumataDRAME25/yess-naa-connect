@@ -432,6 +432,11 @@ def admin_produit_edit(request, pk):
         messages.success(request, "Produit mis à jour.")
         return redirect('admin_transformatrice:admin_catalogue')
 
+    # Attributs d'affichage pour le template
+    produit.photo_url = produit.photo.url if produit.photo else static('images/1sac5kg.jpg')
+    produit.format    = f"{produit.poids_kg} kg"
+    produit.lot_code  = produit.code_lot
+
     context = {
         'active_nav': 'catalogue',
         'produit': produit,
@@ -867,3 +872,19 @@ def api_notifications(request):
         })
 
     return JsonResponse({'notifications': data, 'count': len(data)})
+
+@admin_required
+def admin_partenaires(request):
+    from producteur.models import StockPaddy
+
+    stocks = StockPaddy.objects.select_related(
+        'producteur__user'
+    ).prefetch_related(
+        'commandes_paddy'
+    ).order_by('-date_recolte')
+
+    context = {
+        'active_nav': 'partenaires',
+        'stocks': stocks,
+    }
+    return render(request, 'espace_admin/partenaires.html', context)

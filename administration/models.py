@@ -89,9 +89,12 @@ class CommandePaddy(models.Model):
 class Produit(models.Model):
 
     class TypeRiz(models.TextChoices):
-        BLANC = 'blanc', 'Blanc'
-        ETUVE = 'etuve', 'Étuvé'
-        PARFUME = 'parfume', 'Parfumé'
+        BRISE    = 'brise',    'Riz brisé'
+        ENTIER   = 'entier',   'Riz entier'
+        ETUVE    = 'etuve',    'Riz étuvé'
+        AROMATISE = 'aromatise', 'Riz aromatisé (Jasmine)'
+        EXTRA_FIN = 'extra_fin', 'Riz extra fin'
+        BASMATI  = 'basmati',  'Riz Basmati'
 
     class Poids(models.IntegerChoices):
         CINQ = 5, '5 kg'

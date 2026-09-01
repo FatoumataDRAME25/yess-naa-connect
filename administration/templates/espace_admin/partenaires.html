@@ -1,0 +1,129 @@
+{% extends "espace_admin/base.html" %}
+{% block title %}Partenaires Producteurs — Riz Local{% endblock %}
+
+{% block content %}
+
+<!-- DESKTOP -->
+<div class="hidden md:block">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="font-heading font-bold text-2xl text-yn-green-dark">Partenaires Producteurs</h1>
+      <p class="text-sm text-yn-gray mt-0.5">Historique des stocks et commandes par partenaire</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs font-semibold text-yn-gray uppercase border-b border-gray-100">
+          <th class="px-6 py-4">Producteur</th>
+          <th class="px-6 py-4">Variété</th>
+          <th class="px-6 py-4">Date récolte</th>
+          <th class="px-6 py-4">Déclaré (kg)</th>
+          <th class="px-6 py-4">Date commande</th>
+          <th class="px-6 py-4">Acheté (kg)</th>
+          <th class="px-6 py-4">Restant (kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stocks %}
+        {% with derniere_cmd=stock.commandes_paddy.all|dictsortreversed:"cree_le"|first %}
+        <tr class="border-b border-gray-50 hover:bg-gray-50/60">
+          <td class="px-6 py-4 font-bold text-gray-800">
+            {{ stock.producteur.user.prenom }} {{ stock.producteur.user.nom }}
+          </td>
+          <td class="px-6 py-4 text-gray-600">{{ stock.get_variete_display }}</td>
+          <td class="px-6 py-4 text-gray-500">{{ stock.date_recolte|date:"d M Y" }}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700">{{ stock.quantite_kg|floatformat:0 }} kg</td>
+          <td class="px-6 py-4 text-gray-500">
+            {% if derniere_cmd %}
+              {{ derniere_cmd.cree_le|date:"d M Y" }}
+            {% else %}
+              <span class="text-gray-300">—</span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4 font-semibold text-yn-green">
+            {% if derniere_cmd %}
+              {{ derniere_cmd.quantite_commande|floatformat:0 }} kg
+            {% else %}
+              <span class="text-gray-300">—</span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4 font-semibold
+            {% if stock.quantite_restante <= 0 %}text-red-500
+            {% elif stock.quantite_restante < 100 %}text-amber-500
+            {% else %}text-gray-700{% endif %}">
+            {{ stock.quantite_restante|floatformat:0 }} kg
+          </td>
+          
+        </tr>
+        {% endwith %}
+        {% empty %}
+        <tr>
+          <td colspan="8" class="px-6 py-12 text-center text-yn-gray">
+            Aucun stock déclaré pour le moment.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MOBILE -->
+<div class="md:hidden">
+  <div class="mb-4">
+    <h1 class="font-heading font-bold text-xl text-yn-green-dark">Partenaires</h1>
+    <p class="text-sm text-yn-gray mt-0.5">Historique des stocks</p>
+  </div>
+
+  <div class="space-y-3">
+    {% for stock in stocks %}
+    {% with derniere_cmd=stock.commandes_paddy.all|dictsortreversed:"cree_le"|first %}
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <div class="flex items-center justify-between mb-2">
+        <p class="font-bold text-gray-800">{{ stock.producteur.user.prenom }} {{ stock.producteur.user.nom }}</p>
+        {% if stock.statut == 'disponible' %}
+          <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">Disponible</span>
+        {% elif stock.statut == 'commande' %}
+          <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-full">Commandé</span>
+        {% else %}
+          <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-1 rounded-full">Épuisé</span>
+        {% endif %}
+      </div>
+      <p class="text-xs text-gray-400 mb-3">{{ stock.get_variete_display }} — récolte {{ stock.date_recolte|date:"d M Y" }}</p>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="bg-gray-50 rounded-xl p-2">
+          <p class="text-xs text-gray-500">Déclaré</p>
+          <p class="font-bold text-gray-700 text-sm">{{ stock.quantite_kg|floatformat:0 }} kg</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-2">
+          <p class="text-xs text-gray-500">Acheté</p>
+          <p class="font-bold text-yn-green text-sm">
+            {% if derniere_cmd %}{{ derniere_cmd.quantite_commande|floatformat:0 }}{% else %}0{% endif %} kg
+          </p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-2">
+          <p class="text-xs text-gray-500">Restant</p>
+          <p class="font-bold text-sm
+            {% if stock.quantite_restante <= 0 %}text-red-500
+            {% elif stock.quantite_restante < 100 %}text-amber-500
+            {% else %}text-gray-700{% endif %}">
+            {{ stock.quantite_restante|floatformat:0 }} kg
+          </p>
+        </div>
+      </div>
+      {% if derniere_cmd %}
+      <p class="text-xs text-gray-400 mt-2">Dernière commande : {{ derniere_cmd.cree_le|date:"d M Y" }}</p>
+      {% endif %}
+    </div>
+    {% endwith %}
+    {% empty %}
+    <div class="text-center py-12 text-gray-400 text-sm">
+      Aucun stock déclaré pour le moment.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

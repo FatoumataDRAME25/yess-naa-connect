@@ -105,6 +105,32 @@ class InscriptionProducteurForm(forms.Form):
             raise forms.ValidationError("Ce numéro de téléphone est déjà utilisé.")
         return numero
 
+
+    def clean_prenom(self):
+        prenom = self.cleaned_data.get('prenom', '').strip()
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s\-']*", prenom):
+            raise forms.ValidationError("Le prénom ne doit contenir que des lettres.")
+        return prenom
+
+    def clean_nom(self):
+        nom = self.cleaned_data.get('nom', '').strip()
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s\-']*", nom):
+            raise forms.ValidationError("Le nom ne doit contenir que des lettres.")
+        return nom
+
+    def clean_mot_de_passe(self):
+        mdp = self.cleaned_data.get('mot_de_passe', '')
+        if len(mdp) < 8:
+            raise forms.ValidationError("Le mot de passe doit contenir au moins 8 caractères.")
+        return mdp
+
+    def clean_region(self):
+        region = self.cleaned_data.get('region', '')
+        if not region:
+            raise forms.ValidationError("Veuillez sélectionner votre région.")
+        return region
+
+
     def clean(self):
         cleaned_data = super().clean()
         mdp = cleaned_data.get('mot_de_passe')
@@ -172,6 +198,21 @@ class ProfilForm(forms.ModelForm):
         if qs.exists():
             raise forms.ValidationError("Ce numéro de téléphone est déjà utilisé.")
         return numero
+
+
+    def clean_prenom(self):
+        prenom = self.cleaned_data.get('prenom', '').strip()
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s\-']*", prenom):
+            raise forms.ValidationError("Le prénom ne doit contenir que des lettres.")
+        return prenom
+
+    def clean_nom(self):
+        nom = self.cleaned_data.get('nom', '').strip()
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s\-']*", nom):
+            raise forms.ValidationError("Le nom ne doit contenir que des lettres.")
+        return nom
+
+
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -260,3 +301,14 @@ class DeclarationPaddyForm(forms.ModelForm):
         if val is not None and val <= 0:
             raise forms.ValidationError("Le prix doit être supérieur à 0.")
         return val
+
+
+
+    def clean_date_recolte(self):
+        from datetime import date
+        date_recolte = self.cleaned_data.get('date_recolte')
+        if date_recolte and date_recolte > date.today():
+            raise forms.ValidationError(
+                "La date de récolte ne peut pas être dans le futur."
+            )
+        return date_recolte

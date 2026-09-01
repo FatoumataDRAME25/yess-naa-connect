@@ -21,6 +21,8 @@ urlpatterns = [
     path('stocks/commandes-paddy/', views.admin_commandes_paddy, name='admin_commandes_paddy'),
     path('stocks/commandes-paddy/<int:pk>/recu/', views.admin_marquer_paddy_recu, name='admin_marquer_paddy_recu'),
     path('stocks/commandes-paddy/<int:pk>/statut/', views.admin_commande_paddy_statut, name='admin_commande_paddy_statut'),
+    path('partenaires/', views.admin_partenaires, name='admin_partenaires'),
+
 
     # Catalogue
     path('catalogue/', views.admin_catalogue, name='admin_catalogue'),

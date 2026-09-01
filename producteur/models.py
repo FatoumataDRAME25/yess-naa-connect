@@ -13,8 +13,12 @@ class Producteur(models.Model):
 
 class StockPaddy(models.Model):
     class Variete(models.TextChoices):
-        BLANC = 'blanc', 'Blanc'
-        PARFUME = 'parfume', 'Parfumé'
+        BRISE     = 'brise',     'Riz brisé'
+        ENTIER    = 'entier',    'Riz entier'
+        ETUVE     = 'etuve',     'Riz étuvé'
+        AROMATISE = 'aromatise', 'Riz aromatisé (Jasmine)'
+        EXTRA_FIN = 'extra_fin', 'Riz extra fin'
+        BASMATI   = 'basmati',   'Riz Basmati'
 
     class Statut(models.TextChoices):
         DISPONIBLE = 'disponible', 'Disponible'
@@ -34,3 +38,11 @@ class StockPaddy(models.Model):
 
     def __str__(self):
         return f"Stock #{self.pk} - {self.get_variete_display()} ({self.quantite_kg} kg)"
+
+    @property
+    def quantite_restante(self):
+        from django.db.models import Sum
+        vendu = self.commandes_paddy.filter(
+            statut='recue'
+        ).aggregate(total=Sum('quantite_commande'))['total'] or 0
+        return self.quantite_kg - vendu
