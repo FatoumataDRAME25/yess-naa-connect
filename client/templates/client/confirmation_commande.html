@@ -93,6 +93,12 @@ Riz de la Teranga
                 <span>Sous-total</span>
                 <span>{{ commande.sous_total }} FCFA</span>
               </div>
+              {% if commande.montant_remise %}
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Remise volume ({{ commande.remise_pct }}%)</span>
+                <span class="font-semibold text-green-600">- {{ commande.montant_remise }} FCFA</span>
+              </div>
+              {% endif %}
             </div>
 
             <p class="text-xs text-gray-500 leading-5">

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User, CommandePaddy, Produit
+from .models import User, CommandePaddy, Produit, RegleRemise
 
 
 @admin.register(User)
@@ -43,3 +43,9 @@ class ProduitAdmin(admin.ModelAdmin):
     readonly_fields = ('code_lot', 'cree_le', 'mis_a_jour')
     raw_id_fields = ('stock_source',)
     date_hierarchy = 'cree_le'
+
+
+@admin.register(RegleRemise)
+class RegleRemiseAdmin(admin.ModelAdmin):
+    list_display = ('description', 'seuil_kg', 'taux_remise', 'est_active')
+    list_editable = ('est_active',)

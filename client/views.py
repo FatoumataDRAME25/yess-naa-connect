@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
 from weasyprint import HTML as WeasyHTML
-from administration.models import Produit
+from administration.models import Produit, RegleRemise
 from .models import Client, CommandeClient, LigneCommande
 from django.core.paginator import Paginator
 
@@ -29,11 +29,6 @@ def save_panier(request, panier):
     request.session.modified = True
 
 
-#def nb_articles_panier(request):
-    #"""Retourne le nombre total d'articles dans le panier."""
-    #panier = get_panier(request)
-    #return sum(item['quantite'] for item in panier.values())
-
 def nb_articles_panier(request):
     """Retourne le nombre de produits DIFFÉRENTS dans le panier."""
     panier = get_panier(request)
@@ -50,6 +45,25 @@ def _normaliser_telephone(numero):
     """Garde uniquement les chiffres et compare sur les 9 derniers (format sénégalais)."""
     chiffres = re.sub(r'\D', '', numero or '')
     return chiffres[-9:] if len(chiffres) >= 9 else chiffres
+
+
+def calculer_remise(panier_session):
+    """
+    Calcule le poids total du panier et applique la RegleRemise active
+    si le seuil est atteint.
+    Retourne (poids_total_kg, montant_remise, taux_remise, description_remise).
+    """
+    poids_total = sum(
+        item['quantite'] * item.get('poids', 0)
+        for item in panier_session.values()
+    )
+    sous_total = sum(item['prix'] * item['quantite'] for item in panier_session.values())
+
+    regle = RegleRemise.objects.filter(est_active=True).order_by('-seuil_kg').first()
+    if regle and poids_total >= regle.seuil_kg:
+        montant_remise = int(sous_total * regle.taux_remise / 100)
+        return poids_total, montant_remise, regle.taux_remise, regle.description or str(regle)
+    return poids_total, 0, 0, ''
 
 
 # ---------------------------------------------------------------------------
@@ -157,13 +171,16 @@ def panier(request):
             'ligne_total': ligne_total,
         })
 
-    # Les frais de livraison dépendent de la distance et sont déterminés par
-    # le livreur au moment de la remise, pas à la commande.
-    total = sous_total
+    poids_total, montant_remise, taux_remise, desc_remise = calculer_remise(panier_session)
+    total = sous_total - montant_remise
 
     context = {
         'articles': articles,
         'sous_total': sous_total,
+        'montant_remise': montant_remise,
+        'taux_remise': taux_remise,
+        'desc_remise': desc_remise,
+        'poids_total': poids_total,
         'total': total,
         'nb_panier': nb_articles_panier(request),
         'panier_vide': len(articles) == 0,
@@ -261,9 +278,8 @@ def finaliser_commande(request):
             'ligne_total': ligne_total,
         })
 
-    # Les frais de livraison dépendent de la distance et sont déterminés par
-    # le livreur au moment de la remise, pas à la commande.
-    total = sous_total
+    poids_total, montant_remise, taux_remise, desc_remise = calculer_remise(panier_session)
+    total = sous_total - montant_remise
 
     if request.method == 'POST':
         nom            = request.POST.get('nom', '').strip()
@@ -285,11 +301,13 @@ def finaliser_commande(request):
             erreurs['adresse'] = "L'adresse de livraison est obligatoire."
 
         if erreurs:
-            # Retour au formulaire avec les erreurs et les valeurs saisies
             context = {
                 'nb_panier': nb_articles_panier(request),
                 'articles': articles,
                 'sous_total': sous_total,
+                'montant_remise': montant_remise,
+                'taux_remise': taux_remise,
+                'desc_remise': desc_remise,
                 'total': total,
                 'form_nom': nom,
                 'form_telephone': telephone,
@@ -326,6 +344,8 @@ def finaliser_commande(request):
             adresse_livraison=f"{adresse}, {ville}",
             latitude=lat,
             longitude=lng,
+            montant_remise=montant_remise,
+            remise_pct=taux_remise,
         )
 
         for produit_id, item in panier_session.items():
@@ -338,13 +358,10 @@ def finaliser_commande(request):
                 prix_unitaire=item['prix'],
             )
 
-            # Décrément du stock — adapte le nom du champ si différent
             if hasattr(produit, 'stock'):
                 produit.stock = max(0, produit.stock - item['quantite'])
                 produit.save(update_fields=['stock'])
 
-        # Commande enregistrée : on vide le panier et on garde une trace en
-        # session pour autoriser le téléchargement du reçu sans re-saisie.
         save_panier(request, {})
         request.session['derniere_commande_numero'] = commande.numero
 
@@ -352,19 +369,20 @@ def finaliser_commande(request):
             'commande': commande,
             'articles': articles,
             'sous_total': sous_total,
+            'montant_remise': montant_remise,
+            'taux_remise': taux_remise,
+            'desc_remise': desc_remise,
             'total': total,
             'nb_panier': 0,
         }
         return render(request, "client/confirmation_commande.html", context)
 
-    # --- GET : pas de données de formulaire, on renvoie vers la page de saisie ---
     return redirect('confirmationCommande')
 
 
 def confirmer_commande(request):
     panier_session = get_panier(request)
 
-    # --- Articles + totaux du panier (pour l'affichage du récapitulatif) ---
     articles = []
     sous_total = 0
     for produit_id, item in panier_session.items():
@@ -380,14 +398,16 @@ def confirmer_commande(request):
             'ligne_total': ligne_total,
         })
 
-    # Les frais de livraison dépendent de la distance et sont déterminés par
-    # le livreur au moment de la remise, pas à la commande.
-    total = sous_total
+    poids_total, montant_remise, taux_remise, desc_remise = calculer_remise(panier_session)
+    total = sous_total - montant_remise
 
     context = {
         'nb_panier': nb_articles_panier(request),
         'articles': articles,
         'sous_total': sous_total,
+        'montant_remise': montant_remise,
+        'taux_remise': taux_remise,
+        'desc_remise': desc_remise,
         'total': total,
         'form_nom': '',
         'form_telephone': '',

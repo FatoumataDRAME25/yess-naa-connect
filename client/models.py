@@ -49,6 +49,8 @@ class CommandeClient(models.Model):
     latitude        = models.FloatField(null=True, blank=True)
     longitude       = models.FloatField(null=True, blank=True)
     frais_livraison = models.PositiveIntegerField(default=0)
+    montant_remise  = models.PositiveIntegerField(default=0)
+    remise_pct      = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     date            = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -71,7 +73,7 @@ class CommandeClient(models.Model):
 
     @property
     def total(self):
-        return self.sous_total + self.frais_livraison
+        return self.sous_total - self.montant_remise + self.frais_livraison
 
     @property
     def client_nom(self):

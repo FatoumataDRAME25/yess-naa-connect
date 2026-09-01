@@ -141,9 +141,16 @@ Riz de la Teranga
               <span class="text-gray-600">Sous-total</span>
               <span class="font-semibold text-lime-950" id="sous-total">{{ sous_total }} FCFA</span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex justify-between items-start">
               <span class="text-gray-600">Remise</span>
-              <span class="font-semibold text-green-600">- 0 FCFA</span>
+              {% if montant_remise %}
+              <div class="text-right">
+                <span class="font-semibold text-green-600">- {{ montant_remise }} FCFA ({{ taux_remise }}%)</span>
+                <p class="text-xs text-green-700 mt-0.5">🎉 Remise volume ≥ 3 tonnes</p>
+              </div>
+              {% else %}
+              <span class="font-semibold text-gray-400">- 0 FCFA</span>
+              {% endif %}
             </div>
           </div>
 

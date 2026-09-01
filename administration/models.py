@@ -86,6 +86,32 @@ class CommandePaddy(models.Model):
         return f"Commande #{self.pk} — {self.stock.get_variete_display()} ({self.quantite_commande} kg)"
 
 
+class RegleRemise(models.Model):
+    """
+    Règle de remise volume configurable par l'admin.
+    Si le poids total commandé >= seuil_kg, on applique taux_remise % sur le sous-total.
+    """
+    seuil_kg    = models.PositiveIntegerField(
+        default=3000,
+        help_text="Quantité minimale en kg pour déclencher la remise (ex: 3000 pour 3 tonnes)"
+    )
+    taux_remise = models.DecimalField(
+        max_digits=5, decimal_places=2, default=5.00,
+        help_text="Taux de remise en pourcentage (ex: 5.00 pour 5%)"
+    )
+    est_active  = models.BooleanField(default=True)
+    description = models.CharField(max_length=255, blank=True,
+        help_text="Description affichée au client (ex: Remise volume 3 tonnes)")
+
+    class Meta:
+        verbose_name = "Règle de remise"
+        verbose_name_plural = "Règles de remise"
+        ordering = ['-seuil_kg']
+
+    def __str__(self):
+        return f"Remise {self.taux_remise}% à partir de {self.seuil_kg} kg"
+
+
 class Produit(models.Model):
 
     class TypeRiz(models.TextChoices):
