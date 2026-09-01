@@ -867,3 +867,74 @@ def api_notifications(request):
         })
 
     return JsonResponse({'notifications': data, 'count': len(data)})
+
+
+# ============================================================
+#  RÉCAPITULATIF PAR PRODUCTEUR (Prompt 6)
+# ============================================================
+
+@admin_required
+def admin_recap_producteurs(request):
+    """
+    Vue récapitulative par partenaire producteur :
+    total kg déclarés, kg achetés (commandés+reçus), kg restants disponibles,
+    nombre de commandes, montant total engagé.
+    """
+    from producteur.models import Producteur
+
+    producteurs = Producteur.objects.select_related('user').prefetch_related(
+        'stocks', 'stocks__commandes_paddy'
+    ).order_by('user__nom')
+
+    recap = []
+    for prod in producteurs:
+        stocks = prod.stocks.all()
+
+        # Total déclaré
+        total_declare_kg = stocks.aggregate(total=Sum('quantite_kg'))['total'] or 0
+
+        # Disponible
+        disponible_kg = stocks.filter(
+            statut=StockPaddy.Statut.DISPONIBLE
+        ).aggregate(total=Sum('quantite_kg'))['total'] or 0
+
+        # Commandé (en cours)
+        commandes_actives = CommandePaddy.objects.filter(
+            stock__producteur=prod,
+            statut__in=[CommandePaddy.Statut.EN_ATTENTE, CommandePaddy.Statut.CONFIRMEE]
+        )
+        kg_commande = commandes_actives.aggregate(total=Sum('quantite_commande'))['total'] or 0
+
+        # Reçu (livré)
+        commandes_recues = CommandePaddy.objects.filter(
+            stock__producteur=prod,
+            statut=CommandePaddy.Statut.RECUE
+        )
+        kg_recu = commandes_recues.aggregate(total=Sum('quantite_commande'))['total'] or 0
+
+        # Montant total engagé (toutes commandes sauf annulées)
+        montant_total = 0
+        for cmd in CommandePaddy.objects.filter(
+            stock__producteur=prod
+        ).exclude(statut=CommandePaddy.Statut.ANNULEE).select_related('stock'):
+            montant_total += cmd.quantite_commande * cmd.stock.prix_par_kg
+
+        # Nb total commandes
+        nb_commandes = CommandePaddy.objects.filter(stock__producteur=prod).count()
+
+        recap.append({
+            'producteur': prod,
+            'total_declare_kg': total_declare_kg,
+            'disponible_kg': disponible_kg,
+            'kg_commande': kg_commande,
+            'kg_recu': kg_recu,
+            'nb_commandes': nb_commandes,
+            'montant_total': montant_total,
+        })
+
+    context = {
+        'active_nav': 'stocks',
+        'recap': recap,
+        'nb_producteurs': len(recap),
+    }
+    return render(request, 'espace_admin/recap_producteurs.html', context)

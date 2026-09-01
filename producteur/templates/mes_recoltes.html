@@ -136,10 +136,21 @@
                     <span class="text-xs font-medium text-status-green-text">Disponible</span>
                   </span>
                 {% elif stock.statut == 'commande' %}
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-amber-bg">
-                    <span class="w-1.5 h-1.5 rounded-full bg-status-amber-text flex-shrink-0"></span>
-                    <span class="text-xs font-medium text-status-amber-text">Commandé</span>
-                  </span>
+                  <div class="flex flex-col gap-1">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-amber-bg">
+                      <span class="w-1.5 h-1.5 rounded-full bg-status-amber-text flex-shrink-0"></span>
+                      <span class="text-xs font-medium text-status-amber-text">Commandé</span>
+                    </span>
+                    {% if stock.commande_active %}
+                    <span class="text-xs text-gray-500">
+                      {{ stock.commande_active.quantite_commande }} kg
+                      — {{ stock.commande_active.get_statut_display }}
+                    </span>
+                    {% if stock.commande_active.date_livraison %}
+                    <span class="text-xs text-gray-400">Livraison : {{ stock.commande_active.date_livraison|date:"d M Y" }}</span>
+                    {% endif %}
+                    {% endif %}
+                  </div>
                 {% else %}
                   <div class="flex items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100">

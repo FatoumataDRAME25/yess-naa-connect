@@ -1,0 +1,140 @@
+{% extends "espace_admin/base.html" %}
+{% load static %}
+{% block title %}Récap Producteurs(trices) — Riz de la Teranga{% endblock %}
+
+{% block content %}
+<div class="hidden md:block">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="font-heading font-bold text-2xl text-yn-green-dark">Récap Producteurs(trices)</h1>
+      <p class="text-sm text-yn-gray mt-0.5">Synthèse des stocks et achats par partenaire</p>
+    </div>
+    <a href="{% url 'admin_transformatrice:admin_stocks' %}"
+       class="flex items-center gap-2 text-sm font-semibold text-yn-green border border-yn-green px-4 py-2 rounded-xl hover:bg-yn-green hover:text-white transition">
+      ← Retour aux stocks
+    </a>
+  </div>
+
+  <!-- Stat globale -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-2xl shadow-sm px-6 py-4 flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-yn-green-pale flex items-center justify-center">
+        <svg class="w-5 h-5 text-yn-green" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs text-yn-gray font-semibold uppercase">Partenaires</p>
+        <p class="text-2xl font-bold text-yn-green-dark">{{ nb_producteurs }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs font-semibold text-yn-gray uppercase border-b border-gray-100">
+          <th class="px-6 py-4">Producteur(trice)</th>
+          <th class="px-6 py-4">Total déclaré</th>
+          <th class="px-6 py-4">Disponible</th>
+          <th class="px-6 py-4">En commande</th>
+          <th class="px-6 py-4">Reçu / Livré</th>
+          <th class="px-6 py-4">Nb commandes</th>
+          <th class="px-6 py-4">Montant engagé</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recap %}
+        <tr class="border-b border-gray-50 hover:bg-gray-50/60">
+          <td class="px-6 py-4">
+            <p class="font-bold text-gray-800">{{ r.producteur.user.prenom }} {{ r.producteur.user.nom }}</p>
+            <p class="text-xs text-yn-gray">{{ r.producteur.user.telephone }}</p>
+          </td>
+          <td class="px-6 py-4 font-semibold text-gray-700">{{ r.total_declare_kg }} kg</td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+              {% if r.disponible_kg > 0 %}bg-green-50 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}
+              text-xs font-semibold">
+              {{ r.disponible_kg }} kg
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+              {% if r.kg_commande > 0 %}bg-amber-50 text-amber-700{% else %}bg-gray-100 text-gray-500{% endif %}
+              text-xs font-semibold">
+              {{ r.kg_commande }} kg
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+              {% if r.kg_recu > 0 %}bg-blue-50 text-blue-700{% else %}bg-gray-100 text-gray-500{% endif %}
+              text-xs font-semibold">
+              {{ r.kg_recu }} kg
+            </span>
+          </td>
+          <td class="px-6 py-4 font-semibold text-gray-700">{{ r.nb_commandes }}</td>
+          <td class="px-6 py-4 font-bold text-yn-terracotta">{{ r.montant_total|floatformat:0 }} FCFA</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="px-6 py-12 text-center text-yn-gray">Aucun producteur(trice) enregistré(e).</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- fin desktop -->
+
+<!-- MOBILE -->
+<div class="md:hidden min-h-screen bg-gray-50 pb-24">
+  <div class="flex items-center justify-between px-4 pt-5 pb-3 bg-white sticky top-0 z-20 border-b border-gray-100">
+    <div class="flex items-center gap-3">
+      <a href="{% url 'admin_transformatrice:admin_stocks' %}" class="text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      <h1 class="font-heading font-bold text-lg text-gray-900">Récap Producteurs(trices)</h1>
+    </div>
+  </div>
+
+  <div class="px-4 pt-4 space-y-4">
+    {% for r in recap %}
+    <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-3">
+      <div>
+        <p class="font-bold text-gray-900">{{ r.producteur.user.prenom }} {{ r.producteur.user.nom }}</p>
+        <p class="text-xs text-gray-500">{{ r.producteur.user.telephone }}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-gray-50 rounded-lg px-3 py-2">
+          <p class="text-gray-400 font-semibold uppercase tracking-wide mb-0.5">Déclaré</p>
+          <p class="font-bold text-gray-800">{{ r.total_declare_kg }} kg</p>
+        </div>
+        <div class="bg-green-50 rounded-lg px-3 py-2">
+          <p class="text-green-500 font-semibold uppercase tracking-wide mb-0.5">Disponible</p>
+          <p class="font-bold text-green-700">{{ r.disponible_kg }} kg</p>
+        </div>
+        <div class="bg-amber-50 rounded-lg px-3 py-2">
+          <p class="text-amber-500 font-semibold uppercase tracking-wide mb-0.5">En commande</p>
+          <p class="font-bold text-amber-700">{{ r.kg_commande }} kg</p>
+        </div>
+        <div class="bg-blue-50 rounded-lg px-3 py-2">
+          <p class="text-blue-400 font-semibold uppercase tracking-wide mb-0.5">Reçu</p>
+          <p class="font-bold text-blue-700">{{ r.kg_recu }} kg</p>
+        </div>
+      </div>
+      <div class="flex justify-between items-center border-t border-gray-100 pt-2 text-xs">
+        <span class="text-gray-500">{{ r.nb_commandes }} commande{{ r.nb_commandes|pluralize }}</span>
+        <span class="font-bold text-yn-terracotta">{{ r.montant_total|floatformat:0 }} FCFA engagés</span>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-gray-400 py-12">Aucun producteur(trice) enregistré(e).</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

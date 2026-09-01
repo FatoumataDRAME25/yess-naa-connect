@@ -123,6 +123,14 @@ def dashbord(request):
         statut__in=[CommandePaddy.Statut.CONFIRMEE, CommandePaddy.Statut.RECUE]
     ).order_by('-cree_le').first()
 
+    # Montant total des ventes (commandes reçues uniquement)
+    montant_total_ventes = 0
+    for cmd in CommandePaddy.objects.filter(
+        stock__producteur=producteur,
+        statut=CommandePaddy.Statut.RECUE
+    ).select_related('stock'):
+        montant_total_ventes += cmd.quantite_commande * cmd.stock.prix_par_kg
+
     context = {
         'user': request.user,
         'today': date.today(),
@@ -131,6 +139,7 @@ def dashbord(request):
         'nb_en_attente': nb_en_attente,
         'derniere_commande': derniere_commande,
         'derniers_stocks': stocks[:5],
+        'montant_total_ventes': montant_total_ventes,
     }
     return render(request, 'dashboard_producteur.html', context)
 
@@ -310,6 +319,16 @@ def mes_recoltes(request):
     paginator = Paginator(stocks_qs, 10)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
+
+    # Annoter chaque stock avec sa commande paddy active (en_attente ou confirmee)
+    ids_page = [s.pk for s in page_obj]
+    commandes_actives = CommandePaddy.objects.filter(
+        stock_id__in=ids_page,
+        statut__in=[CommandePaddy.Statut.EN_ATTENTE, CommandePaddy.Statut.CONFIRMEE]
+    ).select_related('stock')
+    commande_par_stock = {c.stock_id: c for c in commandes_actives}
+    for stock in page_obj:
+        stock.commande_active = commande_par_stock.get(stock.pk)
 
     # Stats pour le header
     stock_disponible_kg = StockPaddy.objects.filter(
