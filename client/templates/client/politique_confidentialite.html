@@ -1,0 +1,81 @@
+{% extends "client/base.html" %}
+{% load static %}
+{% block title %}Politique de Confidentialité — Riz de la Teranga{% endblock %}
+
+{% block content %}
+<main class="max-w-3xl mx-auto px-4 md:px-8 pt-28 pb-20">
+
+  <h1 class="text-3xl font-extrabold text-lime-900 mb-2">Politique de Confidentialité</h1>
+  <p class="text-sm text-gray-400 mb-10">Dernière mise à jour : septembre 2026</p>
+
+  <div class="prose prose-sm max-w-none space-y-10 text-gray-700">
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">1. Qui collecte vos données ?</h2>
+      <p><strong>Yess Naa Connect</strong>, éditeur du site yeesnaa.com, est responsable du traitement de vos données personnelles collectées via ce site.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">2. Quelles données sont collectées ?</h2>
+      <p>Lors d'une commande, nous collectons uniquement les données nécessaires à son traitement :</p>
+      <ul class="mt-2 space-y-1 pl-4 list-disc">
+        <li><strong>Prénom et nom</strong> — pour identifier votre commande</li>
+        <li><strong>Numéro de téléphone</strong> — pour vous contacter en cas de besoin</li>
+        <li><strong>Adresse de livraison</strong> — pour acheminer votre commande</li>
+        <li><strong>Position GPS</strong> (optionnelle) — si vous l'autorisez via votre navigateur, pour faciliter la livraison</li>
+      </ul>
+      <p class="mt-3">Nous ne collectons pas d'email, de mot de passe, de données bancaires, ni d'informations de navigation.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">3. Pourquoi utilisons-nous ces données ?</h2>
+      <ul class="mt-2 space-y-1 pl-4 list-disc">
+        <li>Traitement et suivi de votre commande</li>
+        <li>Communication avec le livreur pour la remise du colis</li>
+        <li>Historique des commandes pour la transformatrice</li>
+      </ul>
+      <p class="mt-3">Vos données ne sont <strong>jamais vendues, partagées ou utilisées à des fins commerciales</strong>.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">4. Durée de conservation</h2>
+      <p>Vos données sont conservées pendant <strong>12 mois</strong> à compter de votre dernière commande, puis supprimées automatiquement, sauf obligation légale contraire.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">5. Sécurité des données</h2>
+      <p>Le site yeesnaa.com est protégé par :</p>
+      <ul class="mt-2 space-y-1 pl-4 list-disc">
+        <li>Un certificat SSL (connexion HTTPS chiffrée)</li>
+        <li>Des cookies de session sécurisés</li>
+        <li>Des protections contre les attaques CSRF et XSS (Django)</li>
+        <li>Un accès administrateur protégé par identifiant et mot de passe</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">6. Cookies</h2>
+      <p>Nous utilisons uniquement des <strong>cookies techniques</strong> (session de navigation, panier) indispensables au fonctionnement du site. Aucun cookie publicitaire ou de suivi tiers n'est utilisé.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">7. Vos droits</h2>
+      <p>Conformément à la loi sénégalaise sur la protection des données personnelles (loi n°2008-12 du 25 janvier 2008) et aux principes RGPD, vous disposez des droits suivants :</p>
+      <ul class="mt-2 space-y-1 pl-4 list-disc">
+        <li><strong>Droit d'accès</strong> — connaître les données que nous détenons sur vous</li>
+        <li><strong>Droit de rectification</strong> — corriger des données inexactes</li>
+        <li><strong>Droit à l'effacement</strong> — demander la suppression de vos données</li>
+        <li><strong>Droit d'opposition</strong> — vous opposer à certains traitements</li>
+      </ul>
+      <p class="mt-3">Pour exercer ces droits, contactez-nous à : <strong>contact@rizlocal.sn</strong> ou au <strong>+221 77 545 15 99</strong>.</p>
+    </section>
+
+  </div>
+
+  <div class="mt-12 flex gap-4">
+    <a href="{% url 'mentions_legales' %}" class="text-sm font-semibold text-lime-700 hover:underline">→ Mentions Légales</a>
+    <a href="{% url 'cgv' %}" class="text-sm font-semibold text-lime-700 hover:underline">→ CGV</a>
+  </div>
+
+</main>
+{% endblock %}

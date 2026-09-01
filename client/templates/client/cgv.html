@@ -1,0 +1,77 @@
+{% extends "client/base.html" %}
+{% load static %}
+{% block title %}Conditions Générales de Vente — Riz de la Teranga{% endblock %}
+
+{% block content %}
+<main class="max-w-3xl mx-auto px-4 md:px-8 pt-28 pb-20">
+
+  <h1 class="text-3xl font-extrabold text-lime-900 mb-2">Conditions Générales de Vente</h1>
+  <p class="text-sm text-gray-400 mb-10">Dernière mise à jour : septembre 2026</p>
+
+  <div class="prose prose-sm max-w-none space-y-10 text-gray-700">
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">1. Objet</h2>
+      <p>Les présentes Conditions Générales de Vente (CGV) régissent les ventes de produits réalisées sur le site <strong>yeesnaa.com</strong>, exploité par Yess Naa Connect, Mbour, Sénégal.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">2. Produits</h2>
+      <p>Les produits proposés sont des variétés de riz local sénégalais (riz blanc, riz étuvé, riz brisé, etc.) conditionnés en sacs de 5 kg, 10 kg ou 25 kg selon les références disponibles au catalogue.</p>
+      <p class="mt-2">Les photos et descriptions sont données à titre indicatif. La couleur et l'aspect peuvent légèrement varier selon les récoltes.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">3. Prix</h2>
+      <p>Les prix affichés sont en <strong>Francs CFA (FCFA)</strong>, toutes taxes comprises. Yess Naa Connect se réserve le droit de modifier ses prix à tout moment, mais les produits sont facturés sur la base du tarif en vigueur au moment de la validation de la commande.</p>
+      <p class="mt-2">Une <strong>remise volume</strong> peut être appliquée automatiquement pour les commandes atteignant un seuil de poids défini (actuellement 3 tonnes). Cette remise est affichée dans le récapitulatif du panier.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">4. Commande</h2>
+      <p>La commande est validée après :</p>
+      <ol class="mt-2 space-y-1 pl-4 list-decimal">
+        <li>La saisie de vos informations de livraison</li>
+        <li>Le choix du mode de paiement</li>
+        <li>L'acceptation des présentes CGV</li>
+        <li>La confirmation par le bouton « Confirmer ma commande »</li>
+      </ol>
+      <p class="mt-3">Un numéro de commande unique vous est attribué. Conservez-le pour suivre votre commande.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">5. Livraison</h2>
+      <p>La livraison est assurée par nos livreurs partenaires. Les frais de livraison dépendent de la distance et sont communiqués directement par le livreur. Ils sont réglés à la remise de la commande.</p>
+      <p class="mt-2">Les délais de livraison sont indicatifs et peuvent varier. En cas de retard, notre équipe vous contactera par téléphone.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">6. Paiement</h2>
+      <p>Les modes de paiement acceptés sont :</p>
+      <ul class="mt-2 space-y-1 pl-4 list-disc">
+        <li><strong>Paiement à la livraison</strong> (espèces remises au livreur)</li>
+        <li><strong>Orange Money</strong></li>
+        <li><strong>Wave</strong></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">7. Annulation et retour</h2>
+      <p>Toute demande d'annulation doit être effectuée avant la prise en charge de la commande par un livreur. Passé ce délai, l'annulation ne peut être garantie.</p>
+      <p class="mt-2">En cas de produit non conforme ou endommagé à la livraison, contactez-nous dans les 24 heures suivant la réception au <strong>+221 77 545 15 99</strong>.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">8. Droit applicable</h2>
+      <p>Les présentes CGV sont soumises au droit sénégalais. Tout litige sera soumis à la juridiction compétente du Sénégal.</p>
+    </section>
+
+  </div>
+
+  <div class="mt-12 flex gap-4">
+    <a href="{% url 'mentions_legales' %}" class="text-sm font-semibold text-lime-700 hover:underline">→ Mentions Légales</a>
+    <a href="{% url 'politique_confidentialite' %}" class="text-sm font-semibold text-lime-700 hover:underline">→ Politique de Confidentialité</a>
+  </div>
+
+</main>
+{% endblock %}

@@ -17,6 +17,11 @@ urlpatterns = [
     path("commande/<str:numero>/recu/pdf/", views.recu_commande_pdf, name="recu_commande_pdf"),
     path("verification/", views.verification_qrcode, name="verification_qrcode"),
 
+    # Pages légales
+    path("mentions-legales/", views.mentions_legales, name="mentions_legales"),
+    path("politique-confidentialite/", views.politique_confidentialite, name="politique_confidentialite"),
+    path("cgv/", views.cgv, name="cgv"),
+
     # Actions panier (AJAX POST)
     path("panier/ajouter/<int:produit_id>/", views.ajouter_au_panier, name="ajouter_au_panier"),
     path("panier/modifier/<int:produit_id>/", views.modifier_quantite, name="modifier_quantite"),

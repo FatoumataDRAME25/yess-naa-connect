@@ -1,0 +1,58 @@
+{% extends "client/base.html" %}
+{% load static %}
+{% block title %}Mentions Légales — Riz de la Teranga{% endblock %}
+
+{% block content %}
+<main class="max-w-3xl mx-auto px-4 md:px-8 pt-28 pb-20">
+
+  <h1 class="text-3xl font-extrabold text-lime-900 mb-2">Mentions Légales</h1>
+  <p class="text-sm text-gray-400 mb-10">Dernière mise à jour : septembre 2026</p>
+
+  <div class="prose prose-sm max-w-none space-y-10 text-gray-700">
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">1. Éditeur du site</h2>
+      <p>Le site <strong>yeesnaa.com</strong> est édité par :</p>
+      <ul class="mt-2 space-y-1 list-none pl-0">
+        <li><strong>Raison sociale :</strong> Yess Naa Connect</li>
+        <li><strong>Activité :</strong> Commerce de riz local, mise en relation producteurs-consommateurs</li>
+        <li><strong>Siège social :</strong> Mbour, Sénégal</li>
+        <li><strong>Téléphone :</strong> +221 77 545 15 99</li>
+        <li><strong>Email :</strong> contact@rizlocal.sn</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">2. Hébergement</h2>
+      <p>Le site est hébergé par :</p>
+      <ul class="mt-2 space-y-1 list-none pl-0">
+        <li><strong>Hébergeur :</strong> LWS (La Webeuse Solution)</li>
+        <li><strong>Adresse :</strong> 2 rue Jules Ferry, 93100 Montreuil, France</li>
+        <li><strong>Site :</strong> <a href="https://www.lws.fr" target="_blank" rel="noopener" class="text-lime-700 underline">www.lws.fr</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">3. Propriété intellectuelle</h2>
+      <p>L'ensemble du contenu de ce site (textes, images, logos, icônes, structure) est la propriété exclusive de <strong>Yess Naa Connect</strong> ou de ses partenaires. Toute reproduction, distribution ou utilisation sans autorisation écrite préalable est interdite.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">4. Responsabilité</h2>
+      <p>Yess Naa Connect s'efforce de maintenir les informations du site à jour et exactes. Toutefois, l'éditeur ne saurait être tenu responsable des erreurs, omissions ou résultats obtenus par un mauvais usage des informations publiées.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">5. Droit applicable</h2>
+      <p>Le présent site et les mentions légales sont soumis au droit sénégalais. Tout litige relatif à l'utilisation de ce site sera soumis à la juridiction compétente du Sénégal.</p>
+    </section>
+
+  </div>
+
+  <div class="mt-12 flex gap-4">
+    <a href="{% url 'politique_confidentialite' %}" class="text-sm font-semibold text-lime-700 hover:underline">→ Politique de Confidentialité</a>
+    <a href="{% url 'cgv' %}" class="text-sm font-semibold text-lime-700 hover:underline">→ CGV</a>
+  </div>
+
+</main>
+{% endblock %}

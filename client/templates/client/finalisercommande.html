@@ -250,6 +250,22 @@ Riz de la Teranga
                 Les frais de livraison dépendent de la distance et seront communiqués par le livreur, à régler directement à la remise de votre commande.
               </p>
 
+              <!-- Case consentement RGPD -->
+              <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" name="consentement" id="consentement" required
+                         class="mt-0.5 w-5 h-5 shrink-0 accent-lime-900 rounded">
+                  <span class="text-xs text-gray-600 leading-5">
+                    J'accepte que mes données personnelles (nom, téléphone, adresse de livraison) soient utilisées
+                    uniquement pour le traitement de ma commande, conformément à la
+                    <a href="{% url 'politique_confidentialite' %}" target="_blank" class="text-lime-700 underline hover:text-lime-900">politique de confidentialité</a>
+                    et aux
+                    <a href="{% url 'cgv' %}" target="_blank" class="text-lime-700 underline hover:text-lime-900">conditions générales de vente</a>.
+                    <span class="text-red-500 font-bold">*</span>
+                  </span>
+                </label>
+              </div>
+
               <!-- Bouton soumettre le formulaire -->
               <button type="submit"
                       class="w-full flex items-center justify-center gap-3 py-5 bg-lime-900 text-white

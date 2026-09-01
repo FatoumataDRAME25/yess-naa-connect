@@ -553,3 +553,15 @@ def verification_qrcode(request):
 def page_404(request, exception=None):
     context = {'nb_panier': nb_articles_panier(request)}
     return render(request, '404.html', context, status=404)
+
+
+def mentions_legales(request):
+    return render(request, 'client/mentions_legales.html', {'nb_panier': nb_articles_panier(request)})
+
+
+def politique_confidentialite(request):
+    return render(request, 'client/politique_confidentialite.html', {'nb_panier': nb_articles_panier(request)})
+
+
+def cgv(request):
+    return render(request, 'client/cgv.html', {'nb_panier': nb_articles_panier(request)})

@@ -354,18 +354,37 @@
       <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
         <p class="text-white/50 text-xs">© 2024 Riz de la Teranga. Tous droits réservés.</p>
         <div class="flex gap-6">
-          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Mentions Légales</a>
-          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">Politique de Confidentialité</a>
-          <a href="#" class="text-white/50 text-xs hover:text-white/80 transition-colors">CGV</a>
+          <a href="{% url 'mentions_legales' %}" class="text-white/50 text-xs hover:text-white/80 transition-colors">Mentions Légales</a>
+          <a href="{% url 'politique_confidentialite' %}" class="text-white/50 text-xs hover:text-white/80 transition-colors">Politique de Confidentialité</a>
+          <a href="{% url 'cgv' %}" class="text-white/50 text-xs hover:text-white/80 transition-colors">CGV</a>
         </div>
       </div>
 
     </div>
   </footer>
 
+  <!-- ===========================
+       BANDEAU COOKIES
+  ============================ -->
+  <div id="cookie-banner"
+       class="fixed bottom-0 inset-x-0 z-[90] bg-lime-950 border-t-2 border-yellow-600 px-4 py-4 md:px-8
+              flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <div class="flex items-start gap-3 flex-1">
+      <span class="text-yellow-500 text-xl shrink-0 mt-0.5">🍪</span>
+      <p class="text-white/80 text-sm leading-5">
+        Ce site utilise uniquement des <strong class="text-white">cookies techniques</strong> nécessaires à son fonctionnement (session, panier).
+        Aucun cookie publicitaire ou de suivi n'est utilisé.
+        <a href="{% url 'politique_confidentialite' %}" class="text-yellow-400 underline hover:text-yellow-300 ml-1">En savoir plus</a>
+      </p>
+    </div>
+    <button onclick="acceptCookies()"
+            class="shrink-0 px-5 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-lime-950 text-sm font-bold rounded-xl transition-colors whitespace-nowrap">
+      J'accepte
+    </button>
+  </div>
+
   <!-- JS menu mobile -->
   <script>
-    function openMobileMenu() {
       document.getElementById('mobile-menu').classList.remove('translate-x-full');
       document.getElementById('menu-overlay').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -401,6 +420,22 @@
 
   <!-- JS global -->
 {% block extra_js %}{% endblock %}
+
+<script>
+  /* ── Bandeau cookies ── */
+  (function() {
+    if (!localStorage.getItem('yn_cookies_accepted')) {
+      document.getElementById('cookie-banner').style.display = 'flex';
+    }
+  })();
+  function acceptCookies() {
+    localStorage.setItem('yn_cookies_accepted', '1');
+    var banner = document.getElementById('cookie-banner');
+    banner.style.transition = 'transform 0.3s ease';
+    banner.style.transform = 'translateY(100%)';
+    setTimeout(function() { banner.style.display = 'none'; }, 300);
+  }
+</script>
 
 </body>
 </html>
