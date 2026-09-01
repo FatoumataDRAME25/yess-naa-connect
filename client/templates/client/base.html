@@ -367,8 +367,8 @@
        BANDEAU COOKIES
   ============================ -->
   <div id="cookie-banner"
-       class="fixed bottom-0 inset-x-0 z-[90] bg-lime-950 border-t-2 border-yellow-600 px-4 py-4 md:px-8
-              flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+       class="hidden fixed bottom-0 inset-x-0 z-[90] bg-lime-950 border-t-2 border-yellow-600 px-4 py-4 md:px-8
+              flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
     <div class="flex items-start gap-3 flex-1">
       <span class="text-yellow-500 text-xl shrink-0 mt-0.5">🍪</span>
       <p class="text-white/80 text-sm leading-5">
@@ -425,7 +425,9 @@
   /* ── Bandeau cookies ── */
   (function() {
     if (!localStorage.getItem('yn_cookies_accepted')) {
-      document.getElementById('cookie-banner').style.display = 'flex';
+      var banner = document.getElementById('cookie-banner');
+      banner.classList.remove('hidden');
+      banner.classList.add('flex');
     }
   })();
   function acceptCookies() {
@@ -433,7 +435,11 @@
     var banner = document.getElementById('cookie-banner');
     banner.style.transition = 'transform 0.3s ease';
     banner.style.transform = 'translateY(100%)';
-    setTimeout(function() { banner.style.display = 'none'; }, 300);
+    setTimeout(function() {
+      banner.classList.add('hidden');
+      banner.classList.remove('flex');
+      banner.style.transform = '';
+    }, 300);
   }
 </script>
 
