@@ -13,8 +13,14 @@ class Producteur(models.Model):
 
 class StockPaddy(models.Model):
     class Variete(models.TextChoices):
-        BLANC = 'blanc', 'Blanc'
-        PARFUME = 'parfume', 'Parfumé'
+        BLANC      = 'blanc',      'Riz Blanc'
+        PARFUME    = 'parfume',    'Riz Parfumé'
+        ETUVE      = 'etuve',      'Riz Étuvé'
+        BRISE      = 'brise',      'Riz Brisé'
+        ENTIER     = 'entier',     'Riz Entier'
+        JASMINE    = 'jasmine',    'Riz Aromatisé (Jasmine)'
+        EXTRA_FIN  = 'extra_fin',  'Riz Extra Fin'
+        BASMATI    = 'basmati',    'Riz Basmati'
 
     class Statut(models.TextChoices):
         DISPONIBLE = 'disponible', 'Disponible'
