@@ -2,6 +2,7 @@ from urllib.parse import quote
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db import models
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -50,13 +51,20 @@ def deconnexion_livreur(request):
 @livreur_required
 def dashboard(request):
     """
-    Liste UNIQUEMENT les livraisons assignées au livreur connecté, pour aujourd'hui.
-    C'est ce filtre qui garantit que chaque livreur voit son propre espace.
+    Liste UNIQUEMENT les livraisons assignées au livreur connecté.
+    Affiche toutes les livraisons non confirmées (y compris les jours précédents)
+    + les livraisons confirmées aujourd'hui.
     """
     aujourdhui = timezone.localdate()
+
+    # Livraisons non confirmées (peu importe la date) + confirmées aujourd'hui
     livraisons = (
         Livraison.objects
-        .filter(livreur=request.user, commande__date__date=aujourdhui)
+        .filter(livreur=request.user)
+        .filter(
+            models.Q(confirme_le__isnull=True) |
+            models.Q(confirme_le__date=aujourdhui)
+        )
         .select_related('commande', 'commande__client')
         .prefetch_related('commande__lignes__produit')
         .order_by('confirme_le', '-commande__date')
