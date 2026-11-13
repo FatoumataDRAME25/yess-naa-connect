@@ -33,30 +33,26 @@
      display: flex;
      align-items: center;
      justify-content: center;
-     gap: 12px;
+     gap: 8px;
  }
 
- .brand-icon {
-     width: 32px;
-     height: 32px;
-     background: #2d5a16;
-     border-radius: 50%;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     flex-shrink: 0;
- }
-
- .brand-icon i {
-     font-size: 16px;
-     color: #fff;
+ .brand-logo {
+     display: block;
+     width: 24px;
+     height: 24px;
+     max-width: 24px;
+     max-height: 24px;
+     object-fit: contain;
+     flex: 0 0 auto;
  }
 
  .brand h1 {
      font-family: 'Sora', sans-serif;
-     font-size: 18px;
+     font-size: clamp(14px, 4.2vw, 18px);
      font-weight: 700;
      color: #1a3a0a;
+     line-height: 1.25;
+     min-width: 0;
  }
 
  /* ── Heading ── */

@@ -1,4 +1,5 @@
 from django import forms
+import re
 
 
 class LivreurLoginForm(forms.Form):
@@ -14,3 +15,13 @@ class LivreurLoginForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'placeholder': '••••••••'})
     )
+
+    def clean_telephone(self):
+        """Retire les espaces présents dans le numéro saisi."""
+        telephone = self.cleaned_data['telephone']
+        return re.sub(r'\s+', '', telephone)
+
+    def clean_password(self):
+        """Retire les espaces saisis dans le mot de passe du livreur."""
+        password = self.cleaned_data['password']
+        return re.sub(r'\s+', '', password)
