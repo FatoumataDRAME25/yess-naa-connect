@@ -1,6 +1,8 @@
 {% extends "espace_admin/base.html" %}
 {% block title %}Commande #{{ commande.numero }} — Riz origine Sénégal{% endblock %}
 
+{% block mobile_nav %}{% endblock %}
+
 {% block content %}
 
 <!-- ================================================================ -->
@@ -27,9 +29,17 @@
 <div class="bg-white rounded-2xl shadow-sm shadow-black/5 p-6 mb-6">
     <div class="flex items-center justify-between mb-5">
         <h2 class="text-xs font-bold text-yn-gray uppercase tracking-wider">État de la commande</h2>
-        <span class="bg-yn-green-dark text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">
-            {{ commande.statut_label }}
-        </span>
+        <div class="flex items-center gap-3">
+            {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+    <form method="post" data-confirm="Annuler la commande #{{ commande.numero }} ? Le client ne sera pas livré.">
+      {% csrf_token %}<input type="hidden" name="statut" value="annulee">
+      <button type="submit" class="text-sm font-semibold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 px-4 py-1.5 rounded-full transition">Annuler la commande</button>
+    </form>
+    {% endif %}
+            <span class="bg-yn-green-dark text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">
+                {{ commande.statut_label }}
+            </span>
+        </div>
     </div>
 
     <div class="grid grid-cols-3 gap-4">
@@ -169,8 +179,8 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-center text-gray-700">{{ article.quantite }}</td>
-                    <td class="px-6 py-4 text-right text-gray-600">{{ article.prix_unitaire }} CFA</td>
-                    <td class="px-6 py-4 text-right font-bold text-gray-900">{{ article.sous_total }} CFA</td>
+                    <td class="px-6 py-4 text-right text-gray-600">{{ article.prix_unitaire|floatformat:"0g" }} FCFA</td>
+                    <td class="px-6 py-4 text-right font-bold text-gray-900">{{ article.sous_total|floatformat:"0g" }} FCFA</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -194,15 +204,24 @@
         <div class="flex-1 max-w-xs space-y-3">
             <div class="flex items-center justify-between text-sm">
                 <span class="text-yn-gray">Sous-total</span>
-                <span class="font-semibold text-gray-700">{{ commande.sous_total }} CFA</span>
+                <span class="font-semibold text-gray-700">{{ commande.sous_total|floatformat:"0g" }} FCFA</span>
             </div>
+            {% if commande.montant_remise %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-yn-gray">Remise volume ({{ commande.remise_pct|floatformat:"-2" }} %)</span>
+                <span class="font-semibold text-green-600">- {{ commande.montant_remise|floatformat:"0g" }} FCFA</span>
+            </div>
+            {% endif %}
             <div class="flex items-center justify-between text-sm">
                 <span class="text-yn-gray">Frais de livraison</span>
-                <span class="font-semibold text-gray-700">{{ commande.frais_livraison }} CFA</span>
+                <span class="font-semibold text-gray-700">{{ commande.frais_livraison|floatformat:"0g" }} FCFA</span>
             </div>
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                 <span class="font-bold text-gray-800 text-base">Total à payer</span>
-                <span class="font-bold text-2xl text-gray-900">{{ commande.total }} CFA</span>
+                <span class="font-bold text-2xl text-gray-900">{{ commande.total|floatformat:"0g" }} FCFA</span>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                {% include "espace_admin/_paiement_commande.html" %}
             </div>
         </div>
 
@@ -234,11 +253,6 @@
       </svg>
     </a>
     <h1 class="font-heading font-bold text-lg text-gray-900">Commande #{{ commande.numero }}</h1>
-    <button class="relative w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
-      <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z"/>
-      </svg>
-    </button>
   </div>
 
   <!-- Stepper horizontal -->
@@ -287,7 +301,7 @@
         </div>
         <div class="flex flex-col items-center gap-1 flex-shrink-0">
           <img src="{{ commande.qr_url }}" alt="QR" class="w-16 h-16">
-          <p class="text-[9px] font-bold text-gray-400 uppercase">Scan me</p>
+          <p class="text-[9px] font-bold text-gray-400 uppercase">Scanner pour vérifier</p>
         </div>
       </div>
     </div>
@@ -369,7 +383,7 @@
             <p class="font-bold text-gray-900 text-sm">{{ article.nom }}</p>
             <p class="text-xs text-gray-500">Quantité: x{{ article.quantite }}</p>
           </div>
-          <p class="font-bold text-gray-900 text-sm flex-shrink-0">{{ article.sous_total }} FCFA</p>
+          <p class="font-bold text-gray-900 text-sm flex-shrink-0">{{ article.sous_total|floatformat:"0g" }} FCFA</p>
         </div>
         {% endfor %}
       </div>
@@ -377,20 +391,19 @@
 
     <!-- Paiement + Total -->
     <div class="bg-white rounded-2xl p-4">
-      <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-        <div class="flex items-center gap-2">
-          <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
-            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
-          </svg>
-          <span class="text-sm font-semibold text-gray-700">Paiement à la livraison</span>
+      <div class="pb-3 border-b border-gray-100">
+        {% include "espace_admin/_paiement_commande.html" %}
+        {% if commande.montant_remise %}
+        <div class="flex items-center justify-between text-sm mt-2">
+          <span class="text-gray-500">Remise volume ({{ commande.remise_pct|floatformat:"-2" }} %)</span>
+          <span class="font-semibold text-green-600">- {{ commande.montant_remise|floatformat:"0g" }} FCFA</span>
         </div>
-        <span class="text-xs font-bold text-red-500">NON PAYÉ</span>
+        {% endif %}
       </div>
       <div class="flex items-center justify-between pt-3">
         <div>
           <p class="text-xs text-gray-400 uppercase font-semibold">Total à encaisser</p>
-          <p class="font-bold text-2xl text-gray-900">{{ commande.total }} FCFA</p>
+          <p class="font-bold text-2xl text-gray-900">{{ commande.total|floatformat:"0g" }} FCFA</p>
         </div>
         <div class="w-10 h-10 bg-yn-green-pale rounded-xl flex items-center justify-center">
           <svg class="w-5 h-5 text-yn-green" fill="currentColor" viewBox="0 0 20 20">
@@ -403,7 +416,8 @@
 
   </div><!-- fin px-4 -->
 
-  <!-- CTA fixe en bas -->
+  <!-- CTA fixe en bas (uniquement s'il reste une action possible) -->
+  {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
   <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-3 pb-5 z-30">
     {% for etape in etapes %}
     {% if etape.active %}
@@ -420,10 +434,14 @@
     </form>
     {% endif %}
     {% endfor %}
-    <button class="w-full text-center text-sm font-semibold text-gray-500 hover:text-red-500 transition py-1">
-      Annuler la commande
-    </button>
+    {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+    <form method="post" data-confirm="Annuler la commande #{{ commande.numero }} ? Le client ne sera pas livré.">
+      {% csrf_token %}<input type="hidden" name="statut" value="annulee">
+      <button type="submit" class="w-full text-center text-sm font-semibold text-gray-500 hover:text-red-500 transition py-1">Annuler la commande</button>
+    </form>
+    {% endif %}
   </div>
+  {% endif %}
 
 </div><!-- fin mobile -->
 

@@ -25,7 +25,7 @@
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
             Commander du paddy
         </a>
-        <a href="{% url 'admin_transformatrice:admin_catalogue' %}"
+        <a href="{% url 'admin_transformatrice:admin_catalogue' %}?ajouter=1"
            class="flex items-center gap-2 bg-white border border-yn-green text-yn-green hover:bg-yn-green/5 text-sm font-semibold
                   px-5 py-3 rounded-xl transition">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293L9 21.586 2.414 15 12.121 5.293a1 1 0 01.707-.293H17a1 1 0 011 1v4.586a1 1 0 01-.293.707z"/></svg>
@@ -209,32 +209,13 @@
                         {% endif %}
                     </td>
                     <td class="px-6 py-4">
-                        {% if commande.statut == 'livree' %}
-                            <span class="inline-flex items-center gap-1.5 bg-yn-green-pale text-yn-green text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <span class="w-1.5 h-1.5 rounded-full bg-yn-green"></span> Livrée
-                            </span>
-                        {% elif commande.statut == 'en_preparation' %}
-                            <span class="inline-flex items-center gap-1.5 bg-yn-gold/15 text-yn-gold text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <span class="w-1.5 h-1.5 rounded-full bg-yn-gold"></span> En préparation
-                            </span>
-                        {% elif commande.statut == 'en_livraison' %}
-                            <span class="inline-flex items-center gap-1.5 bg-yn-terracotta/15 text-yn-terracotta text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <span class="w-1.5 h-1.5 rounded-full bg-yn-terracotta"></span> En livraison
-                            </span>
-                        {% else %}
-                            <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> En attente
-                            </span>
-                        {% endif %}
+                        {% include "espace_admin/_statut_commande.html" with statut=commande.statut %}
                     </td>
                     <td class="px-6 py-4 text-gray-600">{{ commande.date|date:"d/m/Y" }}</td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <a href="{% url 'admin_transformatrice:admin_commande_detail' commande.pk %}" class="text-gray-400 hover:text-yn-green">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-                            </a>
-                            <a href="#" class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/></svg>
                             </a>
                         </div>
                     </td>
@@ -254,26 +235,6 @@
 <!-- VERSION MOBILE + TABLETTE                                         -->
 <!-- ================================================================ -->
 <div class="md:hidden min-h-screen bg-gray-50 pb-24">
-
-  <!-- Header mobile : logo + notif + hamburger -->
-  <div class="flex items-center justify-between px-4 pt-5 pb-4 bg-yn-green-dark">
-    <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card yn-logo-card--bar">
-      <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--bar">
-    </a>
-    <div class="flex items-center gap-3">
-      <button class="relative w-9 h-9 rounded-full bg-white/10 flex items-center justify-center">
-        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z"/>
-        </svg>
-        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-      </button>
-      <button onclick="openMobileMenu()" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
-    </div>
-  </div>
 
   <div class="px-4 pt-4">
 
@@ -295,7 +256,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-xs text-yn-gray leading-tight">Commandes</p>
+          <p class="text-xs text-yn-gray leading-tight">Commandes du jour</p>
           <p class="text-xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.commandes_jour }}</span></p>
         </div>
       </div>
@@ -331,7 +292,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-xs text-yn-gray leading-tight">Producteurs</p>
+          <p class="text-xs text-yn-gray leading-tight">Producteurs actifs</p>
           <p class="text-xl font-bold text-yn-green-dark"><span class="yn-count">{{ stats.producteurs_actifs }}</span></p>
         </div>
       </div>
@@ -348,8 +309,10 @@
     <div class="bg-white rounded-2xl shadow-sm p-4 mb-5">
       <h3 class="font-heading font-bold text-sm text-yn-green-dark mb-3">Modes de paiement</h3>
       <div class="flex items-center gap-4">
-        <canvas id="paymentChartMobile" width="110" height="110" class="flex-shrink-0"></canvas>
-        <div class="flex flex-col gap-2 text-sm">
+        <div style="position:relative;width:110px;height:110px;flex-shrink:0;">
+          <canvas id="paymentChartMobile"></canvas>
+        </div>
+        <div class="flex flex-col gap-2 text-sm min-w-0">
           <span class="flex items-center gap-2">
             <span class="w-3 h-3 rounded-full bg-yn-terracotta flex-shrink-0"></span>
             <span class="text-gray-700">À la livraison <strong>{{ pct_livraison }}%</strong></span>
@@ -369,14 +332,14 @@
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
         </svg>
-        Commander paddy
+        Commander du paddy
       </a>
-      <a href="{% url 'admin_transformatrice:admin_catalogue' %}"
+      <a href="{% url 'admin_transformatrice:admin_catalogue' %}?ajouter=1"
          class="flex items-center justify-center gap-2 bg-white border border-yn-green text-yn-green font-semibold text-sm py-3.5 rounded-xl active:bg-yn-green-pale transition">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
         </svg>
-        Ajouter produit
+        Ajouter un produit
       </a>
     </div>
 
@@ -389,27 +352,20 @@
 
       <div class="divide-y divide-gray-50">
         {% for commande in commandes_recentes %}
-        <div class="px-4 py-3 flex items-center gap-3">
+        <a href="{% url 'admin_transformatrice:admin_commande_detail' commande.pk %}" class="px-4 py-3 flex items-center gap-3 active:bg-gray-50">
           <div class="w-10 h-10 rounded-full bg-yn-green-pale flex items-center justify-center flex-shrink-0 text-yn-green-dark font-bold text-sm">
             {{ commande.client.prenom|first|upper }}{{ commande.client.nom|first|upper }}
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm text-gray-900 truncate">{{ commande.client_nom }}</p>
+            <p class="text-[11px] font-semibold text-yn-green-dark truncate">#{{ commande.numero }} · {{ commande.date|date:"d/m/Y" }}</p>
             <p class="text-xs text-yn-gray truncate">{{ commande.produits_resume }}</p>
           </div>
           <div class="flex flex-col items-end gap-1 flex-shrink-0">
-            <p class="text-sm font-bold text-gray-800">{{ commande.montant }} F</p>
-            {% if commande.statut == 'livree' %}
-              <span class="text-[10px] font-bold bg-yn-green-pale text-yn-green px-2 py-0.5 rounded-full">Livrée</span>
-            {% elif commande.statut == 'en_preparation' %}
-              <span class="text-[10px] font-bold bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full">Préparation</span>
-            {% elif commande.statut == 'en_livraison' %}
-              <span class="text-[10px] font-bold bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">En livraison</span>
-            {% else %}
-              <span class="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">En attente</span>
-            {% endif %}
+            <p class="text-sm font-bold text-gray-800">{{ commande.montant }} FCFA</p>
+            {% include "espace_admin/_statut_commande.html" with statut=commande.statut compact=True %}
           </div>
-        </div>
+        </a>
         {% empty %}
         <p class="px-4 py-6 text-center text-xs text-yn-gray">Aucune commande pour le moment.</p>
         {% endfor %}
@@ -418,43 +374,6 @@
 
   </div><!-- fin px-4 -->
 
-  <!-- Bottom nav mobile -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around px-2 py-2 z-30">
-    <a href="{% url 'admin_transformatrice:admin_dashboard' %}"
-       class="flex flex-col items-center gap-1 text-yn-green">
-      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-      </svg>
-      <span class="text-[10px] font-semibold">Accueil</span>
-    </a>
-    <a href="{% url 'admin_transformatrice:admin_catalogue' %}"
-       class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-      </svg>
-      <span class="text-[10px] font-medium">Catalogue</span>
-    </a>
-    <a href="{% url 'admin_transformatrice:admin_commandes' %}"
-       class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-      </svg>
-      <span class="text-[10px] font-medium">Commandes</span>
-    </a>
-    <a href="{% url 'admin_transformatrice:admin_stocks' %}"
-       class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-      </svg>
-      <span class="text-[10px] font-medium">Stocks</span>
-    </a>
-    <a href="#" class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-      </svg>
-      <span class="text-[10px] font-medium">Profil</span>
-    </a>
-  </nav>
 
 </div><!-- fin mobile -->
 
@@ -541,12 +460,16 @@
 })();
 </script>
 
+{{ ventes_semaine|json_script:"ventes-data" }}
+{{ ventes_labels|json_script:"ventes-labels" }}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const ventesData = {{ ventes_semaine|default:"[45000,52000,38000,64000,47000,69000,58000]"|safe }};
-    const labels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-    const pctLiv = {{ pct_livraison|default:65 }};
-    const pctLigne = {{ pct_en_ligne|default:35 }};
+    // Données réelles calculées par la vue (aucune valeur de démonstration)
+    const ventesData = JSON.parse(document.getElementById('ventes-data').textContent);
+    const labels = JSON.parse(document.getElementById('ventes-labels').textContent);
+    const pctLiv = {{ pct_livraison }};
+    const pctLigne = {{ pct_en_ligne }};
+    const aucunePaiement = {{ nb_commandes_valides }} === 0;
 
     const barConfig = (canvasId) => {
         const el = document.getElementById(canvasId);
@@ -582,8 +505,8 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 labels: ['À la livraison', 'En ligne'],
                 datasets: [{
-                    data: [pctLiv, pctLigne],
-                    backgroundColor: ['#C85A1A', '#D4A017'],
+                    data: aucunePaiement ? [1] : [pctLiv, pctLigne],
+                    backgroundColor: aucunePaiement ? ['#E5E7EB'] : ['#C85A1A', '#D4A017'],
                     borderWidth: 0,
                 }]
             },

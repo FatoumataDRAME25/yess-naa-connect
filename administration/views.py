@@ -11,7 +11,7 @@ from django.db.models import Sum, Count, F, Q
 from django.http import HttpResponse, JsonResponse
 from django.templatetags.static import static
 from django.urls import reverse
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import qrcode
 
@@ -88,7 +88,9 @@ def admin_dashboard(request):
         statut=StockPaddy.Statut.DISPONIBLE
     ).aggregate(total=Sum('quantite_kg'))['total'] or 0
 
-    ca_mois = CommandeClient.objects.filter(
+    commandes_valides = CommandeClient.objects.exclude(statut=CommandeClient.Statut.ANNULEE)
+
+    ca_mois = commandes_valides.filter(
         date__year=today.year, date__month=today.month
     ).aggregate(
         total=Sum(F('lignes__quantite') * F('lignes__prix_unitaire'))
@@ -98,9 +100,24 @@ def admin_dashboard(request):
         'lignes__produit'
     ).order_by('-date')[:5]
 
-    total_commandes = CommandeClient.objects.count() or 1
-    en_livraison = CommandeClient.objects.filter(statut=CommandeClient.Statut.EN_LIVRAISON).count()
-    en_attente = CommandeClient.objects.filter(statut=CommandeClient.Statut.ATTENTE).count()
+    # Ventes réelles des 7 derniers jours (aujourd'hui inclus), hors commandes annulées
+    jours_fr = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+    debut = today - timedelta(days=6)
+    par_jour = {
+        ligne['date__date']: ligne['total'] or 0
+        for ligne in commandes_valides.filter(date__date__gte=debut)
+        .values('date__date')
+        .annotate(total=Sum(F('lignes__quantite') * F('lignes__prix_unitaire')))
+    }
+    jours = [debut + timedelta(days=i) for i in range(7)]
+    ventes_semaine = [int(par_jour.get(j, 0)) for j in jours]
+    ventes_labels = [f"{jours_fr[j.weekday()]} {j.day}" for j in jours]
+
+    # Répartition réelle des modes de paiement (hors commandes annulées)
+    nb_valides = commandes_valides.count()
+    nb_livraison = commandes_valides.filter(mode_paiement='livraison').count()
+    pct_livraison = round(nb_livraison / nb_valides * 100) if nb_valides else 0
+    pct_en_ligne = (100 - pct_livraison) if nb_valides else 0
 
     context = {
         'active_nav': 'dashboard',
@@ -111,8 +128,11 @@ def admin_dashboard(request):
             'stock_paddy': f"{int(stock_paddy_total):,}".replace(',', ' '),
             'producteurs_actifs': producteurs_actifs,
         },
-        'pct_livraison': round(en_livraison / total_commandes * 100),
-        'pct_en_ligne': round(en_attente / total_commandes * 100),
+        'pct_livraison': pct_livraison,
+        'pct_en_ligne': pct_en_ligne,
+        'nb_commandes_valides': nb_valides,
+        'ventes_semaine': ventes_semaine,
+        'ventes_labels': ventes_labels,
         'commandes_recentes': commandes_recentes,
     }
     return render(request, 'espace_admin/dashboard.html', context)
@@ -489,6 +509,7 @@ def admin_commandes(request):
 
     if q:
         commandes_qs = commandes_qs.filter(
+            Q(numero__icontains=q.lstrip('#')) |
             Q(client__prenom__icontains=q) |
             Q(client__nom__icontains=q) |
             Q(client__telephone__icontains=q)
@@ -501,6 +522,9 @@ def admin_commandes(request):
     commandes_jour = CommandeClient.objects.filter(date__date=today).count()
     en_attente_count = counts.get('attente', 0)
     en_livraison_count = counts.get('en_livraison', 0)
+    revenu_jour = CommandeClient.objects.filter(date__date=today).exclude(
+        statut=CommandeClient.Statut.ANNULEE
+    ).aggregate(total=Sum(F('lignes__quantite') * F('lignes__prix_unitaire')))['total'] or 0
 
     paginator = Paginator(commandes_qs, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
@@ -512,6 +536,7 @@ def admin_commandes(request):
             'en_attente': en_attente_count,
             'en_livraison': en_livraison_count,
             'commandes_jour': commandes_jour,
+            'revenu_jour': f"{int(revenu_jour):,}".replace(',', ' '),
         },
         'status_tabs': [
             {'label': 'Toutes',         'value': 'toutes',       'count': total_all,                    'active': statut_filtre == 'toutes'},

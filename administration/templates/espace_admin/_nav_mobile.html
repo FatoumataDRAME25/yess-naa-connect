@@ -1,0 +1,25 @@
+{% comment %} Barre de navigation mobile commune à tout l'espace admin {% endcomment %}
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around px-2 py-2 z-30" aria-label="Navigation principale">
+  {% with on="color:#0B5D0B;" off="color:#9CA3AF;" %}
+  <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="flex flex-col items-center gap-1" style="{% if active_nav == 'dashboard' %}{{ on }}{% else %}{{ off }}{% endif %}">
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+    <span class="text-[10px] font-semibold">Accueil</span>
+  </a>
+  <a href="{% url 'admin_transformatrice:admin_stocks' %}" class="flex flex-col items-center gap-1" style="{% if active_nav == 'stocks' or active_nav == 'recap_producteurs' or active_nav == 'commandes_paddy' %}{{ on }}{% else %}{{ off }}{% endif %}">
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2L3 6v8l7 4 7-4V6l-7-4z"/></svg>
+    <span class="text-[10px] font-semibold">Stocks</span>
+  </a>
+  <a href="{% url 'admin_transformatrice:admin_commandes' %}" class="flex flex-col items-center gap-1" style="{% if active_nav == 'commandes' %}{{ on }}{% else %}{{ off }}{% endif %}">
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+    <span class="text-[10px] font-semibold">Commandes</span>
+  </a>
+  <a href="{% url 'admin_transformatrice:admin_catalogue' %}" class="flex flex-col items-center gap-1" style="{% if active_nav == 'catalogue' %}{{ on }}{% else %}{{ off }}{% endif %}">
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+    <span class="text-[10px] font-semibold">Catalogue</span>
+  </a>
+  <a href="{% url 'admin_transformatrice:admin_profil' %}" class="flex flex-col items-center gap-1" style="{% if active_nav == 'profil' %}{{ on }}{% else %}{{ off }}{% endif %}">
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+    <span class="text-[10px] font-semibold">Profil</span>
+  </a>
+  {% endwith %}
+</nav>

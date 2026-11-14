@@ -1,0 +1,16 @@
+{% comment %}
+  Badge de statut d'une commande client — identique sur desktop et mobile.
+  Usage : {% include "espace_admin/_statut_commande.html" with statut=commande.statut %}
+  (ajouter compact=True pour la version mobile, plus petite)
+{% endcomment %}
+{% if statut == 'livree' %}
+  <span class="inline-flex items-center gap-1.5 bg-yn-green-pale text-yn-green {% if compact %}text-[10px] px-2 py-0.5{% else %}text-xs px-3 py-1.5{% endif %} font-semibold rounded-full whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-yn-green"></span>Livrée</span>
+{% elif statut == 'preparation' %}
+  <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 {% if compact %}text-[10px] px-2 py-0.5{% else %}text-xs px-3 py-1.5{% endif %} font-semibold rounded-full whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>En préparation</span>
+{% elif statut == 'en_livraison' %}
+  <span class="inline-flex items-center gap-1.5 bg-orange-50 text-orange-700 {% if compact %}text-[10px] px-2 py-0.5{% else %}text-xs px-3 py-1.5{% endif %} font-semibold rounded-full whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>En livraison</span>
+{% elif statut == 'annulee' %}
+  <span class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 {% if compact %}text-[10px] px-2 py-0.5{% else %}text-xs px-3 py-1.5{% endif %} font-semibold rounded-full whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Annulée</span>
+{% else %}
+  <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 {% if compact %}text-[10px] px-2 py-0.5{% else %}text-xs px-3 py-1.5{% endif %} font-semibold rounded-full whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>En attente</span>
+{% endif %}
