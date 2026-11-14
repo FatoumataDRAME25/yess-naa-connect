@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}?v=2">
     <!-- Fonts locales -->
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/brand.css' %}">
 
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -142,9 +143,8 @@
         <div>
             <!-- Logo -->
             <div class="px-8 pt-8 pb-10">
-                <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="font-heading font-extrabold text-xl">
-                    <span class="text-white">Riz</span>
-                    <span class="text-yn-green-light">Local</span>
+                <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card">
+                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--lg">
                 </a>
             </div>
 
@@ -238,10 +238,9 @@
         <div>
             <!-- Header drawer -->
             <div class="flex items-center justify-between px-6 pt-6 pb-4">
-                <p class="font-heading font-extrabold text-xl">
-                    <span class="text-white">Riz</span>
-                    <span class="text-yn-green-light">Local</span>
-                </p>
+                <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card">
+                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo">
+                </a>
                 <button onclick="closeMobileMenu()" class="text-white/60 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -398,8 +397,8 @@
     </svg>
   </button>
   <!-- Logo centré -->
-  <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="font-heading font-extrabold text-base">
-    <span class="text-lime-900">Riz</span><span class="text-lime-500">Local</span>
+  <a href="{% url 'admin_transformatrice:admin_dashboard' %}">
+    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--bar">
   </a>
   <!-- Cloche + profil -->
   <div class="flex items-center gap-3">

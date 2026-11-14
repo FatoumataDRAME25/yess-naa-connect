@@ -11,7 +11,7 @@
     <title>{% block title %}{% endblock %}</title>
 
     <!-- SEO -->
-    <meta name="description" content="Achetez du riz local directement auprès des producteurs sénégalais avec Riz de la Teranga.">
+    <meta name="description" content="Achetez du riz origine Sénégal directement auprès des producteurs sénégalais avec Riz de la Teranga.">
     <meta name="keywords" content="riz, Sénégal, agriculture, producteurs, vente en ligne, Riz de la Teranga">
     <meta name="author" content="Riz de la Teranga">
 
@@ -38,7 +38,7 @@
       </a> -->
       <a href="{% url 'accueil' %}" class="flex items-center shrink-0">
         <img src="{% static 'images/logo.png' %}"
-            alt="Logo Riz de la Teranga"
+            alt="YEESNAA CONNECT"
             class="h-12 md:h-14 w-auto object-contain"/>
       </a>
 
@@ -250,12 +250,16 @@
         <!-- Logo -->
         <a href="{% url 'accueil' %}" class="flex items-center">
             <img src="{% static 'images/logo.png' %}"
-                alt="Logo Riz de la Teranga"
+                alt="YEESNAA CONNECT"
                 class="h-12 w-auto object-contain"/>
         </a>
 
         <!-- Bouton fermer -->
         <button onclick="closeMobileMenu()" aria-label="Fermer" class="text-gray-500">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
     </div>
     <nav class="flex flex-col px-2 py-4">
       <a href="{% url 'accueil' %}" class="px-4 py-3 rounded-xl text-base font-semibold {% if request.resolver_match.url_name == 'accueil' %}text-lime-900 bg-lime-50{% else %}text-gray-700{% endif %}">Accueil</a>
@@ -300,7 +304,7 @@
 
         <!-- Colonne 1 : Présentation -->
         <div>
-          <p class="text-white text-2xl font-extrabold uppercase mb-6">Riz origine sénégal</p>
+          <p class="text-white text-2xl font-extrabold uppercase mb-6">Riz origine Sénégal</p>
           <p class="text-white/70 text-sm leading-6 mb-6">
             Connecter les producteurs locaux de riz du Sénégal directement aux consommateurs.
             Pour une agriculture durable et une économie circulaire forte.

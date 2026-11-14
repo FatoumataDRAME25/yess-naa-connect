@@ -1,0 +1,45 @@
+/*
+ * YEESNAA CONNECT — règles d'affichage du logo (charte graphique v2.0)
+ *
+ * Fichier source unique : static/images/logo.png (PNG 1254x1254, fond blanc).
+ * - Jamais étiré : seule la largeur est fixée, la hauteur suit (height:auto).
+ * - Taille mini web de la version complète : 120 px de logo visible.
+ *   Le PNG contient ~6 % de marge blanche de chaque côté, d'où 136 px d'image.
+ * - Zone de protection = hauteur du « Y » (~11 % de la largeur de l'image) :
+ *   assurée par la marge intégrée au PNG + le padding ci-dessous.
+ * - Sur fond foncé, le logo couleur est posé sur une carte blanche
+ *   (pas de version blanche fournie, et le vert « YEES » sur vert foncé
+ *   serait un fond de faible contraste, interdit par la charte).
+ */
+
+.yn-logo {
+    display: block;
+    height: auto;
+    max-width: none;
+    width: 136px;            /* = 120 px de logo visible, minimum charte */
+}
+
+.yn-logo--lg {
+    width: 160px;
+}
+
+/* Variante compacte pour les barres mobiles de 56 px de haut.
+   En dessous du minimum de 120 px : contrainte de hauteur assumée,
+   le logo pleine taille est visible dans le menu déroulant. */
+.yn-logo--bar {
+    width: 48px;
+}
+
+/* Carte blanche pour poser le logo couleur sur fond foncé */
+.yn-logo-card {
+    display: inline-block;
+    background: #fff;
+    border-radius: 14px;
+    padding: 8px;
+    line-height: 0;
+}
+
+.yn-logo-card--bar {
+    border-radius: 10px;
+    padding: 2px;
+}

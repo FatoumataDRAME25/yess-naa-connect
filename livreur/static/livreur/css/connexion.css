@@ -31,28 +31,33 @@
  /* ── Logo ── */
  .brand {
      display: flex;
+     flex-direction: column;
      align-items: center;
      justify-content: center;
-     gap: 8px;
+     gap: 6px;
+ }
+
+ /* Logo officiel (static/images/logo.png) : largeur seule fixée pour ne
+    jamais déformer ; 160 px >= minimum charte de 120 px de logo visible.
+    La marge blanche du PNG + le gap assurent la zone de protection. */
+ .brand-title {
+     margin: 0;
+     line-height: 0;
  }
 
  .brand-logo {
      display: block;
-     width: 24px;
-     height: 24px;
-     max-width: 24px;
-     max-height: 24px;
-     object-fit: contain;
-     flex: 0 0 auto;
+     width: 160px;
+     height: auto;
+     max-width: none;
  }
 
- .brand h1 {
+ .brand-tagline {
      font-family: 'Sora', sans-serif;
-     font-size: clamp(14px, 4.2vw, 18px);
+     font-size: 14px;
      font-weight: 700;
-     color: #1a3a0a;
+     color: #0B5D0B;
      line-height: 1.25;
-     min-width: 0;
  }
 
  /* ── Heading ── */
