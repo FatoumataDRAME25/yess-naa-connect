@@ -21,7 +21,7 @@
   </header>
 
   <div class="order-meta-bar">
-    <span class="order-id">#YNC-{{ livraison.commande.id|stringformat:"04d" }}</span>
+    <span class="order-id">#{{ livraison.commande.numero }}</span>
     {% if livraison.confirme_le %}
       <span class="status-pill" style="background:#f2f9ed; color:#7dbd48;">Livrée</span>
     {% else %}

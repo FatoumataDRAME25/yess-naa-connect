@@ -11,6 +11,13 @@ class Livreur(models.Model):
         return f"Livreur: {self.user.prenom} {self.user.nom}"
 
 
+class LivraisonsActivesManager(models.Manager):
+    """Par défaut, les livraisons des commandes archivées n'apparaissent plus (ni au livreur, ni dans les statistiques)."""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(commande__archivee_le__isnull=True)
+
+
 class Livraison(models.Model):
     commande = models.OneToOneField(
         'client.CommandeClient', on_delete=models.CASCADE, related_name='livraison'
@@ -20,6 +27,12 @@ class Livraison(models.Model):
     )
     montant_encaisse = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     confirme_le = models.DateTimeField(null=True, blank=True)
+
+    objects = LivraisonsActivesManager()
+    toutes  = models.Manager()
+
+    class Meta:
+        base_manager_name = 'toutes'
 
     def confirmer(self, montant=None):
         """Confirme la livraison et met à jour le statut de la commande liée."""

@@ -34,6 +34,11 @@ urlpatterns = [
     # Commandes clients
     path('commandes/', views.admin_commandes, name='admin_commandes'),
     path('commandes/<int:pk>/', views.admin_commande_detail, name='admin_commande_detail'),
+    path('commandes/<int:pk>/supprimer/', views.admin_commande_supprimer, name='admin_commande_supprimer'),
+    path('commandes/archives/', views.admin_commandes_archives, name='admin_commandes_archives'),
+    path('commandes/archives/vider/', views.admin_commandes_archives_vider, name='admin_commandes_archives_vider'),
+    path('commandes/archives/<int:pk>/restaurer/', views.admin_commande_restaurer, name='admin_commande_restaurer'),
+    path('commandes/archives/<int:pk>/supprimer/', views.admin_commande_supprimer_definitivement, name='admin_commande_supprimer_definitivement'),
 
     # Gestion des livreurs
     path('livreurs/', views.admin_livreurs, name='admin_livreurs'),

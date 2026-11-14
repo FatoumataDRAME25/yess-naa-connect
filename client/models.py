@@ -33,6 +33,13 @@ class Client(models.Model):
         return f"{self.prenom} {self.nom} ({self.telephone})"
 
 
+class CommandesActivesManager(models.Manager):
+    """Gestionnaire par défaut : les commandes archivées (supprimées par l'admin) sont exclues partout."""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(archivee_le__isnull=True)
+
+
 class CommandeClient(models.Model):
     class Statut(models.TextChoices):
         ATTENTE      = 'attente',      'En attente'
@@ -52,8 +59,16 @@ class CommandeClient(models.Model):
     montant_remise  = models.PositiveIntegerField(default=0)
     remise_pct      = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     date            = models.DateTimeField(auto_now_add=True)
+    # Suppression par l'admin = archivage : la commande disparaît de toutes les
+    # listes (admin, livreurs, suivi client) mais reste restaurable depuis les
+    # Archives, d'où elle peut être supprimée définitivement.
+    archivee_le     = models.DateTimeField(null=True, blank=True)
+
+    objects = CommandesActivesManager()   # commandes visibles (non archivées)
+    tous    = models.Manager()            # toutes, y compris les archives
 
     class Meta:
+        base_manager_name = 'tous'
         verbose_name = 'Commande client'
         verbose_name_plural = 'Commandes clients'
         ordering = ['-date']
@@ -62,7 +77,7 @@ class CommandeClient(models.Model):
         if not self.numero:
             # Boucle pour garantir l'unicité
             numero = _generer_numero_commande()
-            while CommandeClient.objects.filter(numero=numero).exists():
+            while CommandeClient.tous.filter(numero=numero).exists():
                 numero = _generer_numero_commande()
             self.numero = numero
         super().save(*args, **kwargs)

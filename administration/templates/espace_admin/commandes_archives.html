@@ -1,0 +1,81 @@
+{% extends "espace_admin/base.html" %}
+{% block title %}Commandes archivées — Riz origine Sénégal{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl md:pt-0 pt-4">
+
+  <!-- En-tête -->
+  <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
+    <div class="flex items-start gap-3">
+      <a href="{% url 'admin_transformatrice:admin_commandes' %}" class="mt-1 text-gray-600" aria-label="Retour aux commandes">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </a>
+      <div>
+        <h1 class="font-heading font-bold text-xl md:text-2xl text-yn-green-dark">Commandes archivées</h1>
+        <p class="text-sm text-yn-gray mt-0.5">Commandes supprimées : restaurez-les ou supprimez-les définitivement.</p>
+      </div>
+    </div>
+    {% if nb_archives %}
+    <form method="post" action="{% url 'admin_transformatrice:admin_commandes_archives_vider' %}"
+          data-confirm="Supprimer définitivement les {{ nb_archives }} commande(s) archivée(s) ? Cette action est irréversible.">
+      {% csrf_token %}
+      <button type="submit" class="inline-flex items-center gap-2 text-sm font-semibold rounded-xl px-4 py-2.5"
+              style="color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        Vider les archives ({{ nb_archives }})
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+  <!-- Liste (même présentation sur ordinateur et téléphone) -->
+  <div class="space-y-3">
+    {% for commande in page_obj %}
+    <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <span class="font-bold text-sm text-yn-green-dark">#{{ commande.numero }}</span>
+          {% include "espace_admin/_statut_commande.html" with statut=commande.statut compact=True %}
+        </div>
+        <p class="font-semibold text-gray-900">{{ commande.client_nom }} <span class="font-normal text-xs text-gray-500">· {{ commande.client_telephone }}</span></p>
+        <p class="text-xs text-gray-600 truncate">{{ commande.produits_resume }}</p>
+        <p class="text-xs text-gray-400 mt-1">Passée le {{ commande.date|date:"d/m/Y à H:i" }} · supprimée le {{ commande.archivee_le|date:"d/m/Y à H:i" }}</p>
+      </div>
+      <p class="font-bold text-gray-900 whitespace-nowrap">{{ commande.montant }} FCFA</p>
+      <div class="flex items-center gap-2">
+        <form method="post" action="{% url 'admin_transformatrice:admin_commande_restaurer' commande.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="inline-flex items-center gap-1.5 text-sm font-semibold rounded-xl px-3 py-2 whitespace-nowrap"
+                  style="color:#0B5D0B;background:#E8F3E3;border:1px solid #B7D9AE;"
+                  title="Remettre la commande dans la liste des commandes">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v2M3 10l5-5M3 10l5 5"/></svg>
+            Restaurer
+          </button>
+        </form>
+        <form method="post" action="{% url 'admin_transformatrice:admin_commande_supprimer_definitivement' commande.pk %}"
+              data-confirm="Supprimer définitivement la commande #{{ commande.numero }} ? Elle ne pourra plus être récupérée.">
+          {% csrf_token %}
+          <button type="submit" class="inline-flex items-center justify-center rounded-xl"
+                  style="width:40px;height:40px;color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;"
+                  title="Supprimer définitivement" aria-label="Supprimer définitivement la commande #{{ commande.numero }}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-2xl shadow-sm px-6 py-12 text-center text-yn-gray text-sm">
+      Aucune commande archivée.
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_other_pages %}
+  <div class="flex items-center justify-center gap-4 mt-6 text-sm">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="font-semibold text-yn-green">← Précédent</a>{% endif %}
+    <span class="text-gray-500">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="font-semibold text-yn-green">Suivant →</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -17,10 +17,18 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
     </div>
-    <div>
+    <div class="flex-1">
         <h1 class="font-heading font-bold text-2xl text-yn-green-dark">Détails de la commande #{{ commande.numero }}</h1>
         <p class="text-sm text-yn-gray">Passée le {{ commande.date_str }} à {{ commande.heure }}</p>
     </div>
+    <form method="post" action="{% url 'admin_transformatrice:admin_commande_supprimer' commande.pk %}"
+          data-confirm="Supprimer la commande #{{ commande.numero }} ? Elle sera placée dans les archives (restaurable).">
+      {% csrf_token %}
+      <button type="submit" class="inline-flex items-center gap-2 text-sm font-semibold rounded-xl px-4 py-2" style="color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;" title="Supprimer (archiver)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        Supprimer
+      </button>
+    </form>
 </div>
 
 <div class="border-t border-gray-100 mb-7"></div>
@@ -413,6 +421,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Suppression (archivage) — disponible quel que soit le statut -->
+    <form method="post" action="{% url 'admin_transformatrice:admin_commande_supprimer' commande.pk %}"
+          data-confirm="Supprimer la commande #{{ commande.numero }} ? Elle sera placée dans les archives (restaurable).">
+      {% csrf_token %}
+      <button type="submit" class="w-full flex items-center justify-center gap-2 text-sm font-semibold rounded-2xl py-3 mt-1" style="color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;" title="Supprimer (archiver)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        Supprimer la commande
+      </button>
+    </form>
 
   </div><!-- fin px-4 -->
 

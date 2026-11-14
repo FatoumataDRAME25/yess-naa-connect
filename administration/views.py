@@ -550,6 +550,7 @@ def admin_commandes(request):
         'paginator': paginator,
         'page_obj': page_obj,
         'statut_filtre': statut_filtre,
+        'nb_archives': CommandeClient.tous.filter(archivee_le__isnull=False).count(),
         'q': q,
     }
     return render(request, 'espace_admin/commandes.html', context)
@@ -1136,4 +1137,72 @@ def admin_reinitialiser_mdp(request, pk):
         'espace': 'Producteurs(trices)' if cible.role == User.Role.PRODUCTEUR else 'Livreur',
     }
     return redirect(retour)
+
+
+# ============================================================
+#  COMMANDES CLIENTS : SUPPRESSION → ARCHIVES
+# ============================================================
+
+@admin_required
+def admin_commande_supprimer(request, pk):
+    """« Supprimer » une commande = l'archiver. Elle disparaît de toutes les listes
+    (admin, livreurs, suivi client) mais reste restaurable depuis les Archives."""
+    if request.method != 'POST':
+        return redirect('admin_transformatrice:admin_commandes')
+    from django.utils import timezone
+    commande = get_object_or_404(CommandeClient, pk=pk)
+    commande.archivee_le = timezone.now()
+    commande.save(update_fields=['archivee_le'])
+    messages.success(
+        request,
+        f"Commande #{commande.numero} supprimée et placée dans les archives "
+        f"(vous pouvez la restaurer ou la supprimer définitivement depuis « Archives »)."
+    )
+    return redirect('admin_transformatrice:admin_commandes')
+
+
+@admin_required
+def admin_commandes_archives(request):
+    archives = CommandeClient.tous.filter(archivee_le__isnull=False).select_related(
+        'client'
+    ).prefetch_related('lignes__produit').order_by('-archivee_le')
+    page_obj = Paginator(archives, 15).get_page(request.GET.get('page'))
+    return render(request, 'espace_admin/commandes_archives.html', {
+        'active_nav': 'commandes',
+        'page_obj': page_obj,
+        'nb_archives': archives.count(),
+    })
+
+
+@admin_required
+def admin_commande_restaurer(request, pk):
+    if request.method == 'POST':
+        commande = get_object_or_404(CommandeClient.tous, pk=pk, archivee_le__isnull=False)
+        commande.archivee_le = None
+        commande.save(update_fields=['archivee_le'])
+        messages.success(request, f"Commande #{commande.numero} restaurée dans la liste des commandes.")
+    return redirect('admin_transformatrice:admin_commandes_archives')
+
+
+@admin_required
+def admin_commande_supprimer_definitivement(request, pk):
+    """Suppression définitive (lignes et livraison comprises), uniquement depuis les archives."""
+    if request.method == 'POST':
+        commande = get_object_or_404(CommandeClient.tous, pk=pk, archivee_le__isnull=False)
+        numero = commande.numero
+        commande.delete()
+        messages.success(request, f"Commande #{numero} supprimée définitivement.")
+    return redirect('admin_transformatrice:admin_commandes_archives')
+
+
+@admin_required
+def admin_commandes_archives_vider(request):
+    """Supprime définitivement toutes les commandes archivées."""
+    if request.method == 'POST':
+        archives = CommandeClient.tous.filter(archivee_le__isnull=False)
+        nb = archives.count()
+        for commande in archives:
+            commande.delete()
+        messages.success(request, f"{nb} commande(s) archivée(s) supprimée(s) définitivement.")
+    return redirect('admin_transformatrice:admin_commandes_archives')
 

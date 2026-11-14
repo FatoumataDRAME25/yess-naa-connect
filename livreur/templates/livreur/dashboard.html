@@ -58,7 +58,7 @@
     <article class="delivery-card {% if livraison.confirme_le %}done{% endif %}">
       <div class="card-top">
         <div>
-          <p class="card-id">#YNC-{{ livraison.commande.id|stringformat:"04d" }}</p>
+          <p class="card-id">#{{ livraison.commande.numero }}</p>
           <div class="card-name-row">
             <i class="ti ti-map-pin"></i>
             <span class="card-name" {% if livraison.confirme_le %}style="color:#9ca3af"{% endif %}>
