@@ -24,7 +24,7 @@
     <section>
       <h2 class="text-lg font-bold text-lime-900 mb-3 pb-2 border-b border-gray-100">3. Prix</h2>
       <p>Les prix affichés sont en <strong>Francs CFA (FCFA)</strong>, toutes taxes comprises. Yess Naa Connect se réserve le droit de modifier ses prix à tout moment, mais les produits sont facturés sur la base du tarif en vigueur au moment de la validation de la commande.</p>
-      <p class="mt-2">Une <strong>remise volume</strong> peut être appliquée automatiquement pour les commandes atteignant un seuil de poids défini (actuellement 3 tonnes). Cette remise est affichée dans le récapitulatif du panier.</p>
+      <p class="mt-2">Une <strong>remise volume</strong> peut être appliquée automatiquement pour les commandes atteignant un seuil de poids défini{% if regle_remise %} (actuellement {{ regle_remise.taux_remise|floatformat:"-2" }} % dès {{ regle_remise.seuil_kg }} kg commandés){% endif %}. Cette remise est affichée dans le récapitulatif du panier.</p>
     </section>
 
     <section>

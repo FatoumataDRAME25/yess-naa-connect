@@ -142,9 +142,9 @@
     <aside class="hidden md:flex w-72 bg-yn-green-dark flex-col justify-between fixed h-screen z-30">
         <div>
             <!-- Logo -->
-            <div class="px-8 pt-8 pb-10">
-                <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card">
-                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--lg">
+            <div class="yn-sidebar-brand px-8 pt-8 pb-8">
+                <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card yn-logo-card--sidebar">
+                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--sidebar">
                 </a>
             </div>
 
@@ -237,11 +237,11 @@
                 transition-transform duration-300 ease-in-out flex flex-col justify-between overflow-y-auto md:hidden">
         <div>
             <!-- Header drawer -->
-            <div class="flex items-center justify-between px-6 pt-6 pb-4">
-                <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card">
-                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo">
+            <div class="yn-sidebar-brand px-6 pt-6 pb-4">
+                <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card yn-logo-card--sidebar">
+                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--sidebar">
                 </a>
-                <button onclick="closeMobileMenu()" class="text-white/60 hover:text-white">
+                <button onclick="closeMobileMenu()" aria-label="Fermer" class="text-white/60 hover:text-white" style="position:absolute;right:24px;top:24px;">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>

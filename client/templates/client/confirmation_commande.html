@@ -95,7 +95,7 @@ Riz origine Sénégal
               </div>
               {% if commande.montant_remise %}
               <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Remise volume ({{ commande.remise_pct }}%)</span>
+                <span class="text-gray-500">Remise volume ({{ commande.remise_pct|floatformat:"-2" }} %)</span>
                 <span class="font-semibold text-green-600">- {{ commande.montant_remise }} FCFA</span>
               </div>
               {% endif %}

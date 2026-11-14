@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import Sum, Count, F, Q
 from django.http import HttpResponse, JsonResponse
 from django.templatetags.static import static
@@ -290,7 +291,10 @@ def admin_catalogue(request):
         except (CommandePaddy.DoesNotExist, ValueError):
             messages.warning(request, "Commande paddy introuvable ou non reçue.")
 
-    tous_produits = Produit.objects.select_related('stock_source__stock__producteur__user').order_by('-cree_le')
+    # Les produits supprimés mais conservés pour l'historique (archivés) ne sont plus listés
+    tous_produits = Produit.objects.select_related('stock_source__stock__producteur__user').exclude(
+        statut=Produit.Statut.ARCHIVE
+    ).order_by('-cree_le')
 
     if filtre == 'en_ligne':
         produits_affiches = tous_produits.filter(est_actif=True, stock_sacs__gt=10)
@@ -443,11 +447,27 @@ def admin_produit_edit(request, pk):
 
 @admin_required
 def admin_produit_delete(request, pk):
+    """
+    Supprime un produit du catalogue.
+    - Jamais commandé : suppression définitive.
+    - Déjà commandé : retiré (archivé) — il disparaît du catalogue admin et
+      du site, mais reste visible dans les commandes et reçus existants.
+    """
     produit = get_object_or_404(Produit, pk=pk)
     if request.method == 'POST':
         nom = produit.nom
-        produit.delete()
-        messages.success(request, f"Produit « {nom} » supprimé.")
+        if produit.lignes_commande.exists():
+            produit.est_actif = False
+            produit.statut = Produit.Statut.ARCHIVE
+            produit.save(update_fields=['est_actif', 'statut', 'mis_a_jour'])
+            messages.success(
+                request,
+                f"Produit « {nom} » supprimé du catalogue "
+                f"(conservé uniquement dans l'historique des commandes déjà passées)."
+            )
+        else:
+            produit.delete()
+            messages.success(request, f"Produit « {nom} » supprimé.")
     return redirect('admin_transformatrice:admin_catalogue')
 
 
@@ -988,6 +1008,7 @@ def admin_recap_producteurs(request):
             'kg_commande': kg_commande,
             'kg_recu': kg_recu,
             'nb_commandes': nb_commandes,
+            'nb_declarations': stocks.count(),
             'montant_total': montant_total,
         })
 
@@ -997,3 +1018,39 @@ def admin_recap_producteurs(request):
         'nb_producteurs': len(recap),
     }
     return render(request, 'espace_admin/recap_producteurs.html', context)
+
+
+@admin_required
+def admin_producteur_delete(request, pk):
+    """
+    Supprime définitivement un(e) producteur(trice) et tout ce qui lui est lié :
+    son compte de connexion, ses déclarations de stock paddy et les commandes
+    paddy passées sur ces stocks. Les produits du catalogue fabriqués à partir
+    de ces commandes sont conservés (leur origine devient « Non renseignée »).
+    """
+    from producteur.models import Producteur
+
+    producteur = get_object_or_404(Producteur.objects.select_related('user'), pk=pk)
+    user = producteur.user
+    if request.method != 'POST':
+        return redirect('admin_transformatrice:admin_recap_producteurs')
+
+    # Garde-fou : ne jamais supprimer un compte administrateur par ce biais
+    if user.is_superuser or user.role != User.Role.PRODUCTEUR:
+        messages.error(request, "Ce compte n'est pas un compte producteur : suppression refusée.")
+        return redirect('admin_transformatrice:admin_recap_producteurs')
+
+    nom = f"{user.prenom} {user.nom}".strip() or user.username
+    with transaction.atomic():
+        commandes = CommandePaddy.objects.filter(stock__producteur=producteur)
+        nb_commandes = commandes.count()
+        nb_declarations = producteur.stocks.count()
+        commandes.delete()      # protégées par les stocks : à supprimer en premier
+        user.delete()           # supprime aussi le profil producteur et ses stocks (cascade)
+
+    messages.success(
+        request,
+        f"Producteur(trice) « {nom} » supprimé(e), avec {nb_declarations} déclaration(s) "
+        f"et {nb_commandes} commande(s) paddy."
+    )
+    return redirect('admin_transformatrice:admin_recap_producteurs')

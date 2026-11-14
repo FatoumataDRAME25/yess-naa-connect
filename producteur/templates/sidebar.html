@@ -42,11 +42,11 @@
                   transform -translate-x-full transition-transform duration-300 ease-in-out
                   md:translate-x-0 md:flex">
         <div class="pt-8 px-5">
-            <div class="flex items-center justify-between mb-10 md:mb-10">
-                <a href="{% url 'dashbord' %}" class="yn-logo-card">
-                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo">
+            <div class="yn-sidebar-brand mb-8">
+                <a href="{% url 'dashbord' %}" class="yn-logo-card yn-logo-card--sidebar">
+                    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--sidebar">
                 </a>
-                <button onclick="closeMobileMenu()" aria-label="Fermer" class="md:hidden text-white/70">
+                <button onclick="closeMobileMenu()" aria-label="Fermer" class="md:hidden text-white/70" style="position:absolute;right:0;top:0;">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>

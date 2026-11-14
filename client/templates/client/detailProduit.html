@@ -126,10 +126,22 @@ Riz origine Sénégal
             <div class="flex flex-col sm:flex-row gap-4">
 
                 <!-- Sélecteur de quantité -->
-                <div class="flex items-center border rounded-xl px-3 py-2 gap-4 w-fit">
-                  <button id="btn-moins" class="text-xl cursor-pointer hover:text-lime-900 transition-colors">-</button>
-                  <span id="quantity">1</span>
-                  <button id="btn-plus" class="text-xl cursor-pointer hover:text-lime-900 transition-colors">+</button>
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center border rounded-xl px-2 py-2 gap-2 w-fit">
+                    <button type="button" id="btn-moins" aria-label="Retirer un sac"
+                            class="w-9 h-9 rounded-lg font-bold text-xl cursor-pointer"
+                            style="background:#E8F3E3;color:#0B5D0B;">−</button>
+                    <!-- Le client peut aussi taper directement le nombre de sacs -->
+                    <input type="number" id="quantity" inputmode="numeric" min="1" step="1" value="1"
+                           {% if produit.stock_sacs %}max="{{ produit.stock_sacs }}"{% endif %}
+                           aria-label="Nombre de sacs"
+                           class="font-bold text-lime-950 text-center border border-gray-200 rounded-lg"
+                           style="width:72px;height:36px;">
+                    <button type="button" id="btn-plus" aria-label="Ajouter un sac"
+                            class="w-9 h-9 rounded-lg font-bold text-xl cursor-pointer"
+                            style="background:#E8F3E3;color:#0B5D0B;">+</button>
+                  </div>
+                  <p id="alerte-quantite" class="text-xs text-amber-700 hidden"></p>
                 </div>
 
                 <button
@@ -225,20 +237,34 @@ Riz origine Sénégal
 {% block extra_js %}
 
 <script>
-  /* COMPTEUR DE QUANTITÉ */
-  let quantity = 1;
+  /* QUANTITÉ : boutons − / + ou saisie directe, bornée entre 1 et le stock */
+  const champQte = document.getElementById('quantity');
+  const stockMax = parseInt(champQte.getAttribute('max') || '0', 10);
+  const alerteQte = document.getElementById('alerte-quantite');
+
+  function lireQuantite() {
+    let n = parseInt(champQte.value, 10);
+    if (!n || n < 1) n = 1;
+    if (stockMax && n > stockMax) {
+      n = stockMax;
+      alerteQte.textContent = 'Stock disponible : ' + stockMax + ' sacs maximum.';
+      alerteQte.classList.remove('hidden');
+    } else {
+      alerteQte.classList.add('hidden');
+    }
+    champQte.value = n;
+    return n;
+  }
 
   document.getElementById('btn-plus').addEventListener('click', function () {
-    quantity++;
-    document.getElementById('quantity').textContent = quantity;
+    champQte.value = lireQuantite() + 1;
+    lireQuantite();
   });
-
   document.getElementById('btn-moins').addEventListener('click', function () {
-    if (quantity > 1) {
-      quantity--;
-      document.getElementById('quantity').textContent = quantity;
-    }
+    champQte.value = Math.max(1, lireQuantite() - 1);
+    lireQuantite();
   });
+  champQte.addEventListener('change', lireQuantite);
 
   /* SÉLECTION DU POIDS */
   document.querySelectorAll('.btn-poids').forEach(function (btn) {
@@ -284,7 +310,7 @@ Riz origine Sénégal
 
   btnAjouter.addEventListener('click', function () {
     const url         = btnAjouter.dataset.url;
-    const qteAAjouter = parseInt(document.getElementById('quantity').textContent, 10);
+    const qteAAjouter = lireQuantite();
     const poidsActif  = document.querySelector('.btn-poids.bg-lime-900');
     const poids       = poidsActif ? poidsActif.dataset.poids : '';
 
@@ -305,8 +331,11 @@ Riz origine Sénégal
         mettreAJourBadge(data.nb_panier);
 
         // Remettre le compteur à 1 pour le prochain ajout
-        quantity = 1;
-        document.getElementById('quantity').textContent = 1;
+        champQte.value = 1;
+        if (data.limite_stock) {
+          alerteQte.textContent = 'Stock disponible : ' + data.stock_max + ' sacs maximum (déjà dans votre panier).';
+          alerteQte.classList.remove('hidden');
+        }
 
         // Réactiver le bouton
         btnAjouter.disabled = false;

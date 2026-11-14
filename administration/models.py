@@ -104,12 +104,12 @@ class RegleRemise(models.Model):
     Si le poids total commandé >= seuil_kg, on applique taux_remise % sur le sous-total.
     """
     seuil_kg    = models.PositiveIntegerField(
-        default=3000,
-        help_text="Quantité minimale en kg pour déclencher la remise (ex: 3000 pour 3 tonnes)"
+        default=1000,
+        help_text="Quantité minimale en kg pour déclencher la remise (ex: 1000 pour 1 tonne)"
     )
     taux_remise = models.DecimalField(
-        max_digits=5, decimal_places=2, default=5.00,
-        help_text="Taux de remise en pourcentage (ex: 5.00 pour 5%)"
+        max_digits=5, decimal_places=2, default=15.00,
+        help_text="Taux de remise en pourcentage (ex: 15.00 pour 15%)"
     )
     est_active  = models.BooleanField(default=True)
     description = models.CharField(max_length=255, blank=True,
@@ -121,7 +121,8 @@ class RegleRemise(models.Model):
         ordering = ['-seuil_kg']
 
     def __str__(self):
-        return f"Remise {self.taux_remise}% à partir de {self.seuil_kg} kg"
+        taux = f"{self.taux_remise:.2f}".rstrip('0').rstrip('.')
+        return f"Remise volume {taux} % dès {self.seuil_kg} kg"
 
 
 class Produit(models.Model):

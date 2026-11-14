@@ -73,7 +73,7 @@ Riz origine Sénégal
           <div class="flex-1 min-w-0">
             <h3 class="text-base sm:text-lg font-semibold text-lime-950 truncate">{{ article.nom }}</h3>
             {% if article.poids %}
-            <p class="text-sm text-gray-500">Format : {{ article.poids }}</p>
+            <p class="text-sm text-gray-500">Format : {{ article.poids }} kg</p>
             {% endif %}
 
             <div class="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -83,25 +83,34 @@ Riz origine Sénégal
                    data-url pointe vers modifier_quantite en Django
                    data-action indique si c'est "increment" ou "decrement"
               -->
-              <div class="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-full px-3 py-1 self-start">
-                <button
-                  class="btn-quantite text-gray-500 hover:text-lime-900 font-bold w-6 text-center"
+              <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-2 py-1 self-start">
+                <button type="button"
+                  class="btn-quantite w-8 h-8 rounded-full font-bold text-lg"
+                  style="background:#E8F3E3;color:#0B5D0B;"
+                  aria-label="Retirer un sac"
                   data-action="decrement"
                   data-url="{% url 'modifier_quantite' article.id %}"
-                  data-article-id="{{ article.id }}">
-                  −
-                </button>
-                <span class="font-bold text-lime-950 w-6 text-center" id="qte-{{ article.id }}">
-                  {{ article.quantite|stringformat:"02d" }}
-                </span>
-                <button
-                  class="btn-quantite text-gray-500 hover:text-lime-900 font-bold w-6 text-center"
+                  data-article-id="{{ article.id }}">−</button>
+                <!-- Saisie directe du nombre de sacs (validée à la sortie du champ ou avec Entrée) -->
+                <input type="number" inputmode="numeric" min="1" step="1"
+                  {% if article.stock_max %}max="{{ article.stock_max }}"{% endif %}
+                  value="{{ article.quantite }}"
+                  class="input-quantite font-bold text-lime-950 text-center bg-white border border-gray-200 rounded-lg"
+                  style="width:64px;height:32px;"
+                  aria-label="Nombre de sacs de {{ article.nom }}"
+                  id="qte-{{ article.id }}"
+                  data-url="{% url 'modifier_quantite' article.id %}"
+                  data-article-id="{{ article.id }}"
+                  data-valeur="{{ article.quantite }}">
+                <button type="button"
+                  class="btn-quantite w-8 h-8 rounded-full font-bold text-lg"
+                  style="background:#E8F3E3;color:#0B5D0B;"
+                  aria-label="Ajouter un sac"
                   data-action="increment"
                   data-url="{% url 'modifier_quantite' article.id %}"
-                  data-article-id="{{ article.id }}">
-                  +
-                </button>
+                  data-article-id="{{ article.id }}">+</button>
               </div>
+              <p class="text-xs text-amber-700 hidden" id="alerte-{{ article.id }}"></p>
 
               <!-- Prix ligne -->
               <div class="text-left sm:text-right">
@@ -143,15 +152,16 @@ Riz origine Sénégal
             </div>
             <div class="flex justify-between items-start">
               <span class="text-gray-600">Remise</span>
-              {% if montant_remise %}
               <div class="text-right">
-                <span class="font-semibold text-green-600">- {{ montant_remise }} FCFA ({{ taux_remise }}%)</span>
-                <p class="text-xs text-green-700 mt-0.5">🎉 Remise volume ≥ 3 tonnes</p>
+                <span class="font-semibold {% if montant_remise %}text-green-600{% else %}text-gray-400{% endif %}" id="montant-remise">
+                  - {{ montant_remise }} FCFA{% if montant_remise %} ({{ taux_remise|floatformat:"-2" }} %){% endif %}
+                </span>
+                <p class="text-xs text-green-700 mt-0.5 {% if not montant_remise %}hidden{% endif %}" id="remise-appliquee">🎉 {{ desc_remise|default:"Remise volume appliquée" }}</p>
               </div>
-              {% else %}
-              <span class="font-semibold text-gray-400">- 0 FCFA</span>
-              {% endif %}
             </div>
+            <p class="text-xs text-gray-500 {% if not prochain_seuil_kg %}hidden{% endif %}" id="remise-prochaine">
+              {% if prochain_seuil_kg %}Plus que <strong>{{ kg_manquants }} kg</strong> pour bénéficier de {{ prochain_taux|floatformat:"-2" }} % de remise (dès {{ prochain_seuil_kg }} kg).{% endif %}
+            </p>
           </div>
 
           <div class="flex justify-between items-end mt-6">
@@ -242,39 +252,91 @@ Riz origine Sénégal
     }
 
     /* ----------------------------------------------------------------
-       RECALCUL DES TOTAUX
-       - Parcourt toutes les cards encore présentes dans le DOM
-       - Lit data-prix et la quantité affichée pour chaque ligne
-       - Recalcule le sous-total, applique les frais de livraison,
-         et met à jour l'affichage sans recharger la page
+       RÉCAPITULATIF
+       Le serveur renvoie à chaque modification le récapitulatif complet
+       (sous-total, remise volume, total). La remise est donc toujours
+       celle réglée dans l'espace admin, sans recharger la page.
     ---------------------------------------------------------------- */
-    const FRAIS_LIVRAISON = 0; // Déterminés à la livraison selon la distance
+    function fcfa(n) {
+      return Number(n || 0).toLocaleString('fr-FR') + ' FCFA';
+    }
+    function pct(n) {
+      return Number(n).toLocaleString('fr-FR', { maximumFractionDigits: 2 }) + ' %';
+    }
 
-    function recalculerTotaux() {
-      let sousTotal = 0;
+    function afficherRecap(data) {
+      const el = id => document.getElementById(id);
+      if (el('sous-total'))    el('sous-total').textContent    = fcfa(data.sous_total);
+      if (el('total-general')) el('total-general').textContent = fcfa(data.total);
 
-      // Pour chaque article encore dans le DOM
-      document.querySelectorAll('[id^="article-"]').forEach(card => {
-        const articleId = card.id.replace('article-', '');
-        const prix      = parseInt(card.dataset.prix, 10);         // prix unitaire
-        const qteSpan   = document.getElementById('qte-' + articleId);
-        const quantite  = qteSpan ? parseInt(qteSpan.textContent, 10) : 0;
-        const lignTotal = prix * quantite;
+      const remise = el('montant-remise');
+      if (remise) {
+        remise.textContent = '- ' + fcfa(data.montant_remise) +
+          (data.montant_remise ? ' (' + pct(data.taux_remise) + ')' : '');
+        remise.classList.toggle('text-green-600', !!data.montant_remise);
+        remise.classList.toggle('text-gray-400', !data.montant_remise);
+      }
+      if (el('remise-appliquee')) {
+        el('remise-appliquee').textContent = '🎉 ' + (data.desc_remise || 'Remise volume appliquée');
+        el('remise-appliquee').classList.toggle('hidden', !data.montant_remise);
+      }
 
-        // Mettre à jour le total de la ligne
+      const prochaine = el('remise-prochaine');
+      if (prochaine) {
+        if (data.prochain_seuil_kg) {
+          prochaine.innerHTML = 'Plus que <strong>' + data.kg_manquants + ' kg</strong> pour bénéficier de ' +
+            pct(data.prochain_taux) + ' de remise (dès ' + data.prochain_seuil_kg + ' kg).';
+          prochaine.classList.remove('hidden');
+        } else {
+          prochaine.classList.add('hidden');
+        }
+      }
+    }
+
+    function retirerCarte(card) {
+      card.style.transition = 'opacity 0.3s';
+      card.style.opacity = '0';
+      setTimeout(() => {
+        card.remove();
+        if (document.querySelectorAll('[id^="article-"]').length === 0) {
+          window.location.reload(); // afficher "panier vide"
+        }
+      }, 300);
+    }
+
+    /* Envoie la modification et met à jour la ligne + le récapitulatif */
+    function changerQuantite(articleId, url, body) {
+      const card  = document.getElementById('article-' + articleId);
+      const input = document.getElementById('qte-' + articleId);
+      const ctrls = card.querySelectorAll('.btn-quantite, .input-quantite');
+      ctrls.forEach(c => c.disabled = true);
+
+      post(url, body).then(data => {
+        mettreAJourBadge(data.nb_panier);
+        afficherRecap(data);
+
+        if (data.quantite === 0) {
+          retirerCarte(card);
+          return;
+        }
+        if (input) { input.value = data.quantite; input.dataset.valeur = data.quantite; }
         const totalLigne = document.getElementById('total-' + articleId);
-        if (totalLigne) totalLigne.textContent = lignTotal.toLocaleString('fr-FR') + ' FCFA';
+        if (totalLigne) totalLigne.textContent = fcfa(data.ligne_total);
 
-        sousTotal += lignTotal;
+        const alerte = document.getElementById('alerte-' + articleId);
+        if (alerte) {
+          if (data.limite_stock) {
+            alerte.textContent = 'Stock disponible : ' + data.stock_max + ' sacs maximum.';
+            alerte.classList.remove('hidden');
+          } else {
+            alerte.classList.add('hidden');
+          }
+        }
+        ctrls.forEach(c => c.disabled = false);
+      }).catch(() => {
+        if (input) input.value = input.dataset.valeur;   // on remet la dernière valeur valide
+        ctrls.forEach(c => c.disabled = false);
       });
-
-      const total = sousTotal + FRAIS_LIVRAISON;
-
-      // Mettre à jour les éléments du récapitulatif
-      const elSousTotal = document.getElementById('sous-total');
-      const elTotal     = document.getElementById('total-general');
-      if (elSousTotal) elSousTotal.textContent = sousTotal.toLocaleString('fr-FR') + ' FCFA';
-      if (elTotal)     elTotal.textContent     = total.toLocaleString('fr-FR') + ' FCFA';
     }
 
     /* ----------------------------------------------------------------
@@ -285,63 +347,40 @@ Riz origine Sénégal
       /* --- Boutons + et − --- */
       document.querySelectorAll('.btn-quantite').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          const url       = btn.dataset.url;
-          const action    = btn.dataset.action;     // 'increment' ou 'decrement'
-          const articleId = btn.dataset.articleId;
+          changerQuantite(btn.dataset.articleId, btn.dataset.url, 'action=' + btn.dataset.action);
+        });
+      });
 
-          // Feedback visuel immédiat : on désactive les boutons pendant la requête
-          const card = document.getElementById('article-' + articleId);
-          card.querySelectorAll('.btn-quantite').forEach(b => b.disabled = true);
-
-          post(url, 'action=' + action).then(data => {
-            mettreAJourBadge(data.nb_panier);
-
-            if (data.quantite === 0) {
-              // L'article a été retiré (quantité passée à 0 via decrement)
-              card.style.transition = 'opacity 0.3s';
-              card.style.opacity = '0';
-              setTimeout(() => {
-                card.remove();
-                recalculerTotaux();
-                if (document.querySelectorAll('[id^="article-"]').length === 0) {
-                  window.location.reload(); // afficher "panier vide"
-                }
-              }, 300);
-            } else {
-              // Mettre à jour la quantité affichée
-              const qteSpan = document.getElementById('qte-' + articleId);
-              if (qteSpan) qteSpan.textContent = String(data.quantite).padStart(2, '0');
-
-              // Recalculer tous les totaux immédiatement
-              recalculerTotaux();
-
-              // Réactiver les boutons
-              card.querySelectorAll('.btn-quantite').forEach(b => b.disabled = false);
-            }
-          }).catch(() => {
-            // En cas d'erreur réseau, on réactive quand même les boutons
-            card.querySelectorAll('.btn-quantite').forEach(b => b.disabled = false);
-          });
+      /* --- Saisie directe du nombre de sacs --- */
+      document.querySelectorAll('.input-quantite').forEach(function (input) {
+        function valider() {
+          const n = parseInt(input.value, 10);
+          if (!n || n < 1) {                 // champ vide ou 0 : on garde l'ancienne valeur
+            input.value = input.dataset.valeur;
+            return;
+          }
+          if (String(n) === input.dataset.valeur) return;
+          changerQuantite(input.dataset.articleId, input.dataset.url, 'action=set&quantite=' + n);
+        }
+        input.addEventListener('change', valider);
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
         });
       });
 
       /* --- Bouton supprimer (✕) --- */
       document.querySelectorAll('.btn-supprimer').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          const url       = btn.dataset.url;
-          const articleId = btn.dataset.articleId;
-          const card      = document.getElementById('article-' + articleId);
-
-          // Animation de disparition
+          const card = document.getElementById('article-' + btn.dataset.articleId);
           card.style.transition = 'opacity 0.3s, transform 0.3s';
           card.style.opacity    = '0';
           card.style.transform  = 'translateX(20px)';
 
-          post(url, '').then(data => {
+          post(btn.dataset.url, '').then(data => {
             mettreAJourBadge(data.nb_panier);
+            afficherRecap(data);
             setTimeout(() => {
               card.remove();
-              recalculerTotaux();
               if (document.querySelectorAll('[id^="article-"]').length === 0) {
                 window.location.reload();
               }

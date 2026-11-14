@@ -53,7 +53,8 @@ def _normaliser_telephone(numero):
 def calculer_remise(panier_session):
     """
     Calcule le poids total du panier et applique la RegleRemise active
-    si le seuil est atteint.
+    si le seuil est atteint. Les règles sont relues en base à chaque appel :
+    toute modification faite dans l'espace admin s'applique immédiatement.
     Retourne (poids_total_kg, montant_remise, taux_remise, description_remise).
     """
     poids_total = sum(
@@ -62,11 +63,42 @@ def calculer_remise(panier_session):
     )
     sous_total = sum(item['prix'] * item['quantite'] for item in panier_session.values())
 
-    regle = RegleRemise.objects.filter(est_active=True).order_by('-seuil_kg').first()
-    if regle and poids_total >= regle.seuil_kg:
+    # Meilleure règle atteinte : le seuil le plus élevé inférieur ou égal au poids
+    regle = RegleRemise.objects.filter(
+        est_active=True, seuil_kg__lte=poids_total
+    ).order_by('-seuil_kg').first()
+    if regle:
         montant_remise = int(sous_total * regle.taux_remise / 100)
         return poids_total, montant_remise, regle.taux_remise, regle.description or str(regle)
     return poids_total, 0, 0, ''
+
+
+def recap_panier(panier_session):
+    """Totaux du panier + infos de remise, pour la page panier et les mises à jour AJAX."""
+    sous_total = sum(item['prix'] * item['quantite'] for item in panier_session.values())
+    poids_total, montant_remise, taux_remise, desc_remise = calculer_remise(panier_session)
+
+    # Prochaine remise non encore atteinte (pour encourager le client)
+    prochaine = RegleRemise.objects.filter(
+        est_active=True, seuil_kg__gt=poids_total
+    ).order_by('seuil_kg').first()
+
+    return {
+        'sous_total':      sous_total,
+        'poids_total':     poids_total,
+        'montant_remise':  montant_remise,
+        'taux_remise':     float(taux_remise),
+        'desc_remise':     desc_remise,
+        'total':           sous_total - montant_remise,
+        'prochain_seuil_kg':   prochaine.seuil_kg if prochaine else None,
+        'prochain_taux':       float(prochaine.taux_remise) if prochaine else None,
+        'kg_manquants':        (prochaine.seuil_kg - poids_total) if prochaine else None,
+    }
+
+
+def regle_remise_affichee():
+    """Règle active affichée dans les textes (CGV…) : celle au seuil le plus bas."""
+    return RegleRemise.objects.filter(est_active=True).order_by('seuil_kg').first()
 
 
 # ---------------------------------------------------------------------------
@@ -166,12 +198,12 @@ def produit_detail(request, produit_id):
 
 def panier(request):
     panier_session = get_panier(request)
-    articles = []
-    sous_total = 0
+    stocks = dict(Produit.objects.filter(
+        id__in=[int(k) for k in panier_session if k.isdigit()]
+    ).values_list('id', 'stock_sacs'))
 
+    articles = []
     for produit_id, item in panier_session.items():
-        ligne_total = item['prix'] * item['quantite']
-        sous_total += ligne_total
         articles.append({
             'id': produit_id,
             'nom': item['nom'],
@@ -179,20 +211,13 @@ def panier(request):
             'image': item.get('image', ''),
             'quantite': item['quantite'],
             'poids': item.get('poids', ''),
-            'ligne_total': ligne_total,
+            'ligne_total': item['prix'] * item['quantite'],
+            'stock_max': stocks.get(int(produit_id)) if produit_id.isdigit() else None,
         })
-
-    poids_total, montant_remise, taux_remise, desc_remise = calculer_remise(panier_session)
-    total = sous_total - montant_remise
 
     context = {
         'articles': articles,
-        'sous_total': sous_total,
-        'montant_remise': montant_remise,
-        'taux_remise': taux_remise,
-        'desc_remise': desc_remise,
-        'poids_total': poids_total,
-        'total': total,
+        **recap_panier(panier_session),
         'nb_panier': nb_articles_panier(request),
         'panier_vide': len(articles) == 0,
     }
@@ -203,47 +228,94 @@ def panier(request):
 # Actions panier (POST)
 # ---------------------------------------------------------------------------
 
+def _lire_quantite(valeur, defaut=1):
+    """Quantité saisie par le client : entier >= 1, sinon la valeur par défaut."""
+    try:
+        q = int(str(valeur).strip())
+    except (TypeError, ValueError):
+        return defaut
+    return q if q >= 1 else defaut
+
+
 @require_POST
 def ajouter_au_panier(request, produit_id):
     produit  = get_object_or_404(Produit, id=produit_id, est_actif=True)
     panier   = get_panier(request)
-    quantite = int(request.POST.get('quantite', 1))
+    quantite = _lire_quantite(request.POST.get('quantite', 1))
     cle      = str(produit_id)
 
+    deja     = panier[cle]['quantite'] if cle in panier else 0
+    nouvelle = deja + quantite
+    limite   = False
+    if produit.stock_sacs and nouvelle > produit.stock_sacs:
+        nouvelle = max(produit.stock_sacs, deja)
+        limite = True
+
     if cle in panier:
-        panier[cle]['quantite'] += quantite
+        panier[cle]['quantite'] = nouvelle
     else:
         panier[cle] = {
             'nom':      produit.nom,
             'prix':     int(produit.prix),
             'image':    produit.photo_url,
-            'quantite': quantite,
+            'quantite': nouvelle,
             'poids':    produit.poids_kg,
         }
 
     save_panier(request, panier)
-    return JsonResponse({'success': True, 'nb_panier': nb_articles_panier(request)})
+    return JsonResponse({
+        'success':      True,
+        'nb_panier':    nb_articles_panier(request),
+        'quantite':     nouvelle,
+        'limite_stock': limite,
+        'stock_max':    produit.stock_sacs,
+    })
 
 
 @require_POST
 def modifier_quantite(request, produit_id):
-    panier  = get_panier(request)
-    cle     = str(produit_id)
-    action  = request.POST.get('action')
+    """
+    action=increment | decrement | set (avec quantite=N saisi par le client).
+    Renvoie la quantité retenue (bornée au stock) et le récapitulatif complet,
+    remise comprise, pour mettre la page à jour sans rechargement.
+    """
+    panier = get_panier(request)
+    cle    = str(produit_id)
+    action = request.POST.get('action')
+    limite = False
+    stock  = Produit.objects.filter(id=produit_id).values_list('stock_sacs', flat=True).first()
 
     if cle in panier:
+        actuelle = panier[cle]['quantite']
         if action == 'increment':
-            panier[cle]['quantite'] += 1
+            voulue = actuelle + 1
         elif action == 'decrement':
-            if panier[cle]['quantite'] > 1:
-                panier[cle]['quantite'] -= 1
-            else:
-                del panier[cle]
+            voulue = actuelle - 1
+        elif action == 'set':
+            voulue = _lire_quantite(request.POST.get('quantite'), defaut=actuelle)
+        else:
+            voulue = actuelle
+
+        if voulue <= 0:
+            del panier[cle]
+        else:
+            if stock and voulue > stock:
+                voulue = stock
+                limite = True
+            panier[cle]['quantite'] = voulue
         save_panier(request, panier)
 
-    nb       = nb_articles_panier(request)
-    quantite = panier.get(cle, {}).get('quantite', 0)
-    return JsonResponse({'success': True, 'nb_panier': nb, 'quantite': quantite})
+    item     = panier.get(cle)
+    quantite = item['quantite'] if item else 0
+    return JsonResponse({
+        'success':      True,
+        'nb_panier':    nb_articles_panier(request),
+        'quantite':     quantite,
+        'ligne_total':  item['prix'] * quantite if item else 0,
+        'limite_stock': limite,
+        'stock_max':    stock,
+        **recap_panier(panier),
+    })
 
 
 @require_POST
@@ -253,7 +325,11 @@ def supprimer_du_panier(request, produit_id):
     if cle in panier:
         del panier[cle]
         save_panier(request, panier)
-    return JsonResponse({'success': True, 'nb_panier': nb_articles_panier(request)})
+    return JsonResponse({
+        'success': True,
+        'nb_panier': nb_articles_panier(request),
+        **recap_panier(panier),
+    })
 
 
 @require_POST
@@ -578,4 +654,7 @@ def politique_confidentialite(request):
 
 
 def cgv(request):
-    return render(request, 'client/cgv.html', {'nb_panier': nb_articles_panier(request)})
+    return render(request, 'client/cgv.html', {
+        'nb_panier': nb_articles_panier(request),
+        'regle_remise': regle_remise_affichee(),
+    })

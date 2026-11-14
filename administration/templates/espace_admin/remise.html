@@ -47,7 +47,7 @@
       </div>
       <div class="bg-amber-50 rounded-xl px-4 py-3">
         <p class="text-xs text-yn-gray font-semibold uppercase mb-1">Taux de remise</p>
-        <p class="text-2xl font-bold text-yn-gold">{{ regle.taux_remise }}%</p>
+        <p class="text-2xl font-bold text-yn-gold">{{ regle.taux_remise|floatformat:"-2" }} %</p>
         <p class="text-xs text-yn-gray mt-1">sur le sous-total de la commande</p>
       </div>
     </div>
@@ -72,7 +72,7 @@
           Seuil minimum (kg)
         </label>
         <input type="number" name="seuil_kg" min="1" step="1"
-               value="{{ regle.seuil_kg|default:'3000' }}"
+               value="{{ regle.seuil_kg|default:'1000' }}"
                class="w-full px-4 py-3 border {% if errors.seuil_kg %}border-red-400{% else %}border-gray-200{% endif %} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
         {% if errors.seuil_kg %}
           <p class="text-xs text-red-500 mt-1">{{ errors.seuil_kg }}</p>
@@ -87,7 +87,7 @@
           Taux de remise (%)
         </label>
         <input type="number" name="taux_remise" min="0.01" max="100" step="0.01"
-               value="{{ regle.taux_remise|default:'5' }}"
+               value="{{ regle.taux_remise|default:'15' }}"
                class="w-full px-4 py-3 border {% if errors.taux_remise %}border-red-400{% else %}border-gray-200{% endif %} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yn-green">
         {% if errors.taux_remise %}
           <p class="text-xs text-red-500 mt-1">{{ errors.taux_remise }}</p>
