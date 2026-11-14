@@ -310,9 +310,13 @@ Riz origine Sénégal
       var start = (!isNaN(startLat) && !isNaN(startLng)) ? [startLat, startLng] : DAKAR;
 
       var map = L.map('carte-position').setView(start, 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
+      // OpenStreetMap exige de savoir quel site affiche ses cartes (en-tête Referer).
+      // Le site bloque cet en-tête par défaut (Referrer-Policy: same-origin) : on
+      // l'autorise pour les seules images de la carte, réduit au nom du site.
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Contributeurs OpenStreetMap</a>',
         maxZoom: 19,
+        referrerPolicy: 'strict-origin-when-cross-origin',
       }).addTo(map);
 
       var marker = L.marker(start, { draggable: true }).addTo(map);
@@ -343,7 +347,7 @@ Riz origine Sénégal
           statusEl.textContent = "La géolocalisation n'est pas disponible sur cet appareil.";
           return;
         }
-        statusEl.textContent = 'Localisation en cours...';
+        statusEl.textContent = 'Localisation en cours…';
         navigator.geolocation.getCurrentPosition(
           function (position) {
             var lat = position.coords.latitude;
@@ -353,9 +357,18 @@ Riz origine Sénégal
             setPosition(lat, lng);
             statusEl.textContent = 'Position GPS trouvée et placée sur la carte.';
           },
-          function () {
-            statusEl.textContent = "Impossible d'obtenir votre position. Déplacez le repère manuellement.";
-          }
+          function (erreur) {
+            var messages = {
+              1: "Accès à votre position refusé. Pour l'autoriser : touchez le cadenas à gauche de l'adresse du site, "
+                 + "puis « Position » → « Autoriser », et réessayez. Vous pouvez aussi déplacer le repère sur la carte.",
+              2: "Position introuvable : la localisation semble désactivée sur votre appareil. Activez-la "
+                 + "(réglages du téléphone ou de l'ordinateur) ou déplacez le repère sur la carte.",
+              3: "La localisation a pris trop de temps. Réessayez, ou déplacez le repère sur la carte."
+            };
+            statusEl.textContent = messages[erreur && erreur.code] ||
+              "Impossible d'obtenir votre position. Déplacez le repère sur la carte.";
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
         );
       });
     })();
