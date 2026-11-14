@@ -11,9 +11,12 @@ from pathlib import Path
 
 from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
+from django.contrib import messages
+from django.db import transaction
 from weasyprint import HTML as WeasyHTML
 from administration.models import Produit, RegleRemise
 from .models import Client, CommandeClient, LigneCommande
+from .stock import StockInsuffisant, reserver_stock
 from django.core.paginator import Paginator
 
 
@@ -244,11 +247,18 @@ def ajouter_au_panier(request, produit_id):
     quantite = _lire_quantite(request.POST.get('quantite', 1))
     cle      = str(produit_id)
 
+    if produit.stock_sacs <= 0:
+        return JsonResponse({
+            'success': False,
+            'error': 'Rupture de stock',
+            'nb_panier': nb_articles_panier(request),
+        })
+
     deja     = panier[cle]['quantite'] if cle in panier else 0
     nouvelle = deja + quantite
     limite   = False
-    if produit.stock_sacs and nouvelle > produit.stock_sacs:
-        nouvelle = max(produit.stock_sacs, deja)
+    if nouvelle > produit.stock_sacs:
+        nouvelle = max(produit.stock_sacs, min(deja, produit.stock_sacs))
         limite = True
 
     if cle in panier:
@@ -299,10 +309,13 @@ def modifier_quantite(request, produit_id):
         if voulue <= 0:
             del panier[cle]
         else:
-            if stock and voulue > stock:
+            if stock is not None and voulue > stock:
                 voulue = stock
                 limite = True
-            panier[cle]['quantite'] = voulue
+            if voulue <= 0:
+                del panier[cle]
+            else:
+                panier[cle]['quantite'] = voulue
         save_panier(request, panier)
 
     item     = panier.get(cle)
@@ -407,17 +420,33 @@ def finaliser_commande(request):
             }
             return render(request, "client/finalisercommande.html", context)
 
-        # --- Aucune erreur : on enregistre la commande ---
+        # --- Contrôles avant enregistrement (produits, prix, stock) ---
+        produits = {
+            str(p.pk): p for p in Produit.objects.filter(pk__in=[int(k) for k in panier_session if k.isdigit()])
+        }
+        retires, prix_modifies = [], []
+        for produit_id, item in list(panier_session.items()):
+            produit = produits.get(produit_id)
+            if produit is None or not produit.est_actif:
+                retires.append(item['nom'])
+                del panier_session[produit_id]
+            elif int(produit.prix) != item['prix']:
+                prix_modifies.append(produit.nom)
+                item['prix'] = int(produit.prix)
+        if retires or prix_modifies:
+            save_panier(request, panier_session)
+            if retires:
+                messages.error(request, "Ces produits ne sont plus disponibles et ont été retirés de votre panier : "
+                               + ", ".join(retires) + ".")
+            if prix_modifies:
+                messages.warning(request, "Le prix a changé pour : " + ", ".join(prix_modifies)
+                                 + ". Vérifiez votre panier avant de valider.")
+            return redirect('panier')
+
+        # --- Aucune erreur : on enregistre la commande (tout ou rien) ---
         parts = nom.split(' ', 1)
         prenom = parts[0]
         nom_famille = parts[1] if len(parts) > 1 else ''
-
-        client = Client.objects.create(
-            prenom=prenom,
-            nom=nom_famille,
-            telephone=telephone,
-            adresse=f"{adresse}, {ville}",
-        )
 
         try:
             lat = float(latitude) if latitude else None
@@ -425,29 +454,44 @@ def finaliser_commande(request):
         except ValueError:
             lat = lng = None
 
-        commande = CommandeClient.objects.create(
-            client=client,
-            mode_paiement=mode_paiement,
-            adresse_livraison=f"{adresse}, {ville}",
-            latitude=lat,
-            longitude=lng,
-            montant_remise=montant_remise,
-            remise_pct=taux_remise,
-        )
-
-        for produit_id, item in panier_session.items():
-            produit = get_object_or_404(Produit, id=produit_id)
-
-            LigneCommande.objects.create(
-                commande=commande,
-                produit=produit,
-                quantite=item['quantite'],
-                prix_unitaire=item['prix'],
-            )
-
-            if hasattr(produit, 'stock'):
-                produit.stock = max(0, produit.stock - item['quantite'])
-                produit.save(update_fields=['stock'])
+        try:
+            with transaction.atomic():
+                client = Client.objects.create(
+                    prenom=prenom,
+                    nom=nom_famille,
+                    telephone=telephone,
+                    adresse=f"{adresse}, {ville}",
+                )
+                commande = CommandeClient.objects.create(
+                    client=client,
+                    mode_paiement=mode_paiement,
+                    adresse_livraison=f"{adresse}, {ville}",
+                    latitude=lat,
+                    longitude=lng,
+                    montant_remise=montant_remise,
+                    remise_pct=taux_remise,
+                    gestion_stock=True,
+                )
+                for produit_id, item in panier_session.items():
+                    LigneCommande.objects.create(
+                        commande=commande,
+                        produit=produits[produit_id],
+                        quantite=item['quantite'],
+                        prix_unitaire=item['prix'],
+                    )
+                # Retire les sacs du stock ; annule tout si un produit manque
+                reserver_stock(commande)
+        except StockInsuffisant as e:
+            for produit, _demande, dispo in e.manques:
+                cle = str(produit.pk)
+                if dispo > 0:
+                    panier_session[cle]['quantite'] = dispo
+                else:
+                    panier_session.pop(cle, None)
+            save_panier(request, panier_session)
+            messages.error(request, "Stock insuffisant — " + e.message()
+                           + ". Votre panier a été ajusté au stock disponible.")
+            return redirect('panier')
 
         save_panier(request, {})
         request.session['derniere_commande_numero'] = commande.numero

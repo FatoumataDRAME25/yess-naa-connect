@@ -63,6 +63,12 @@ class CommandeClient(models.Model):
     # listes (admin, livreurs, suivi client) mais reste restaurable depuis les
     # Archives, d'où elle peut être supprimée définitivement.
     archivee_le     = models.DateTimeField(null=True, blank=True)
+    # Gestion automatique du stock (voir client/stock.py) :
+    # - gestion_stock : vrai pour les commandes passées depuis sa mise en place ;
+    #   les commandes plus anciennes ne touchent jamais au stock.
+    # - stock_reserve : vrai quand les sacs de la commande sont retirés du stock.
+    gestion_stock   = models.BooleanField(default=False)
+    stock_reserve   = models.BooleanField(default=False)
 
     objects = CommandesActivesManager()   # commandes visibles (non archivées)
     tous    = models.Manager()            # toutes, y compris les archives

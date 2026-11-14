@@ -9,6 +9,18 @@ Riz origine Sénégal
 
   <main class="pt-16 md:pt-20 min-h-screen bg-white">
 
+    {% if messages %}
+    <!-- Messages (stock insuffisant, prix modifié, produit retiré…) -->
+    <div class="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-2" role="alert">
+      {% for message in messages %}
+      <div class="rounded-xl px-4 py-3 text-sm font-semibold"
+           style="{% if message.tags == 'error' %}background:#FEF2F2;color:#B42318;border:1px solid #FECDCA;{% elif message.tags == 'warning' %}background:#FFF8E6;color:#8A5A00;border:1px solid #F5D78A;{% else %}background:#ECFDF3;color:#05603A;border:1px solid #ABEFC6;{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="flex items-end gap-2 pt-8 md:pt-12 pb-6 px-4 md:px-6 max-w-7xl mx-auto">
       <h1 class="text-2xl lg:text-3xl font-bold text-lime-950">Votre Panier</h1>
       {% if not panier_vide %}

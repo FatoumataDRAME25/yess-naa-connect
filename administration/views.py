@@ -21,6 +21,7 @@ from administration.forms import LivreurCreationForm
 from administration.telephone import trouver_par_telephone
 from administration.compte import generer_mot_de_passe_provisoire
 from client.models import CommandeClient
+from client.stock import StockInsuffisant, changer_statut, liberer_stock, reserver_stock
 from livreur.models import Livraison
 
 
@@ -595,9 +596,19 @@ def admin_commande_detail(request, pk):
         nouveau_statut = request.POST.get('statut')
         statuts_valides = [s for s, _ in CommandeClient.Statut.choices]
         if nouveau_statut in statuts_valides:
-            commande.statut = nouveau_statut
-            commande.save(update_fields=['statut'])
-            messages.success(request, f"Commande #{pk} mise à jour.")
+            try:
+                with transaction.atomic():
+                    changer_statut(commande, nouveau_statut)
+            except StockInsuffisant as e:
+                messages.error(
+                    request,
+                    f"Impossible de rouvrir la commande #{commande.numero} : stock insuffisant ({e.message()})."
+                )
+            else:
+                if nouveau_statut == CommandeClient.Statut.ANNULEE:
+                    messages.success(request, f"Commande #{commande.numero} annulée — les sacs ont été remis en stock.")
+                else:
+                    messages.success(request, f"Commande #{commande.numero} mise à jour.")
         return redirect('admin_transformatrice:admin_commandes')
 
     statut = commande.statut
@@ -1151,8 +1162,11 @@ def admin_commande_supprimer(request, pk):
         return redirect('admin_transformatrice:admin_commandes')
     from django.utils import timezone
     commande = get_object_or_404(CommandeClient, pk=pk)
-    commande.archivee_le = timezone.now()
-    commande.save(update_fields=['archivee_le'])
+    with transaction.atomic():
+        if commande.statut != CommandeClient.Statut.LIVREE:
+            liberer_stock(commande)   # une commande livrée garde ses sacs (partis chez le client)
+        commande.archivee_le = timezone.now()
+        commande.save(update_fields=['archivee_le'])
     messages.success(
         request,
         f"Commande #{commande.numero} supprimée et placée dans les archives "
@@ -1178,9 +1192,20 @@ def admin_commandes_archives(request):
 def admin_commande_restaurer(request, pk):
     if request.method == 'POST':
         commande = get_object_or_404(CommandeClient.tous, pk=pk, archivee_le__isnull=False)
-        commande.archivee_le = None
-        commande.save(update_fields=['archivee_le'])
-        messages.success(request, f"Commande #{commande.numero} restaurée dans la liste des commandes.")
+        try:
+            with transaction.atomic():
+                if commande.statut not in (CommandeClient.Statut.ANNULEE, CommandeClient.Statut.LIVREE):
+                    reserver_stock(commande)
+                commande.archivee_le = None
+                commande.save(update_fields=['archivee_le'])
+        except StockInsuffisant as e:
+            messages.error(
+                request,
+                f"Impossible de restaurer la commande #{commande.numero} : stock insuffisant ({e.message()}). "
+                "Augmentez le stock dans le catalogue, puis réessayez."
+            )
+        else:
+            messages.success(request, f"Commande #{commande.numero} restaurée dans la liste des commandes.")
     return redirect('admin_transformatrice:admin_commandes_archives')
 
 

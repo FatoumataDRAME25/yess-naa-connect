@@ -339,6 +339,11 @@ Riz origine Sénégal
 
         // Réactiver le bouton
         btnAjouter.disabled = false;
+      } else {
+        // Refus (ex. rupture de stock) : on l'explique et on réactive le bouton
+        alerteQte.textContent = data.error || "Impossible d'ajouter ce produit.";
+        alerteQte.classList.remove('hidden');
+        btnAjouter.disabled = false;
       }
     })
     .catch(() => {
