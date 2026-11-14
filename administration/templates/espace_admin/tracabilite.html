@@ -7,6 +7,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/brand.css' %}">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-heading { font-family: 'Poppins', sans-serif; }
@@ -26,10 +27,9 @@
 
     <!-- Header vert -->
     <div class="bg-yn-green-dark px-6 pt-8 pb-6 text-center">
-        <p class="font-heading font-extrabold text-xl mb-1">
-            <span class="text-white">Riz</span>
-            <span class="text-yn-green-light"> Local</span>
-        </p>
+        <span class="yn-logo-card" style="margin-bottom:12px;">
+            <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo">
+        </span>
         <p class="text-white/60 text-xs">Certificat d'authenticité et de traçabilité</p>
     </div>
 
@@ -51,9 +51,9 @@
         </div>
 
         <!-- Photo produit -->
-        {% if produit.photo %}
+        {% if produit.photo_url %}
         <div class="flex justify-center mb-5">
-            <img src="{{ produit.photo.url }}" alt="{{ produit.nom }}"
+            <img src="{{ produit.photo_url }}" alt="{{ produit.nom }}"
                  class="w-32 h-32 object-contain rounded-2xl bg-gray-50">
         </div>
         {% endif %}

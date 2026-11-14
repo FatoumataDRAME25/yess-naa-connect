@@ -176,8 +176,8 @@
           {% for ligne in commande.lignes.all %}
           <div class="flex items-center gap-3 md:gap-4">
             <div class="w-14 h-14 md:w-16 md:h-16 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden">
-              {% if ligne.produit.photo %}
-                <img src="{{ ligne.produit.photo.url }}" alt="{{ ligne.produit.nom }}" class="w-full h-full object-cover" loading="lazy"/>
+              {% if ligne.produit.photo_url %}
+                <img src="{{ ligne.produit.photo_url }}" alt="{{ ligne.produit.nom }}" class="w-full h-full object-cover" loading="lazy"/>
               {% else %}
                 <img src="{% static 'images/1sac5kg.jpg' %}" alt="{{ ligne.produit.nom }}" class="w-full h-full object-cover" loading="lazy"/>
               {% endif %}

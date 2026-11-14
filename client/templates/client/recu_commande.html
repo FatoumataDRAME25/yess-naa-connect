@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -33,7 +34,9 @@
     <!-- En-tête -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b-2 border-lime-900 pb-6 mb-6">
       <div>
-        <p class="text-2xl font-extrabold text-lime-900">Riz <span class="text-lime-600">Local</span></p>
+        <img src="{% if logo_src %}{{ logo_src }}{% else %}{% static 'images/logo.png' %}{% endif %}"
+             alt="YEESNAA CONNECT" style="display:block;width:136px;height:auto;margin-bottom:4px;">
+        <p class="text-sm font-bold text-lime-900">Riz origine Sénégal</p>
         <p class="text-xs text-gray-500 mt-1">Mbour, Sénégal</p>
         <p class="text-xs text-gray-500">contact@rizlocal.sn • +221 77 545 15 99</p>
       </div>

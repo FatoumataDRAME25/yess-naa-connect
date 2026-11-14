@@ -7,6 +7,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/brand.css' %}">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-heading { font-family: 'Poppins', sans-serif; }
@@ -22,10 +23,7 @@
         </svg>
     </div>
 
-    <p class="font-heading font-extrabold text-xl mb-1">
-        <span style="color:#1A3A0A">Riz</span>
-        <span style="color:#7DBD48"> Local</span>
-    </p>
+    <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo" style="margin:0 auto;">
 
     <h1 class="font-heading font-bold text-lg text-gray-900 mt-3 mb-2">Produit introuvable</h1>
     <p class="text-sm text-gray-500 mb-4">

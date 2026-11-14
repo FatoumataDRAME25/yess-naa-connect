@@ -257,10 +257,9 @@
 
   <!-- Header mobile : logo + notif + hamburger -->
   <div class="flex items-center justify-between px-4 pt-5 pb-4 bg-yn-green-dark">
-    <p class="font-heading font-extrabold text-base">
-      <span class="text-white">Riz</span>
-      <span class="text-yn-green-light"> Local</span>
-    </p>
+    <a href="{% url 'admin_transformatrice:admin_dashboard' %}" class="yn-logo-card yn-logo-card--bar">
+      <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--bar">
+    </a>
     <div class="flex items-center gap-3">
       <button class="relative w-9 h-9 rounded-full bg-white/10 flex items-center justify-center">
         <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">

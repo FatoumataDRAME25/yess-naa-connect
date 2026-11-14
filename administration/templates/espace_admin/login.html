@@ -8,6 +8,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/brand.css' %}">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-heading { font-family: 'Poppins', sans-serif; }
@@ -34,10 +35,7 @@
 
         <!-- Logo + titre -->
         <div class="text-center mb-8">
-            <p class="font-heading font-extrabold text-xl mb-4">
-                <span class="text-yn-green-dark">Riz</span>
-                <span class="text-yn-green"> Local</span>
-            </p>
+            <img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo yn-logo--lg" style="margin:0 auto 16px;">
             <h1 class="font-heading font-bold text-2xl text-yn-green-dark mb-1">
                 Espace<br>Administrateur
             </h1>

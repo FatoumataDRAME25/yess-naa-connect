@@ -3,8 +3,20 @@ import uuid
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.conf import settings
+from django.templatetags.static import static
 
 from producteur.models import StockPaddy
+
+
+# Photo par défaut de chaque type de riz (static/images/produits/<type>.jpg).
+# Utilisée quand un produit n'a pas de photo propre. Pour couvrir un nouveau
+# type, ajouter le fichier image puis la clé correspondante ici.
+PHOTOS_PAR_TYPE = {
+    'entier':    'images/produits/entier.jpg',
+    'brise':     'images/produits/brise.jpg',
+    'extra_fin': 'images/produits/extra_fin.jpg',
+    'basmati':   'images/produits/basmati.jpg',
+}
 
 
 def _generer_code_lot():
@@ -163,6 +175,14 @@ class Produit(models.Model):
         verbose_name = 'Produit'
         verbose_name_plural = 'Produits'
         ordering = ['-cree_le']
+
+    @property
+    def photo_url(self):
+        """Photo du produit, sinon photo par défaut de son type, sinon ''."""
+        if self.photo:
+            return self.photo.url
+        chemin = PHOTOS_PAR_TYPE.get(self.type_riz)
+        return static(chemin) if chemin else ''
 
     def save(self, *args, **kwargs):
         if not self.code_lot:

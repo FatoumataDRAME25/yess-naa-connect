@@ -20,8 +20,8 @@ Riz de la Teranga
 
                 <!-- Image principale du produit -->
                 <div class="h-[400px] md:h-[600px] rounded-3xl shadow-xl overflow-hidden">
-                    {% if produit.photo %}
-                    <img src="{{ produit.photo.url }}"
+                    {% if produit.photo_url %}
+                    <img src="{{ produit.photo_url }}"
                          alt="{{ produit.nom }}"
                          class="w-full h-full object-cover">
                     {% else %}
@@ -33,8 +33,8 @@ Riz de la Teranga
 
                 <!-- Miniatures (image principale répétée pour l'instant) -->
                 <div class="grid grid-cols-4 gap-3">
-                    {% if produit.photo %}
-                    <img src="{{ produit.photo.url }}" class="h-20 md:h-24 w-full object-cover rounded-xl border-2 border-lime-900" />
+                    {% if produit.photo_url %}
+                    <img src="{{ produit.photo_url }}" class="h-20 md:h-24 w-full object-cover rounded-xl border-2 border-lime-900" />
                     {% endif %}
                     
                     <!-- <img src="{% static 'images/1sac5kg.jpg' %}" class="h-20 md:h-24 w-full object-cover rounded-xl border border-gray-200" />

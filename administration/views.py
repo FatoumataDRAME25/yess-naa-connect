@@ -586,7 +586,7 @@ def admin_commande_detail(request, pk):
     commande.articles = [
         {
             'nom': ligne.produit.nom,
-            'photo_url': ligne.produit.photo.url if ligne.produit.photo else static('images/1sac5kg.jpg'),
+            'photo_url': ligne.produit.photo_url or static('images/1sac5kg.jpg'),
             'quantite': ligne.quantite,
             'prix_unitaire': ligne.prix_unitaire,
             'sous_total': ligne.ligne_total,

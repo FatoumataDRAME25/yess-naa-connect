@@ -7,6 +7,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, Http404, HttpResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from pathlib import Path
+
+from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
 from weasyprint import HTML as WeasyHTML
 from administration.models import Produit, RegleRemise
@@ -115,6 +118,14 @@ def catalogue(request):
             'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
         })
 
+    # Filtres : uniquement les types ayant au moins un produit en ligne
+    types_en_ligne = set(
+        Produit.objects.filter(est_actif=True).values_list('type_riz', flat=True)
+    )
+    types_riz_disponibles = [
+        (val, label) for val, label in Produit.TypeRiz.choices if val in types_en_ligne
+    ]
+
     context = {
         'produits':       page_obj,
         'nb_panier':      nb_articles_panier(request),
@@ -123,7 +134,7 @@ def catalogue(request):
         'q':              q,
         'type_riz_actif': type_riz,
         'poids_actif':    poids,
-        'types_riz':      Produit.TypeRiz.choices,
+        'types_riz':      types_riz_disponibles,
     }
     return render(request, "client/catalogue.html", context)
 
@@ -205,7 +216,7 @@ def ajouter_au_panier(request, produit_id):
         panier[cle] = {
             'nom':      produit.nom,
             'prix':     int(produit.prix),
-            'image':    produit.photo.url if produit.photo else '',
+            'image':    produit.photo_url,
             'quantite': quantite,
             'poids':    produit.poids_kg,
         }
@@ -523,6 +534,9 @@ def recu_commande_pdf(request, numero):
         'commande': commande,
         'lignes': commande.lignes.select_related('produit').all(),
     }
+    logo_path = finders.find('images/logo.png')
+    if logo_path:
+        context['logo_src'] = Path(logo_path).as_uri()
     html_string = render_to_string('client/recu_commande.html', context, request=request)
     pdf_file = WeasyHTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
 
