@@ -34,62 +34,62 @@
   </div>
 
   <!-- Tableau -->
-  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
+  <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+    <table class="w-full text-sm" style="min-width:720px;white-space:nowrap;">
       <thead>
         <tr class="text-left text-xs font-semibold text-yn-gray uppercase border-b border-gray-100">
-          <th class="px-6 py-4">Producteur(trice)</th>
-          <th class="px-6 py-4">Total déclaré</th>
-          <th class="px-6 py-4">Disponible</th>
-          <th class="px-6 py-4">En commande</th>
-          <th class="px-6 py-4">Reçu / Livré</th>
-          <th class="px-6 py-4">Nb commandes</th>
-          <th class="px-6 py-4">Montant engagé</th>
-          <th class="px-6 py-4 text-right">Actions</th>
+          <th class="px-4 py-4">Producteur(trice)</th>
+          <th class="px-4 py-4">Déclaré</th>
+          <th class="px-4 py-4">Disponible</th>
+          <th class="px-4 py-4">En commande</th>
+          <th class="px-4 py-4">Reçu / Livré</th>
+          <th class="px-4 py-4">Commandes</th>
+          <th class="px-4 py-4">Engagé</th>
+          <th class="px-4 py-4 text-right" style="position:sticky;right:0;background:#fff;box-shadow:-8px 0 8px -8px rgba(0,0,0,.12);">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for r in recap %}
         <tr class="border-b border-gray-50 hover:bg-gray-50/60">
-          <td class="px-6 py-4">
+          <td class="px-4 py-4">
             <p class="font-bold text-gray-800">{{ r.producteur.user.prenom }} {{ r.producteur.user.nom }}</p>
             <p class="text-xs text-yn-gray">{{ r.producteur.user.telephone }}</p>
           </td>
-          <td class="px-6 py-4 font-semibold text-gray-700">{{ r.total_declare_kg }} kg</td>
-          <td class="px-6 py-4">
+          <td class="px-4 py-4 font-semibold text-gray-700">{{ r.total_declare_kg }} kg</td>
+          <td class="px-4 py-4">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
               {% if r.disponible_kg > 0 %}bg-green-50 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}
               text-xs font-semibold">
               {{ r.disponible_kg }} kg
             </span>
           </td>
-          <td class="px-6 py-4">
+          <td class="px-4 py-4">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
               {% if r.kg_commande > 0 %}bg-amber-50 text-amber-700{% else %}bg-gray-100 text-gray-500{% endif %}
               text-xs font-semibold">
               {{ r.kg_commande }} kg
             </span>
           </td>
-          <td class="px-6 py-4">
+          <td class="px-4 py-4">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
               {% if r.kg_recu > 0 %}bg-blue-50 text-blue-700{% else %}bg-gray-100 text-gray-500{% endif %}
               text-xs font-semibold">
               {{ r.kg_recu }} kg
             </span>
           </td>
-          <td class="px-6 py-4 font-semibold text-gray-700">{{ r.nb_commandes }}</td>
-          <td class="px-6 py-4 font-bold text-yn-terracotta">{{ r.montant_total|floatformat:0 }} FCFA</td>
-          <td class="px-6 py-4 text-right">
+          <td class="px-4 py-4 font-semibold text-gray-700">{{ r.nb_commandes }}</td>
+          <td class="px-4 py-4 font-bold text-yn-terracotta">{{ r.montant_total|floatformat:0 }} FCFA</td>
+          <td class="px-4 py-4 text-right" style="position:sticky;right:0;background:#fff;box-shadow:-8px 0 8px -8px rgba(0,0,0,.12);">
           <div class="flex items-center justify-end gap-2">
           {% url 'admin_transformatrice:admin_recap_producteurs' as retour_recap %}{% include "espace_admin/_bouton_reinit_mdp.html" with cible=r.producteur.user retour=retour_recap %}
           <form method="post" action="{% url 'admin_transformatrice:admin_producteur_delete' r.producteur.pk %}"
                 data-confirm="Supprimer définitivement {{ r.producteur.user.prenom }} {{ r.producteur.user.nom }} ? Son compte, ses {{ r.nb_declarations }} déclaration(s) et ses {{ r.nb_commandes }} commande(s) paddy seront effacés. Action irréversible.">
             {% csrf_token %}
-            <button type="submit" class="inline-flex items-center gap-1.5 text-xs font-semibold rounded-lg px-3 py-2"
-                    style="color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;"
+            <button type="submit" class="inline-flex items-center justify-center rounded-lg"
+                    style="width:36px;height:36px;color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;"
+                    title="Supprimer le producteur"
                     aria-label="Supprimer {{ r.producteur.user.prenom }} {{ r.producteur.user.nom }}">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              Supprimer
             </button>
           </form>
           </div>
@@ -153,11 +153,11 @@
           <form method="post" action="{% url 'admin_transformatrice:admin_producteur_delete' r.producteur.pk %}"
                 data-confirm="Supprimer définitivement {{ r.producteur.user.prenom }} {{ r.producteur.user.nom }} ? Son compte, ses {{ r.nb_declarations }} déclaration(s) et ses {{ r.nb_commandes }} commande(s) paddy seront effacés. Action irréversible.">
             {% csrf_token %}
-            <button type="submit" class="inline-flex items-center gap-1.5 text-xs font-semibold rounded-lg px-3 py-2"
-                    style="color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;"
+            <button type="submit" class="inline-flex items-center justify-center rounded-lg"
+                    style="width:36px;height:36px;color:#B42318;background:#FEF3F2;border:1px solid #FECDCA;"
+                    title="Supprimer le producteur"
                     aria-label="Supprimer {{ r.producteur.user.prenom }} {{ r.producteur.user.nom }}">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              Supprimer
             </button>
           </form>
       </div>
