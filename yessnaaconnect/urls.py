@@ -16,6 +16,7 @@ urlpatterns = [
     path('espace-admin/', include('administration.urls')),
     path('producteur/', include('producteur.urls')),
     path('livreur/', include('livreur.urls')),
+    path('compte/', include('administration.compte_urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])

@@ -1,0 +1,12 @@
+{% extends "compte/base_compte.html" %}
+{% block title %}Choisissez votre mot de passe{% endblock %}
+{% block contenu %}
+<h1>Choisissez votre mot de passe</h1>
+<p class="intro">Vous vous êtes connecté(e) avec un mot de passe provisoire. Pour votre sécurité, choisissez maintenant votre propre mot de passe avant d'accéder à {{ espace.nom }}.</p>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% include "compte/_erreurs_formulaire.html" %}
+  {% include "compte/_champs_mot_de_passe.html" %}
+  <button type="submit" class="bouton">Enregistrer et continuer</button>
+</form>
+{% endblock %}

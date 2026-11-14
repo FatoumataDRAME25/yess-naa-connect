@@ -23,6 +23,7 @@ urlpatterns = [
     path('stocks/commandes-paddy/<int:pk>/statut/', views.admin_commande_paddy_statut, name='admin_commande_paddy_statut'),
     path('stocks/recap-producteurs/', views.admin_recap_producteurs, name='admin_recap_producteurs'),
     path('producteurs/<int:pk>/supprimer/', views.admin_producteur_delete, name='admin_producteur_delete'),
+    path('utilisateurs/<int:pk>/reinitialiser-mot-de-passe/', views.admin_reinitialiser_mdp, name='admin_reinitialiser_mdp'),
 
     # Catalogue
     path('catalogue/', views.admin_catalogue, name='admin_catalogue'),

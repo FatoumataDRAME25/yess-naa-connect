@@ -1,4 +1,5 @@
 from urllib.parse import quote
+from administration.telephone import trouver_par_telephone
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -28,9 +29,9 @@ def connexion_livreur(request):
         telephone = form.cleaned_data['telephone']
         password = form.cleaned_data['password']
 
-        try:
-            candidat = User.objects.get(telephone=telephone, role=User.Role.LIVREUR)
-        except User.DoesNotExist:
+        # Numéro retrouvé quel que soit le format saisi (espaces, +221…)
+        candidat = trouver_par_telephone(User.objects.filter(role=User.Role.LIVREUR), telephone)
+        if candidat is None:
             form.add_error(None, "Numéro de téléphone ou mot de passe incorrect.")
         else:
             user = authenticate(request, username=candidat.username, password=password)

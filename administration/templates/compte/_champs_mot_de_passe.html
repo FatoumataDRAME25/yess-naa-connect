@@ -1,0 +1,8 @@
+{% for field in form %}
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% if field.name == 'new_password1' %}
+  <div class="aide">Au moins 8 caractères, pas uniquement des chiffres, et différent de votre nom ou de votre numéro.</div>
+  {% endif %}
+  {% if field.errors %}<div class="erreur">{{ field.errors }}</div>{% endif %}
+{% endfor %}

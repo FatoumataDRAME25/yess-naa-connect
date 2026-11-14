@@ -61,6 +61,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # Oblige à choisir un nouveau mot de passe après un mot de passe provisoire
+    'administration.middleware.ChangementMotDePasseObligatoire',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -128,3 +130,31 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ── E-mails (récupération de mot de passe) ───────────────────────────────────
+# En production, renseigner dans .env (ex. boîte LWS noreply@yeesnaa.com) :
+#   EMAIL_HOST=mail.yeesnaa.com  EMAIL_PORT=465  EMAIL_USE_SSL=True
+#   EMAIL_HOST_USER=noreply@yeesnaa.com  EMAIL_HOST_PASSWORD=...
+#   DEFAULT_FROM_EMAIL="YEESNAA CONNECT <noreply@yeesnaa.com>"
+# Tester l'envoi : python manage.py sendtestemail adresse@exemple.com
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+if EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
+    EMAIL_USE_TLS = (not EMAIL_USE_SSL) and os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_TIMEOUT = 15
+else:
+    # Pas de serveur configuré : les e-mails sont écrits dans les logs (aucun envoi réel)
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'YEESNAA CONNECT <noreply@yeesnaa.com>')
+EMAIL_ENVOI_ACTIF = bool(EMAIL_HOST)
+
+# Lien de réinitialisation valable 1 heure
+PASSWORD_RESET_TIMEOUT = 60 * 60
+
+# Contact affiché quand la récupération par e-mail n'est pas possible
+CONTACT_SUPPORT_TELEPHONE = os.environ.get('CONTACT_SUPPORT_TELEPHONE', '+221 77 545 15 99')
+CONTACT_SUPPORT_EMAIL = os.environ.get('CONTACT_SUPPORT_EMAIL', 'yessalgicuun.pdg@gmail.com')

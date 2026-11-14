@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion</title>
+  <title>Connexion Producteur — Riz origine Sénégal</title>
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
   <link rel="stylesheet" href="{% static 'css/brand.css' %}">
@@ -89,7 +89,7 @@
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between">
               <label class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Mot de passe</label>
-              <a href="#" class="text-xs font-semibold text-[#2D5A16] hover:underline">Oublié ?</a>
+              <a href="{% url 'compte:mot_de_passe_oublie' %}" class="text-xs font-semibold text-[#2D5A16] hover:underline">Mot de passe oublié ?</a>
             </div>
             <div class="relative">
               <div class="absolute left-4 top-1/2 -translate-y-1/2">

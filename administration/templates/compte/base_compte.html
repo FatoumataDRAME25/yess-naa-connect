@@ -1,0 +1,57 @@
+{% load static %}<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>{% block title %}Mon compte{% endblock %} — YEESNAA CONNECT</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/brand.css' %}">
+  <style>
+    /* Charte YEESNAA CONNECT — Vert foncé #0B5D0B, Vert #17830A, Or #E8A70B */
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #F6F8F4; color: #1F2937;
+           font-family: Calibri, Carlito, "Segoe UI", Arial, sans-serif; font-size: 16px;
+           display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+    .carte { width: 100%; max-width: 440px; background: #fff; border-radius: 20px;
+             box-shadow: 0 10px 30px rgba(11,93,11,.08); padding: 32px 28px; }
+    .logo { display: flex; justify-content: center; margin-bottom: 20px; }
+    h1 { font-family: Montserrat, Arial, Helvetica, sans-serif; font-weight: 700; color: #0B5D0B;
+         font-size: 22px; text-align: center; margin: 0 0 8px; }
+    .intro { text-align: center; color: #4B5563; font-size: 15px; line-height: 1.5; margin: 0 0 24px; }
+    label { display: block; font-weight: 700; font-size: 13px; color: #374151; margin: 16px 0 6px; }
+    input[type=text], input[type=password], input[type=email] {
+      width: 100%; padding: 13px 14px; border: 1px solid #D1D5DB; border-radius: 12px; font-size: 16px;
+      background: #F9FAFB; font-family: inherit; }
+    input:focus { outline: none; border-color: #17830A; box-shadow: 0 0 0 3px rgba(23,131,10,.15); background: #fff; }
+    .aide { font-size: 13px; color: #6B7280; margin-top: 6px; line-height: 1.45; }
+    .aide ul { margin: 6px 0 0; padding-left: 18px; }
+    .erreur { background: #FEF2F2; color: #B42318; border: 1px solid #FECDCA; border-radius: 12px;
+              padding: 11px 14px; font-size: 14px; margin-top: 8px; }
+    .erreur ul { margin: 0; padding-left: 18px; }
+    .succes { background: #ECFDF3; color: #05603A; border: 1px solid #ABEFC6; border-radius: 12px;
+              padding: 14px 16px; font-size: 15px; line-height: 1.5; }
+    .bouton { display: block; width: 100%; margin-top: 22px; padding: 14px; border: 0; border-radius: 12px;
+              background: #0B5D0B; color: #fff; font-weight: 700; font-size: 16px; text-align: center;
+              text-decoration: none; cursor: pointer; font-family: inherit; }
+    .bouton:hover { background: #17830A; }
+    .lien { display: block; text-align: center; margin-top: 18px; color: #0B5D0B; font-weight: 700;
+            font-size: 14px; text-decoration: none; }
+    .lien:hover { text-decoration: underline; }
+    .encadre { margin-top: 24px; padding: 14px 16px; background: #FFF8E6; border: 1px solid #F5D78A;
+               border-radius: 12px; font-size: 14px; color: #6B4E00; line-height: 1.5; }
+    .encadre strong { color: #4A3600; }
+    .encadre a { color: #8A5A00; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main class="carte">
+    <div class="logo">
+      <a href="{% url 'accueil' %}"><img src="{% static 'images/logo.png' %}" alt="YEESNAA CONNECT" class="yn-logo"></a>
+    </div>
+    {% block contenu %}{% endblock %}
+  </main>
+</body>
+</html>

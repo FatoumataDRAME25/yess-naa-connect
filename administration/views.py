@@ -18,6 +18,8 @@ import qrcode
 from producteur.models import StockPaddy
 from administration.models import Produit, CommandePaddy, User, RegleRemise
 from administration.forms import LivreurCreationForm
+from administration.telephone import trouver_par_telephone
+from administration.compte import generer_mot_de_passe_provisoire
 from client.models import CommandeClient
 from livreur.models import Livraison
 
@@ -52,11 +54,9 @@ def admin_login(request):
 
         # Si échec, on cherche par téléphone et on réessaie avec le vrai username
         if user is None:
-            try:
-                found = User.objects.get(telephone=username)
+            found = trouver_par_telephone(User.objects.all(), username)
+            if found is not None:
                 user = authenticate(request, username=found.username, password=password)
-            except User.DoesNotExist:
-                pass
 
         if user is not None:
             login(request, user)
@@ -673,6 +673,7 @@ def admin_livreurs(request):
                 nom=form.cleaned_data['nom'],
                 telephone=form.cleaned_data['telephone'],
                 adresse=form.cleaned_data.get('adresse', ''),
+                email=form.cleaned_data.get('email', ''),
             )
             from livreur.models import Livreur
             Livreur.objects.create(user=user)
@@ -702,6 +703,7 @@ def admin_livreurs(request):
         'active_nav': 'livreurs',
         'form': form,
         'livreurs_stats': livreurs_stats,
+        'mdp_provisoire': request.session.pop('mdp_provisoire', None),
     }
     return render(request, 'espace_admin/livreurs.html', context)
 
@@ -837,6 +839,7 @@ def admin_profil(request):
             prenom = request.POST.get('prenom', '').strip()
             nom    = request.POST.get('nom', '').strip()
             tel    = request.POST.get('telephone', '').strip()
+            email  = request.POST.get('email', '').strip()
 
             if not prenom:
                 errors['prenom'] = "Le prénom est obligatoire."
@@ -844,11 +847,28 @@ def admin_profil(request):
                 errors['nom'] = "Le nom est obligatoire."
             if not tel:
                 errors['telephone'] = "Le téléphone est obligatoire."
+            else:
+                from administration.telephone import normaliser_telephone
+                tel_norm = normaliser_telephone(tel)
+                if len(tel_norm) != 9:
+                    errors['telephone'] = "Le numéro doit contenir 9 chiffres (ex : 77 123 45 67)."
+                elif User.objects.exclude(pk=user.pk).filter(Q(telephone=tel_norm) | Q(username=tel_norm)).exists():
+                    errors['telephone'] = "Ce numéro est déjà utilisé par un autre compte."
+                else:
+                    tel = tel_norm
+            if email:
+                from django.core.validators import validate_email
+                from django.core.exceptions import ValidationError
+                try:
+                    validate_email(email)
+                except ValidationError:
+                    errors['email'] = "Adresse e-mail invalide."
 
             if not errors:
                 user.prenom    = prenom
                 user.nom       = nom
                 user.telephone = tel
+                user.email     = email
                 user.username  = tel  # username = téléphone
                 if request.FILES.get('photo'):
                     user.photo = request.FILES['photo']
@@ -1038,6 +1058,7 @@ def admin_recap_producteurs(request):
         })
 
     context = {
+        'mdp_provisoire': request.session.pop('mdp_provisoire', None),
         'active_nav': 'stocks',
         'recap': recap,
         'nb_producteurs': len(recap),
@@ -1079,3 +1100,40 @@ def admin_producteur_delete(request, pk):
         f"et {nb_commandes} commande(s) paddy."
     )
     return redirect('admin_transformatrice:admin_recap_producteurs')
+
+
+@admin_required
+def admin_reinitialiser_mdp(request, pk):
+    """
+    Donne un mot de passe provisoire à un(e) producteur(trice) ou un livreur
+    qui n'a pas d'e-mail pour le récupérer seul(e). Le mot de passe est affiché
+    une seule fois à l'admin, qui le transmet (appel, WhatsApp) ; l'utilisateur
+    devra en choisir un nouveau dès sa connexion.
+    """
+    from django.utils.http import url_has_allowed_host_and_scheme
+
+    retour = request.POST.get('next') or reverse('admin_transformatrice:admin_recap_producteurs')
+    if not url_has_allowed_host_and_scheme(retour, allowed_hosts={request.get_host()}):
+        retour = reverse('admin_transformatrice:admin_recap_producteurs')
+    if request.method != 'POST':
+        return redirect(retour)
+
+    cible = get_object_or_404(User, pk=pk)
+    if cible.is_superuser or cible.role not in (User.Role.PRODUCTEUR, User.Role.LIVREUR):
+        messages.error(request, "Seuls les comptes producteur et livreur peuvent être réinitialisés ici.")
+        return redirect(retour)
+
+    provisoire = generer_mot_de_passe_provisoire()
+    cible.set_password(provisoire)
+    cible.doit_changer_mdp = True
+    cible.save(update_fields=['password', 'doit_changer_mdp'])
+
+    # Affiché une seule fois sur la page suivante (jamais stocké en clair ailleurs)
+    request.session['mdp_provisoire'] = {
+        'nom': f"{cible.prenom} {cible.nom}".strip() or cible.username,
+        'telephone': cible.telephone,
+        'mot_de_passe': provisoire,
+        'espace': 'Producteurs(trices)' if cible.role == User.Role.PRODUCTEUR else 'Livreur',
+    }
+    return redirect(retour)
+

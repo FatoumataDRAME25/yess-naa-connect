@@ -1,0 +1,12 @@
+{% extends "compte/base_compte.html" %}
+{% block title %}Changer mon mot de passe{% endblock %}
+{% block contenu %}
+<h1>Changer mon mot de passe</h1>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% include "compte/_erreurs_formulaire.html" %}
+  {% include "compte/_champs_mot_de_passe.html" %}
+  <button type="submit" class="bouton">Enregistrer</button>
+</form>
+<a href="{{ retour_url }}" class="lien">← Annuler</a>
+{% endblock %}

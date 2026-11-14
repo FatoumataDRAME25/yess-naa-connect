@@ -74,6 +74,14 @@ class InscriptionProducteurForm(forms.Form):
             'class': "w-full px-4 py-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl text-base text-slate-700 placeholder-gray-400 outline-none focus:border-green-700 transition",
         })
     )
+    email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'nom@exemple.com',
+            'class': INPUT_CLASS,
+            'autocomplete': 'email',
+        })
+    )
     region = forms.ChoiceField(
         choices=REGIONS_SENEGAL,
         widget=forms.Select(attrs={

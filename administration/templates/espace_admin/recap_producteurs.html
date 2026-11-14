@@ -3,6 +3,7 @@
 {% block title %}Récap Producteurs(trices) — Riz origine Sénégal{% endblock %}
 
 {% block content %}
+{% include "espace_admin/_mdp_provisoire.html" %}
 <div class="hidden md:block">
 
   <!-- Header -->
@@ -79,6 +80,8 @@
           <td class="px-6 py-4 font-semibold text-gray-700">{{ r.nb_commandes }}</td>
           <td class="px-6 py-4 font-bold text-yn-terracotta">{{ r.montant_total|floatformat:0 }} FCFA</td>
           <td class="px-6 py-4 text-right">
+          <div class="flex items-center justify-end gap-2">
+          {% url 'admin_transformatrice:admin_recap_producteurs' as retour_recap %}{% include "espace_admin/_bouton_reinit_mdp.html" with cible=r.producteur.user retour=retour_recap %}
           <form method="post" action="{% url 'admin_transformatrice:admin_producteur_delete' r.producteur.pk %}"
                 data-confirm="Supprimer définitivement {{ r.producteur.user.prenom }} {{ r.producteur.user.nom }} ? Son compte, ses {{ r.nb_declarations }} déclaration(s) et ses {{ r.nb_commandes }} commande(s) paddy seront effacés. Action irréversible.">
             {% csrf_token %}
@@ -89,6 +92,7 @@
               Supprimer
             </button>
           </form>
+          </div>
           </td>
         </tr>
         {% empty %}
@@ -144,7 +148,8 @@
         <span class="text-gray-500">{{ r.nb_commandes }} commande{{ r.nb_commandes|pluralize }}</span>
         <span class="font-bold text-yn-terracotta">{{ r.montant_total|floatformat:0 }} FCFA engagés</span>
       </div>
-      <div class="flex justify-end">
+      <div class="flex justify-end gap-2">
+          {% url 'admin_transformatrice:admin_recap_producteurs' as retour_recap %}{% include "espace_admin/_bouton_reinit_mdp.html" with cible=r.producteur.user retour=retour_recap %}
           <form method="post" action="{% url 'admin_transformatrice:admin_producteur_delete' r.producteur.pk %}"
                 data-confirm="Supprimer définitivement {{ r.producteur.user.prenom }} {{ r.producteur.user.nom }} ? Son compte, ses {{ r.nb_declarations }} déclaration(s) et ses {{ r.nb_commandes }} commande(s) paddy seront effacés. Action irréversible.">
             {% csrf_token %}

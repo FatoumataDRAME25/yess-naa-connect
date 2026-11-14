@@ -36,6 +36,13 @@
       <p style="font-weight:700; color:#1a3a0a; margin-bottom:8px;">{{ livreur.prenom }} {{ livreur.nom }}</p>
       <p style="color:#6b7280; font-size:13px; margin-bottom:4px;">{{ livreur.telephone }}</p>
       <p style="color:#6b7280; font-size:13px; margin-bottom:16px;">{{ livreur.adresse }}</p>
+      {% if messages %}{% for message in messages %}
+        <p style="background:#ECFDF3;color:#05603A;border:1px solid #ABEFC6;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px;">{{ message }}</p>
+      {% endfor %}{% endif %}
+      <a href="{% url 'compte:changer_mot_de_passe' %}"
+         style="display:block;text-align:center;padding:12px;border:1.5px solid #0B5D0B;border-radius:12px;color:#0B5D0B;font-weight:700;text-decoration:none;margin-bottom:10px;">
+        Changer mon mot de passe
+      </a>
       <form method="post" action="{% url 'livreur:deconnexion' %}">
         {% csrf_token %}
         <button type="submit" class="btn-confirm">Se déconnecter</button>

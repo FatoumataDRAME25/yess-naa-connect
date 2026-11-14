@@ -57,6 +57,9 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=Role.choices)
     photo = models.ImageField(upload_to='users/photos/', blank=True, null=True)
     adresse = models.CharField(max_length=255, blank=True)
+    # Vrai après un mot de passe provisoire donné par l'admin : l'utilisateur
+    # doit en choisir un nouveau avant d'accéder à son espace.
+    doit_changer_mdp = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 

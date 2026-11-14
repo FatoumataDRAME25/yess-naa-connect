@@ -1,0 +1,19 @@
+{% extends "compte/base_compte.html" %}
+{% block title %}Nouveau mot de passe{% endblock %}
+{% block contenu %}
+{% if validlink %}
+  <h1>Choisissez un nouveau mot de passe</h1>
+  <p class="intro">Vous l'utiliserez ensuite avec votre numéro de téléphone pour vous connecter.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "compte/_erreurs_formulaire.html" %}
+    {% include "compte/_champs_mot_de_passe.html" %}
+    <button type="submit" class="bouton">Enregistrer le mot de passe</button>
+  </form>
+{% else %}
+  <h1>Lien expiré ou déjà utilisé</h1>
+  <div class="erreur">Ce lien de réinitialisation n'est plus valable (il expire au bout d'1 heure et ne sert qu'une fois).</div>
+  <a href="{% url 'compte:mot_de_passe_oublie' %}" class="bouton">Demander un nouveau lien</a>
+  {% include "compte/_contact_support.html" %}
+{% endif %}
+{% endblock %}

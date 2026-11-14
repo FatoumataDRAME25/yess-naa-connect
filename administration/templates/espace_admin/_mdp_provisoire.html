@@ -1,0 +1,24 @@
+{% if mdp_provisoire %}
+<div class="mb-6 rounded-2xl p-5" style="background:#FFF8E6;border:1.5px solid #E8A70B;" role="status">
+  <p class="font-bold mb-1" style="color:#0B5D0B;">Mot de passe provisoire créé pour {{ mdp_provisoire.nom }}</p>
+  <p class="text-sm mb-3" style="color:#4B5563;">
+    Communiquez-lui ces informations (appel, SMS ou WhatsApp). À sa prochaine connexion à l'espace
+    {{ mdp_provisoire.espace }}, il/elle devra choisir son propre mot de passe.
+    <strong>Ce mot de passe ne sera plus affiché après avoir quitté cette page.</strong>
+  </p>
+  <div class="flex flex-wrap items-center gap-3">
+    <div class="rounded-xl px-4 py-2 bg-white" style="border:1px solid #F5D78A;">
+      <span class="text-xs uppercase font-semibold" style="color:#6B7280;">Identifiant</span>
+      <span class="block font-bold" style="color:#111827;">{{ mdp_provisoire.telephone }}</span>
+    </div>
+    <div class="rounded-xl px-4 py-2 bg-white" style="border:1px solid #F5D78A;">
+      <span class="text-xs uppercase font-semibold" style="color:#6B7280;">Mot de passe provisoire</span>
+      <span id="mdp-provisoire" class="block font-bold tracking-wider" style="color:#111827;font-family:ui-monospace,Menlo,monospace;font-size:18px;">{{ mdp_provisoire.mot_de_passe }}</span>
+    </div>
+    <button type="button" class="rounded-xl px-4 py-3 text-sm font-semibold text-white" style="background:#0B5D0B;"
+            onclick="navigator.clipboard && navigator.clipboard.writeText('Identifiant : {{ mdp_provisoire.telephone|escapejs }} — Mot de passe provisoire : {{ mdp_provisoire.mot_de_passe|escapejs }}').then(() => { this.textContent = 'Copié ✓'; })">
+      Copier
+    </button>
+  </div>
+</div>
+{% endif %}

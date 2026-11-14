@@ -76,6 +76,10 @@
           {% if form.password.errors %}
             <p style="color:#c85a1a; font-size:12px;">{{ form.password.errors.0 }}</p>
           {% endif %}
+          <a href="{% url 'compte:mot_de_passe_oublie' %}"
+             style="display:block;text-align:right;margin-top:8px;font-size:13px;font-weight:600;color:#0B5D0B;text-decoration:none;">
+            Mot de passe oublié ?
+          </a>
         </div>
 
         <button type="submit" class="btn-submit">

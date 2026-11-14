@@ -10,6 +10,7 @@ from datetime import date
 from administration.models import User, CommandePaddy
 from producteur.models import Producteur, StockPaddy
 from .forms import InscriptionProducteurForm, ConnexionForm, ProfilForm, DeclarationPaddyForm
+from administration.telephone import trouver_par_telephone
 
 class InscriptionView(View):
     template_name = 'inscription.html'
@@ -31,6 +32,7 @@ class InscriptionView(View):
                         nom=form.cleaned_data['nom'],
                         telephone=form.cleaned_data['telephone'],
                         adresse=form.cleaned_data['region'],
+                        email=form.cleaned_data.get('email', ''),
                     )
                     Producteur.objects.create(user=user)
 
@@ -62,9 +64,14 @@ class ConnexionView(View):
             mot_de_passe = form.cleaned_data['mot_de_passe']
             se_souvenir = form.cleaned_data['se_souvenir']
 
-            # Django utilise username pour authenticate
-            # notre username = telephone
-            user = authenticate(request, username=telephone, password=mot_de_passe)
+            # Le compte est retrouvé quel que soit le format du numéro saisi
+            # (« 77 123 45 67 », « +221… »), puis authentifié avec son username réel.
+            compte = trouver_par_telephone(User.objects.filter(role='producteur'), telephone)
+            user = authenticate(
+                request,
+                username=compte.username if compte else telephone,
+                password=mot_de_passe,
+            )
 
             if user is not None:
                 # Vérifier que c'est bien un producteur
